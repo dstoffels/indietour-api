@@ -14,4 +14,4 @@ class User(AbstractUser):
     verification_code = models.CharField(max_length=6, default=generate_verification_code)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["email", "username", "password"]
+    REQUIRED_FIELDS = ["username", "password"]

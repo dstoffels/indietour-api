@@ -30,10 +30,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         fields = ("email", "password", "username")
 
     def create(self, validated_data):
-        user = User.objects.create(
-            email=validated_data["email"],
-            username=validated_data["username"],
-        )
+        user = User(**validated_data)
         user.set_password(validated_data["password"])
         user.save()
 
@@ -46,5 +43,4 @@ class RegistrationSerializer(serializers.ModelSerializer):
             [user.email],
             fail_silently=False,
         )
-
-        return TokenObtainPairSerializer().get_token(user)
+        return user
