@@ -9,26 +9,20 @@ from itertools import chain
 from django.shortcuts import get_object_or_404
 
 
-class BandsView(generics.GenericAPIView):
+class BandsView(generics.ListCreateAPIView):
     queryset = Band.objects.all()
     serializer_class = BandSerializer
     permission_classes = (IsVerified,)
 
-    def post(self, request: Request, *args, **kwargs):
-        user: User = request.user
-        ser = BandSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        ser.save(owner=user)
-        user.active_band = ser.instance
-        user.save()
+    def perform_create(self, serializer: BandSerializer):
+        user: User = self.request.user
+        serializer.save(owner=user)
+        user.active_band = serializer.instance
+        return super().perform_create(serializer)
 
-        return Response(ser.data, 200)
-
-    def get(self, request: Request, *args, **kwargs):
-        user = request.user
-        user_bands = list(chain(self.queryset.filter(owner=user), self.queryset.filter(banduser__user=user)))
-        ser = BandSerializer(user_bands, many=True)
-        return Response(ser.data, 200)
+    def get_queryset(self):
+        user: User = self.request.user
+        return list(chain(self.queryset.filter(owner=user), self.queryset.filter(banduser__user=user)))
 
 
 class BandView(generics.RetrieveUpdateDestroyAPIView):

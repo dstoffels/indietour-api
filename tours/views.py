@@ -16,7 +16,9 @@ class ToursView(generics.ListCreateAPIView):
     permission_classes = (IsBandAdmin,)
 
     def perform_create(self, serializer: TourSerializer):
+        user: User = self.request.user
         serializer.save(band_id=self.kwargs.get("band_id"))
+        user.active_tour = serializer.instance
         return super().perform_create(serializer)
 
     def get_queryset(self):
