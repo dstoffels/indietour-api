@@ -44,9 +44,9 @@ To verify, log in to your account at indietour.app/login and you will be directe
                 fail_silently=False,
             )
 
-        banduser = BandUser.objects.filter(band=band, user=user)
-        if len(banduser):
-            raise ValidationError({"details": "Band User already exists", "code": "DUPLICATE"})
+        banduser = BandUser.objects.filter(band=band, user=user).first()
+        if banduser:
+            return banduser
         banduser = BandUser.objects.create(band=band, user=user, is_admin=is_admin)
 
         return banduser

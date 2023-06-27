@@ -34,11 +34,9 @@ class TourUserSerializer(serializers.ModelSerializer):
             ser.save()
             banduser = ser.instance
 
-        touruser = TourUser.objects.filter(tour=tour, banduser=banduser)
-        if len(touruser):
-            raise ValidationError({"details": "Tour User already exists", "code": "DUPLICATE"})
-        touruser = TourUser.objects.create(tour=tour, banduser=banduser)
-
+        touruser = TourUser.objects.filter(tour=tour, banduser=banduser).first()
+        if not touruser:
+            touruser = TourUser.objects.create(tour=tour, banduser=banduser)
         return touruser
 
 
