@@ -1,13 +1,15 @@
-from django.shortcuts import render
 from rest_framework import generics
-from rest_framework_simplejwt.tokens import Token
+from rest_framework.request import Request
 from .serializers import RegistrationSerializer, TokenSerializer, UserSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.serializers import ValidationError
 from .models import User
 from django.shortcuts import get_object_or_404
+from django.core.mail import send_mail
+from django.conf import settings
+from .utils import generate_verification_code
 
 
 class LoginView(TokenObtainPairView):
@@ -44,3 +46,37 @@ class UserView(generics.UpdateAPIView):
             {"refresh": str(token), "access": str(token.access_token)},
             200,
         )
+
+
+class UserVerifyView(generics.CreateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request: Request, *args, **kwargs):
+        user: User = request.user
+        user.verification_code = generate_verification_code()
+        user.save()
+        send_mail(
+            "indietour email verification",
+            f"""Please verify your indietour account.
+Your email verification code is: {user.verification_code}
+""",
+            settings.EMAIL_HOST,
+            [user.email],
+            fail_silently=False,
+        )
+        return Response("", 200)
+
+    def post(self, request: Request, *args, **kwargs):
+        verification_code = request.data.get("verification_code")
+        user: User = request.user
+        if user.verification_code == verification_code:
+            user.email_verified = True
+            user.save()
+            token = TokenSerializer().get_token(user)
+            return Response(
+                {"refresh": str(token), "access": str(token.access_token)},
+                200,
+            )
+        else:
+            return Response({"detail": "Invalid verification code"}, 400)

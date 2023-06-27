@@ -36,8 +36,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
         send_mail(
             "indietour email verification",
             f"""Please verify your indietour account.
-            Your email verification code is: {user.verification_code}
-            """,
+Your email verification code is: {user.verification_code}
+""",
             settings.EMAIL_HOST,
             [user.email],
             fail_silently=False,
