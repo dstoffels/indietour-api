@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "authentication",
     "bands",
     "tours",
+    "dates",
 ]
 
 MIDDLEWARE = [

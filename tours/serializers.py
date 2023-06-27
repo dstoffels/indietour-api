@@ -40,15 +40,25 @@ class TourUserSerializer(serializers.ModelSerializer):
         return touruser
 
 
+from dates.serializers import DateSerializer
+
+
 class TourSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tour
-        fields = ("id", "name", "is_archived", "band_id", "users")
+        fields = ("id", "name", "is_archived", "band_id", "users", "dates")
 
     users = TourUserSerializer(source="touruser_set", read_only=True, many=True)
+    dates = DateSerializer(read_only=True, many=True)
 
     def create(self, validated_data: dict):
         duplicate = Tour.objects.filter(band_id=validated_data.get("band_id"), name=validated_data.get("name")).first()
         if duplicate:
             raise ValidationError({"details": "Cannot have duplicate tours.", "code": "DUPLICATE"})
         return super().create(validated_data)
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        dates = rep["dates"]
+        rep["dates"] = sorted(dates, key=lambda d: d["date"])
+        return rep
