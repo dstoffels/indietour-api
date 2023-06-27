@@ -1,6 +1,3 @@
-import os
-from dotenv import load_dotenv
+from authentication.utils import generate_password
 
-load_dotenv()
-
-print(os.getenv("JWT_SIGNING_KEY"))
+print(generate_password())

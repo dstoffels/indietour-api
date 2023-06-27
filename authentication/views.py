@@ -10,10 +10,23 @@ from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from django.conf import settings
 from .utils import generate_verification_code
+from django.contrib.auth import authenticate
+from django.utils import timezone
 
 
 class LoginView(TokenObtainPairView):
     serializer_class = TokenSerializer
+
+    def post(self, request: Request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+
+        user = authenticate(request, email=request.data.get("email"), password=request.data.get("password"))
+
+        if user:
+            user.last_login = timezone.now()
+            user.save()
+
+        return response
 
 
 class RegisterView(generics.CreateAPIView):
@@ -24,6 +37,13 @@ class RegisterView(generics.CreateAPIView):
         user_ser = self.get_serializer(data=request.data)
         user_ser.is_valid(raise_exception=True)
         self.perform_create(user_ser)
+
+        user = authenticate(request, email=request.data.get("email"), password=request.data.get("password"))
+
+        if user:
+            user.last_login = timezone.now()
+            user.save()
+
         token = TokenSerializer().get_token(user_ser.instance)
         return Response(
             {"refresh": str(token), "access": str(token.access_token)},
@@ -60,6 +80,8 @@ class UserVerifyView(generics.CreateAPIView):
             "Verify your email to begin using indietour",
             f"""Verify your email address so we know it’s really you.
 Your email verification code is: {user.verification_code}
+
+To verify, log in to your account at indietour.app/login and you will be directed to enter your verification code.
 """,
             settings.EMAIL_HOST,
             [user.email],
@@ -74,9 +96,23 @@ Your email verification code is: {user.verification_code}
             user.email_verified = True
             user.save()
             token = TokenSerializer().get_token(user)
-            return Response(
-                {"refresh": str(token), "access": str(token.access_token)},
-                200,
-            )
+            return Response({"refresh": str(token), "access": str(token.access_token)}, 200)
         else:
-            return Response({"detail": "Invalid verification code"}, 400)
+            return ValidationError({"detail": "Invalid verification code"})
+
+
+class UserPasswordView(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request: Request, *args, **kwargs):
+        old_password = request.data.get("old_password")
+        new_password = request.data.get("new_password")
+
+        user: User = request.user
+
+        if user.check_password(old_password):
+            user.set_password(new_password)
+            token = TokenSerializer().get_token(user)
+            return Response({"refresh": str(token), "access": str(token.access_token)}, 200)
+
+        raise ValidationError({"detail": "Incorrect credentials", "code": "BAD_CREDENTIALS"})

@@ -37,6 +37,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
             "Verify your email to begin using indietour",
             f"""Verify your email address so we know it’s really you.
 Your email verification code is: {user.verification_code}
+
+To verify, log in to your account at indietour.app/login and you will be directed to enter your verification code.
 """,
             settings.EMAIL_HOST,
             [user.email],
@@ -52,4 +54,4 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "email", "username", "is_active", "email_verified")
+        fields = ("email", "username", "is_active", "email_verified")

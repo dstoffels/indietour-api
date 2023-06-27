@@ -18,6 +18,8 @@ class IsBandUser(IsVerified):
 
 
 class IsBandAdmin(IsBandUser):
+    message = {"details": "You must be a band admin to make this request.", "code": "REQUIRES_ADMIN"}
+
     def has_permission(self, request: Request, view):
         user: User = request.user
         band_id = view.kwargs.get("band_id")
