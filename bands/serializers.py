@@ -6,6 +6,7 @@ from rest_framework.exceptions import ValidationError
 from authentication.utils import generate_password
 from django.core.mail import send_mail
 from django.conf import settings
+from tours.serializers import TourSerializer
 
 
 class BandUserSerializer(serializers.ModelSerializer):
@@ -60,3 +61,4 @@ class BandSerializer(serializers.ModelSerializer):
 
     owner = UserSerializer(read_only=True)
     users = BandUserSerializer(source="banduser_set", read_only=True, many=True)
+    tours = TourSerializer(source="tour_set", read_only=True, many=True)
