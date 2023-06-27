@@ -34,8 +34,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user.save()
 
         send_mail(
-            "indietour email verification",
-            f"""Please verify your indietour account.
+            "Verify your email to begin using indietour",
+            f"""Verify your email address so we know it’s really you.
 Your email verification code is: {user.verification_code}
 """,
             settings.EMAIL_HOST,
@@ -52,4 +52,4 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("email", "username", "is_active", "email_verified")
+        fields = ("id", "email", "username", "is_active", "email_verified")

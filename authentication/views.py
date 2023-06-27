@@ -57,8 +57,8 @@ class UserVerifyView(generics.CreateAPIView):
         user.verification_code = generate_verification_code()
         user.save()
         send_mail(
-            "indietour email verification",
-            f"""Please verify your indietour account.
+            "Verify your email to begin using indietour",
+            f"""Verify your email address so we know it’s really you.
 Your email verification code is: {user.verification_code}
 """,
             settings.EMAIL_HOST,
