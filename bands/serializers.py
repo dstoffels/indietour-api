@@ -6,16 +6,14 @@ from rest_framework.exceptions import ValidationError
 from authentication.utils import generate_password
 from django.core.mail import send_mail
 from django.conf import settings
-from tours.serializers import TourSerializer
 
 
 class BandUserSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
-    # band_id = serializers.CharField(write_only=True)
 
     class Meta:
         model = BandUser
-        fields = "user", "id", "band_id", "is_admin"
+        fields = "user", "id", "is_admin"
 
     def create(self, validated_data: dict):
         email = self.initial_data.get("email")
@@ -54,10 +52,13 @@ To verify, log in to your account at indietour.app/login and you will be directe
         return banduser
 
 
+from tours.serializers import TourSerializer
+
+
 class BandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Band
-        fields = "__all__"
+        fields = "id", "name", "is_archived", "owner", "users", "tours"
 
     owner = UserSerializer(read_only=True)
     users = BandUserSerializer(source="banduser_set", read_only=True, many=True)

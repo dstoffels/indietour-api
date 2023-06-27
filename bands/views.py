@@ -31,15 +31,16 @@ class BandsView(generics.GenericAPIView):
         return Response(ser.data, 200)
 
 
-class BandGetter(generics.RetrieveAPIView):
+class BandView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Band.objects.all()
     serializer_class = BandSerializer
-    permission_classes = (IsBandUser,)
     lookup_url_kwarg = "band_id"
+    lookup_field = "id"
 
-
-class BandUpdater(generics.UpdateAPIView):
-    serializer_class = BandSerializer
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [IsBandUser()]
+        return [IsBandAdmin()]
 
 
 class BandUsersView(generics.CreateAPIView):

@@ -97,8 +97,7 @@ To verify, log in to your account at indietour.app/login and you will be directe
             user.save()
             token = TokenSerializer().get_token(user)
             return Response({"refresh": str(token), "access": str(token.access_token)}, 200)
-        else:
-            return ValidationError({"detail": "Invalid verification code"})
+        raise ValidationError({"detail": "Invalid verification code", "code": "BAD_CREDENTIALS"})
 
 
 class UserPasswordView(generics.CreateAPIView):
@@ -112,6 +111,7 @@ class UserPasswordView(generics.CreateAPIView):
 
         if user.check_password(old_password):
             user.set_password(new_password)
+            user.save()
             token = TokenSerializer().get_token(user)
             return Response({"refresh": str(token), "access": str(token.access_token)}, 200)
 
