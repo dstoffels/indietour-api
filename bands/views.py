@@ -42,7 +42,7 @@ class BandUpdater(generics.UpdateAPIView):
     serializer_class = BandSerializer
 
 
-class BandUserView(generics.CreateAPIView):
+class BandUsersView(generics.CreateAPIView):
     serializer_class = BandUserSerializer
     permission_classes = (IsBandAdmin,)
     lookup_url_kwarg = "band_id"
@@ -57,9 +57,19 @@ class BandUserView(generics.CreateAPIView):
         return Response(band_ser.data, 201)
 
 
-class BandUserUpdater(generics.UpdateAPIView):
+class BandUserView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = BandUser.objects.all()
     serializer_class = BandUserSerializer
-    lookup_url_kwarg = ("band_id", "banduser_id")
+    permission_classes = (IsBandAdmin,)
+    lookup_url_kwarg = "banduser_id"
+    lookup_field = "id"
+
+    def patch(self, request, *args, **kwargs):
+        band = self.get_object().band
+        super().patch(request, *args, **kwargs)
+        return Response(BandSerializer(band).data, 200)
 
     def delete(self, request, *args, **kwargs):
-        pass
+        band = self.get_object().band
+        super().delete(request, *args, **kwargs)
+        return Response(BandSerializer(band).data, 204)

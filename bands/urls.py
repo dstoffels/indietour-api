@@ -5,5 +5,6 @@ from . import views
 urlpatterns = [
     path("", views.BandsView.as_view(), name="get bands"),
     path("/<band_id>", views.BandGetter.as_view(), name="get bands"),
-    path("/<band_id>/user", views.BandUserView.as_view(), name="add band user"),
+    path("/<band_id>/user", views.BandUsersView.as_view(), name="add banduser"),
+    path("/<band_id>/user/<banduser_id>", views.BandUserView.as_view(), name="edit banduser"),
 ]
