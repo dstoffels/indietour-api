@@ -26,7 +26,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-
         fields = ("email", "password", "username")
 
     def create(self, validated_data):
@@ -44,3 +43,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
             fail_silently=False,
         )
         return user
+
+
+class UserSerializer(serializers.ModelSerializer):
+    email = serializers.CharField(read_only=True)
+    is_active = serializers.BooleanField(read_only=True)
+    email_verified = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ("email", "username", "is_active", "email_verified")
