@@ -5,16 +5,11 @@ from .serializers import Tour, TourSerializer, TourUser, TourUserSerializer
 from .permissions import IsTourUser, IsTourAdmin, IsBandUser
 from bands.permissions import IsBandAdmin
 from django.shortcuts import get_object_or_404
+from core.views import BaseAPIView
 
 
-class ToursView(generics.ListCreateAPIView):
+class ToursView(generics.ListCreateAPIView, BaseAPIView):
     serializer_class = TourSerializer
-
-    def perform_create(self, serializer: TourSerializer):
-        user: User = self.request.user
-        serializer.save(band_id=self.band_id)
-        user.active_tour = serializer.instance
-        return super().perform_create(serializer)
 
     def get_queryset(self):
         return Tour.objects.filter(band_id=self.band_id)

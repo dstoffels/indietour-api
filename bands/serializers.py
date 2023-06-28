@@ -6,9 +6,11 @@ from rest_framework.exceptions import ValidationError
 from authentication.utils import generate_password
 from django.core.mail import send_mail
 from django.conf import settings
+from core.serializers import BaseSerializer
+from django.shortcuts import get_object_or_404
 
 
-class BandUserSerializer(serializers.ModelSerializer):
+class BandUserSerializer(BaseSerializer):
     user = UserSerializer(read_only=True)
 
     class Meta:
@@ -18,12 +20,13 @@ class BandUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data: dict):
         email = self.initial_data.get("email")
         is_admin = self.initial_data.get("is_admin")
+        band_id = self.context.get("band_id")
 
         user, created = User.objects.get_or_create(email=email)
 
-        band: Band = self.context.get("band")
-
         if created:
+            band = get_object_or_404(Band, id=band_id)
+
             password = generate_password()
             user.set_password(password)
             user.save()
@@ -44,18 +47,19 @@ To verify, log in to your account at indietour.app/login and you will be directe
                 fail_silently=False,
             )
 
-        banduser = BandUser.objects.filter(band=band, user=user).first()
+        banduser = BandUser.objects.filter(band_id=band_id, user=user).first()
         if banduser:
             return banduser
-        banduser = BandUser.objects.create(band=band, user=user, is_admin=is_admin)
+        banduser = BandUser.objects.create(band_id=band_id, user=user, is_admin=is_admin)
 
         return banduser
 
 
+# BAND SERIALIZER
 from tours.serializers import TourSerializer
 
 
-class BandSerializer(serializers.ModelSerializer):
+class BandSerializer(BaseSerializer):
     class Meta:
         model = Band
         fields = "id", "name", "is_archived", "owner", "users", "tours"
@@ -63,3 +67,7 @@ class BandSerializer(serializers.ModelSerializer):
     owner = UserSerializer(read_only=True)
     users = BandUserSerializer(source="banduser_set", read_only=True, many=True)
     tours = TourSerializer(source="tour_set", read_only=True, many=True)
+
+    def create(self, validated_data):
+        validated_data["owner"] = self.user
+        return super().create(validated_data)

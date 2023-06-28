@@ -55,14 +55,10 @@ class TimeslotSerializer(serializers.ModelSerializer):
         from tours.models import Tour
         from dates.models import Date
 
-        band_id = self.context.get("band_id")
         tour_id = self.context.get("tour_id")
         date_id = self.context.get("date_id")
-        tour = get_object_or_404(Tour, id=tour_id)
         date = get_object_or_404(Date, id=date_id)
 
-        if str(tour.band_id) != band_id:
-            raise ValidationError({"details": "Tour does no belong to this Band.", "code": "INVALID"})
         if str(date.tour_id) != tour_id:
             raise ValidationError({"details": "Date does no belong to this Tour.", "code": "INVALID"})
 

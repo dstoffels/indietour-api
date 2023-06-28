@@ -7,25 +7,20 @@ from authentication.permissions import IsVerified
 from .permissions import IsBandUser, IsBandAdmin
 from itertools import chain
 from django.shortcuts import get_object_or_404
+from core.views import BaseAPIView
 
 
-class BandsView(generics.ListCreateAPIView):
+class BandsView(generics.ListCreateAPIView, BaseAPIView):
     queryset = Band.objects.all()
     serializer_class = BandSerializer
     permission_classes = (IsVerified,)
-
-    def perform_create(self, serializer: BandSerializer):
-        user: User = self.request.user
-        serializer.save(owner=user)
-        user.active_band = serializer.instance
-        return super().perform_create(serializer)
 
     def get_queryset(self):
         user: User = self.request.user
         return list(chain(self.queryset.filter(owner=user), self.queryset.filter(banduser__user=user)))
 
 
-class BandView(generics.RetrieveUpdateDestroyAPIView):
+class BandView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
     queryset = Band.objects.all()
     serializer_class = BandSerializer
     lookup_url_kwarg = "band_id"
@@ -37,22 +32,18 @@ class BandView(generics.RetrieveUpdateDestroyAPIView):
         return [IsBandAdmin()]
 
 
-class BandUsersView(generics.CreateAPIView):
+class BandUsersView(generics.CreateAPIView, BaseAPIView):
     serializer_class = BandUserSerializer
     permission_classes = (IsBandAdmin,)
     lookup_url_kwarg = "band_id"
 
-    def post(self, request: Request, *args, **kwargs):
-        band_id = kwargs.get("band_id")
-        band = get_object_or_404(Band, id=band_id)
-        ser = BandUserSerializer(data=request.data, context={"band": band})
-        ser.is_valid(raise_exception=True)
-        ser.save()
-        band_ser = BandSerializer(band)
-        return Response(band_ser.data, 201)
+    def post(self, request, *args, **kwargs):
+        super().post(request, *args, **kwargs)
+        band = get_object_or_404(Band, id=kwargs.get("band_id"))
+        return Response(BandSerializer(band).data, 201)
 
 
-class BandUserView(generics.RetrieveUpdateDestroyAPIView):
+class BandUserView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
     queryset = BandUser.objects.all()
     serializer_class = BandUserSerializer
     permission_classes = (IsBandAdmin,)

@@ -8,9 +8,22 @@ from django.core.mail import send_mail
 from django.conf import settings
 from bands.serializers import BandUserSerializer
 from django.shortcuts import get_object_or_404
+from core.serializers import BaseSerializer
 
 
-class TourUserSerializer(serializers.ModelSerializer):
+class TourSerializerBase(BaseSerializer):
+    def validate(self, attrs):
+        band_id = self.context.get("band_id")
+        tour_id = self.context.get("tour_id")
+        if tour_id:
+            tour = Tour.objects.only("band_id").get(id=tour_id)
+
+            if tour.band.id != band_id:
+                raise ValidationError({"details": "Tour does no belong to this Band.", "code": "INVALID"})
+        return super().validate(attrs)
+
+
+class TourUserSerializer(TourSerializerBase):
     class Meta:
         model = TourUser
         fields = "id", "banduser", "tour_id"
@@ -43,7 +56,7 @@ class TourUserSerializer(serializers.ModelSerializer):
 from dates.serializers import DateSerializer
 
 
-class TourSerializer(serializers.ModelSerializer):
+class TourSerializer(TourSerializerBase):
     class Meta:
         model = Tour
         fields = ("id", "name", "is_archived", "band_id", "users", "dates")
@@ -52,6 +65,7 @@ class TourSerializer(serializers.ModelSerializer):
     dates = DateSerializer(read_only=True, many=True)
 
     def create(self, validated_data: dict):
+        validated_data["band_id"] = self.context.get("band_id")
         duplicate = Tour.objects.filter(band_id=validated_data.get("band_id"), name=validated_data.get("name")).first()
         if duplicate:
             raise ValidationError({"details": "Cannot have duplicate tours.", "code": "DUPLICATE"})
