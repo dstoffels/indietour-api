@@ -17,3 +17,9 @@ class DateSerializer(serializers.ModelSerializer):
         if duplicate:
             raise ValidationError({"details": "Cannot have duplicate dates in a tour.", "code": "DUPLICATE"})
         return super().create(validated_data)
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        timeslots = rep["timeslots"]
+        rep["timeslots"] = sorted(timeslots, key=lambda d: d["start_time"])
+        return rep
