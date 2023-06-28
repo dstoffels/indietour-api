@@ -11,3 +11,9 @@ class DateSerializer(serializers.ModelSerializer):
         fields = ("id", "date", "notes", "is_show_day", "is_confirmed", "title", "tour_id", "timeslots")
 
     timeslots = TimeslotSerializer(read_only=True, many=True)
+
+    def create(self, validated_data):
+        duplicate = Date.objects.filter(tour_id=validated_data.get("tour_id"), date=validated_data.get("date")).first()
+        if duplicate:
+            raise ValidationError({"details": "Cannot have duplicate dates in a tour.", "code": "DUPLICATE"})
+        return super().create(validated_data)

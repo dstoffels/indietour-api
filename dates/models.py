@@ -3,7 +3,7 @@ from uuid_model import UUIDModel
 
 
 class Date(UUIDModel):
-    date = models.DateField(unique=True)
+    date = models.DateField()
     title = models.CharField(max_length=255, blank=True)
     notes = models.TextField(blank=True)
     is_show_day = models.BooleanField(default=False)
