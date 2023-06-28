@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "bands",
     "tours",
     "dates",
+    "places",
 ]
 
 MIDDLEWARE = [
