@@ -9,12 +9,15 @@ from places.serializers import PlaceSerializer
 class TimeslotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Timeslot
-        exclude = ["date"]
+        fields = "__all__"
 
-    date_id = serializers.DateField(write_only=True, required=False)
+    start_time = serializers.TimeField(required=True)
+    date_id = serializers.UUIDField(write_only=True, required=False)
+    date = serializers.DateField(required=False)
     origin_id = serializers.CharField(write_only=True, required=False)
     destination_id = serializers.CharField(write_only=True, required=False)
-    origin = PlaceSerializer()
+    origin = PlaceSerializer(read_only=True)
+    destination = PlaceSerializer(read_only=True)
     type_options = serializers.SerializerMethodField()
 
     def get_type_options(self, timeslot):
