@@ -18,8 +18,7 @@ class PlaceView(generics.RetrieveAPIView):
     lookup_field = "id"
 
     def retrieve(self, request, *args, **kwargs):
-        place_id = request.GET.get("place_id")
-        ser = PlaceSerializer(data={"place_id": place_id})
+        ser = PlaceSerializer(data=request.GET)
         ser.is_valid(raise_exception=True)
         ser.save()
         return Response(ser.data)

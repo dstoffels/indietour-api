@@ -6,6 +6,7 @@ from .utils import fetch_place
 
 
 class PlaceSerializer(serializers.ModelSerializer):
+    place_id = serializers.CharField(write_only=True)
     id = serializers.CharField(read_only=True)
     name = serializers.CharField(read_only=True)
     formatted_address = serializers.CharField(read_only=True)
@@ -18,7 +19,7 @@ class PlaceSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        place_id = self.initial_data.get("place_id")
+        place_id = validated_data.get("place_id")
         place, created = Place.objects.get_or_create(id=place_id)
 
         if created:
@@ -53,3 +54,6 @@ class PlaceSerializer(serializers.ModelSerializer):
             place.save()
 
         return place
+
+    def is_valid(self, *, raise_exception=True):
+        return super().is_valid(raise_exception=raise_exception)
