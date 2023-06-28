@@ -2,10 +2,7 @@ from rest_framework import serializers
 from .models import Place
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
-import requests
-import os
-
-BASE_URL = "https://maps.googleapis.com/maps/api"
+from .utils import fetch_place
 
 
 class PlaceSerializer(serializers.ModelSerializer):
@@ -25,11 +22,7 @@ class PlaceSerializer(serializers.ModelSerializer):
         place, created = Place.objects.get_or_create(id=place_id)
 
         if created:
-            response = requests.get(
-                f'{BASE_URL}/place/details/json?key={os.getenv("GOOGLE_API_KEY")}&place_id={place_id}&fields=place_id,formatted_address,geometry,name,address_components'
-            )
-            data = response.json()
-            result = data.get("result")
+            result = fetch_place(place_id)
             address_components = result.get("address_components")
 
             political_address = []
@@ -55,7 +48,6 @@ class PlaceSerializer(serializers.ModelSerializer):
             place.name = result.get("name")
             place.lat = result.get("geometry", {}).get("location", {}).get("lat")
             place.lng = result.get("geometry", {}).get("location", {}).get("lng")
-            # place.description = data.get("description")
             place.political_address = political_address
 
             place.save()

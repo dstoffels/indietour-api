@@ -7,8 +7,7 @@ from authentication.permissions import IsVerified
 from django.shortcuts import get_object_or_404
 import requests
 import os
-
-BASE_URL = "https://maps.googleapis.com/maps/api"
+from .utils import GAPI_BASE_URL
 
 
 class PlaceView(generics.RetrieveAPIView):
@@ -19,7 +18,7 @@ class PlaceView(generics.RetrieveAPIView):
     lookup_field = "id"
 
     def retrieve(self, request, *args, **kwargs):
-        place_id = self.kwargs.get("place_id")
+        place_id = request.GET.get("place_id")
         ser = PlaceSerializer(data={"place_id": place_id})
         ser.is_valid(raise_exception=True)
         ser.save()
@@ -32,7 +31,7 @@ class AutocompleteView(generics.RetrieveAPIView):
     def get(self, request: Request, *args, **kwargs):
         input = request.GET.get("input")
         response = requests.get(
-            f"{BASE_URL}/place/autocomplete/json?key={os.getenv('GOOGLE_API_KEY')}&input={input}&fields=geometry"
+            f"{GAPI_BASE_URL}/place/autocomplete/json?key={os.getenv('GOOGLE_API_KEY')}&input={input}&fields=geometry"
         )
         return Response(response.json())
 
@@ -44,6 +43,6 @@ class DirectionsView(generics.RetrieveAPIView):
         origin = request.GET.get("origin")
         destination = request.GET.get("destination")
         response = requests.get(
-            f"{BASE_URL}/directions/json?key={os.getenv('GOOGLE_API_KEY')}&origin=place_id:{origin}&destination=place_id:{destination}"
+            f"{GAPI_BASE_URL}/directions/json?key={os.getenv('GOOGLE_API_KEY')}&origin=place_id:{origin}&destination=place_id:{destination}"
         )
         return Response(response.json())
