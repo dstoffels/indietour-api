@@ -9,4 +9,5 @@ class DateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Date
         fields = ("id", "date", "notes", "is_show_day", "is_confirmed", "title", "tour_id", "timeslots")
-        depth = 1
+
+    timeslots = TimeslotSerializer(read_only=True, many=True)

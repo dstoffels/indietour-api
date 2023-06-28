@@ -9,13 +9,16 @@ from places.serializers import PlaceSerializer
 class TimeslotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Timeslot
-        exclude = ("date",)
+        exclude = ["date"]
 
-    # type_options = serializers.ListField(source=Timeslot.TYPES)
     date_id = serializers.DateField(write_only=True, required=False)
     origin_id = serializers.CharField(write_only=True, required=False)
     destination_id = serializers.CharField(write_only=True, required=False)
     origin = PlaceSerializer()
+    type_options = serializers.SerializerMethodField()
+
+    def get_type_options(self, timeslot):
+        return Timeslot.TYPES
 
     def create(self, validated_data):
         origin_id = validated_data.get("origin_id")
