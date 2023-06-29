@@ -26,7 +26,7 @@ class BaseAPIView(generics.GenericAPIView):
 
     Path variables are automatically assigned to serializer context."""
 
-    query_params: list[QueryParam]
+    query_params: list[QueryParam] = []
     """add any QueryParams (type) expected for this view"""
     invalid_params: list[QueryParam] = []
 
@@ -63,15 +63,15 @@ class BaseAPIView(generics.GenericAPIView):
 
     def user_bands_response(self, status_code=200):
         bands = self.get_user_bands()
-        return Response(BandSerializer(bands, many=True).data, status_code)
+        return Response(self.get_serializer(bands, many=True).data, status_code)
 
     def band_response(self, status_code=200):
         band = get_object_or_404(Band, id=self.kwargs.get("band_id"))
-        return Response(BandSerializer(band).data, status_code)
+        return Response(self.get_serializer(band).data, status_code)
 
     def tour_response(self, status_code=200):
         tour = get_object_or_404(Tour, id=self.kwargs.get("tour_id"))
-        return Response(TourSerializer(tour).data, status_code)
+        return Response(self.get_serializer().data, status_code)
 
 
 class BandDependentView(BaseAPIView):
