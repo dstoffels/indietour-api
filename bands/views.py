@@ -10,9 +10,10 @@ from core.views import BandDependentView, BaseAPIView, QueryParam
 
 
 class BandsView(generics.ListCreateAPIView, BaseAPIView):
-    queryset = Band.objects.all()
+    # queryset = Band.objects.all()
     serializer_class = BandSerializer
     permission_classes = (IsVerified,)
+    query_params = [QueryParam("archived_tours", boolean=True), QueryParam("archived_bands", boolean=True)]
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
@@ -22,7 +23,7 @@ class BandsView(generics.ListCreateAPIView, BaseAPIView):
         return self.user_bands_response(201)
 
     def get_queryset(self):
-        return self.get_user_bands()
+        return self.get_bands_for_user()
 
 
 class BandView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
@@ -30,7 +31,7 @@ class BandView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
     serializer_class = BandSerializer
     lookup_url_kwarg = "band_id"
     lookup_field = "id"
-    query_params = [QueryParam("archived_tours", boolean=True)]
+    query_params = [QueryParam("archived_tours", boolean=True), QueryParam("archived_bands", boolean=True)]
 
     def get_permissions(self):
         if self.request.method == "GET":

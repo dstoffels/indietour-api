@@ -57,12 +57,16 @@ class BaseAPIView(generics.GenericAPIView):
 
         return context
 
-    def get_user_bands(self):
+    def get_bands_for_user(self):
         user = self.request.user
-        return Band.objects.filter(Q(owner=user) | Q(banduser__user=user)).order_by("name")
+        bands = Band.objects.filter(Q(owner=user) | Q(banduser__user=user)).order_by("name")
+        archived_bands = self.request.query_params.get("archived_bands")
+        if archived_bands != "true":
+            bands = bands.filter(is_archived=False)
+        return bands
 
     def user_bands_response(self, status_code=200):
-        bands = self.get_user_bands()
+        bands = self.get_bands_for_user()
         return Response(self.get_serializer(bands, many=True).data, status_code)
 
     def band_response(self, status_code=200):
