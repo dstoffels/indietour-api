@@ -1,7 +1,10 @@
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
-from tours.models import Tour
-from dates.models import Date
+from bands.serializers import Band, BandSerializer
+from tours.serializers import Tour, TourSerializer
+from dates.serializers import Date, DateSerializer
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
 
 
 class BaseAPIView(generics.GenericAPIView):
@@ -13,6 +16,14 @@ class BaseAPIView(generics.GenericAPIView):
         context = super().get_serializer_context()
         context.update(self.kwargs)
         return context
+
+    def band_response(self, status_code=200):
+        band = get_object_or_404(Band, id=self.kwargs.get("band_id"))
+        return Response(BandSerializer(band).data, status_code)
+
+    def tour_response(self, status_code=200):
+        tour = get_object_or_404(Tour, id=self.kwargs.get("tour_id"))
+        return Response(TourSerializer(tour).data, status_code)
 
 
 class BandDependentView(BaseAPIView):

@@ -8,20 +8,19 @@ from dates.serializers import Date, DateSerializer
 from tours.permissions import IsTourUser, IsTourAdmin, IsBandUser
 from bands.permissions import IsBandAdmin
 from django.shortcuts import get_object_or_404
-from core.views import BaseAPIView
+from core.views import DateDependentView
 
 
-class TimeslotsView(generics.CreateAPIView, BaseAPIView):
+class TimeslotsView(generics.CreateAPIView, DateDependentView):
     serializer_class = TimeslotSerializer
     permission_classes = (IsTourAdmin,)
 
     def post(self, request: Request, *args, **kwargs):
         super().post(request, *args, **kwargs)
-        tour = get_object_or_404(Tour, id=kwargs.get("tour_id"))
-        return Response(TourSerializer(tour).data)
+        return self.tour_response(201)
 
 
-class TimeslotView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
+class TimeslotView(generics.RetrieveUpdateDestroyAPIView, DateDependentView):
     queryset = Timeslot.objects.all()
     serializer_class = TimeslotSerializer
     permission_classes = (IsTourAdmin,)
@@ -30,10 +29,8 @@ class TimeslotView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
 
     def patch(self, request, *args, **kwargs):
         super().patch(request, *args, **kwargs)
-        tour = get_object_or_404(Tour, id=kwargs.get("tour_id"))
-        return Response(TourSerializer(tour).data)
+        return self.tour_response()
 
     def delete(self, request, *args, **kwargs):
         super().delete(request, *args, **kwargs)
-        tour = get_object_or_404(Tour, id=kwargs.get("tour_id"))
-        return Response(TourSerializer(tour).data)
+        return self.tour_response()

@@ -1,10 +1,8 @@
 from rest_framework import generics
 from rest_framework.response import Response
-from bands.serializers import Band, BandSerializer
 from .serializers import Tour, TourSerializer, TourUser, TourUserSerializer
 from .permissions import IsTourUser, IsTourAdmin, IsBandUser
 from bands.permissions import IsBandAdmin
-from django.shortcuts import get_object_or_404
 from core.views import BaseAPIView, BandDependentView, TourDependentView
 
 
@@ -13,8 +11,7 @@ class ToursView(generics.ListCreateAPIView, BaseAPIView):
 
     def post(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
-        band = get_object_or_404(Band, id=kwargs.get("band_id"))
-        return Response(BandSerializer(band).data, 201)
+        return self.band_response(201)
 
     def get_queryset(self):
         return Tour.objects.filter(band_id=self.band_id)
@@ -35,6 +32,14 @@ class TourView(generics.RetrieveUpdateDestroyAPIView, BandDependentView):
     lookup_field = "id"
     lookup_url_kwarg = "tour_id"
 
+    def patch(self, request, *args, **kwargs):
+        super().patch(request, *args, **kwargs)
+        return self.band_response()
+
+    def delete(self, request, *args, **kwargs):
+        super().delete(request, *args, **kwargs)
+        return self.band_response()
+
     def get_permissions(self):
         if self.request.method == "GET":
             return [IsTourUser()]
@@ -48,8 +53,7 @@ class TourUsersView(generics.CreateAPIView, TourDependentView):
 
     def post(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
-        tour = get_object_or_404(Tour, id=self.kwargs.get("tour_id"))
-        return Response(TourSerializer(tour).data, 201)
+        return self.tour_response(201)
 
 
 class TourUserView(generics.DestroyAPIView, TourDependentView):
