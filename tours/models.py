@@ -9,7 +9,7 @@ class Tour(UUIDModel):
     is_archived = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return f"{self.name} ({self.band.name})"
+        return f"Tour: {self.name} (band: {self.band.name})"
 
 
 class TourUser(UUIDModel):

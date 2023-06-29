@@ -10,7 +10,7 @@ class Band(UUIDModel):
     is_archived = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return self.name
+        return f"Band: {self.name}"
 
 
 class BandUser(UUIDModel):

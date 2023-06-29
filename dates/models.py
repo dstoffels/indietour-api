@@ -14,4 +14,4 @@ class Date(UUIDModel):
     # contacts = models.ManyToManyField("contacts.DateContact", related_name='dates')
 
     def __str__(self):
-        return f"{self.date} - {self.tour.name}"
+        return f"Date: {self.date}  (tour: {self.tour.name})"

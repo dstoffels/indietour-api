@@ -1,15 +1,20 @@
 from rest_framework import generics
 from rest_framework.response import Response
-from authentication.models import User
+from bands.serializers import Band, BandSerializer
 from .serializers import Tour, TourSerializer, TourUser, TourUserSerializer
 from .permissions import IsTourUser, IsTourAdmin, IsBandUser
 from bands.permissions import IsBandAdmin
 from django.shortcuts import get_object_or_404
-from core.views import BaseAPIView
+from core.views import BaseAPIView, BandDependentView, TourDependentView
 
 
 class ToursView(generics.ListCreateAPIView, BaseAPIView):
     serializer_class = TourSerializer
+
+    def post(self, request, *args, **kwargs):
+        super().post(request, *args, **kwargs)
+        band = get_object_or_404(Band, id=kwargs.get("band_id"))
+        return Response(BandSerializer(band).data, 201)
 
     def get_queryset(self):
         return Tour.objects.filter(band_id=self.band_id)
@@ -24,7 +29,7 @@ class ToursView(generics.ListCreateAPIView, BaseAPIView):
         return super().initial(request, *args, **kwargs)
 
 
-class TourView(generics.RetrieveUpdateDestroyAPIView):
+class TourView(generics.RetrieveUpdateDestroyAPIView, BandDependentView):
     queryset = Tour.objects.all()
     serializer_class = TourSerializer
     lookup_field = "id"
@@ -36,7 +41,7 @@ class TourView(generics.RetrieveUpdateDestroyAPIView):
         return [IsTourAdmin()]
 
 
-class TourUsersView(generics.CreateAPIView):
+class TourUsersView(generics.CreateAPIView, TourDependentView):
     queryset = TourUser.objects.all()
     permission_classes = (IsTourAdmin,)
     serializer_class = TourUserSerializer
@@ -44,15 +49,10 @@ class TourUsersView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
         tour = get_object_or_404(Tour, id=self.kwargs.get("tour_id"))
-        return Response(TourSerializer(tour).data)
-
-    def perform_create(self, serializer):
-        serializer.initial_data["band_id"] = self.kwargs.get("band_id")
-        serializer.save(tour_id=self.kwargs.get("tour_id"))
-        return super().perform_create(serializer)
+        return Response(TourSerializer(tour).data, 201)
 
 
-class TourUserView(generics.DestroyAPIView):
+class TourUserView(generics.DestroyAPIView, TourDependentView):
     queryset = TourUser.objects.all()
     permission_classes = (IsTourAdmin,)
     serializer_class = TourUserSerializer

@@ -8,7 +8,3 @@ class BaseSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         self.user = request.user
         return super().is_valid(raise_exception=raise_exception)
-
-    def validate(self, attrs):
-        self.context
-        return super().validate(attrs)

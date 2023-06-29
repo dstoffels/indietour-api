@@ -7,7 +7,7 @@ from authentication.permissions import IsVerified
 from .permissions import IsBandUser, IsBandAdmin
 from itertools import chain
 from django.shortcuts import get_object_or_404
-from core.views import BaseAPIView
+from core.views import BaseAPIView, BandDependentView
 
 
 class BandsView(generics.ListCreateAPIView, BaseAPIView):
@@ -43,7 +43,7 @@ class BandUsersView(generics.CreateAPIView, BaseAPIView):
         return Response(BandSerializer(band).data, 201)
 
 
-class BandUserView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
+class BandUserView(generics.RetrieveUpdateDestroyAPIView, BandDependentView):
     queryset = BandUser.objects.all()
     serializer_class = BandUserSerializer
     permission_classes = (IsBandAdmin,)

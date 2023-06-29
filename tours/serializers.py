@@ -1,13 +1,6 @@
-from rest_framework import serializers
 from .models import Tour, TourUser
-from authentication.serializers import UserSerializer
-from authentication.models import User
 from rest_framework.exceptions import ValidationError
-from authentication.utils import generate_password
-from django.core.mail import send_mail
-from django.conf import settings
 from bands.serializers import BandUserSerializer
-from django.shortcuts import get_object_or_404
 from core.serializers import BaseSerializer
 
 
@@ -18,45 +11,42 @@ class TourSerializerBase(BaseSerializer):
         if tour_id:
             tour = Tour.objects.only("band_id").get(id=tour_id)
 
-            if tour.band.id != band_id:
+            if str(tour.band.id) != band_id:
                 raise ValidationError({"details": "Tour does no belong to this Band.", "code": "INVALID"})
         return super().validate(attrs)
 
 
-class TourUserSerializer(TourSerializerBase):
+class TourUserSerializer(BaseSerializer):
     class Meta:
         model = TourUser
-        fields = "id", "banduser", "tour_id"
+        fields = "id", "banduser"
 
     banduser = BandUserSerializer(read_only=True)
 
     def create(self, validated_data):
-        from bands.serializers import BandUserSerializer, BandUser, Band
+        from bands.serializers import BandUserSerializer, BandUser
 
         email = self.initial_data.get("email")
-        tour_id = validated_data.get("tour_id")
-        band_id = self.initial_data.get("band_id")
-        band = get_object_or_404(Band, id=band_id)
-        tour: Tour = get_object_or_404(Tour, id=tour_id)
+        tour_id = self.context.get("tour_id")
 
         try:
             banduser = BandUser.objects.get(user__email=email)
         except:
-            ser = BandUserSerializer(data=self.initial_data, context={"band": band})
+            ser = BandUserSerializer(data=self.initial_data, context=self.context)
             ser.is_valid(raise_exception=True)
             ser.save()
             banduser = ser.instance
 
-        touruser = TourUser.objects.filter(tour=tour, banduser=banduser).first()
+        touruser = TourUser.objects.filter(tour_id=tour_id, banduser=banduser).first()
         if not touruser:
-            touruser = TourUser.objects.create(tour=tour, banduser=banduser)
+            touruser = TourUser.objects.create(tour_id=tour_id, banduser=banduser)
         return touruser
 
 
 from dates.serializers import DateSerializer
 
 
-class TourSerializer(TourSerializerBase):
+class TourSerializer(BaseSerializer):
     class Meta:
         model = Tour
         fields = ("id", "name", "is_archived", "band_id", "users", "dates")
