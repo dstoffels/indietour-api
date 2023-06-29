@@ -5,9 +5,8 @@ from authentication.models import User
 from .serializers import BandSerializer, Band, BandUserSerializer, BandUser
 from authentication.permissions import IsVerified
 from .permissions import IsBandUser, IsBandAdmin
-from itertools import chain
 from django.shortcuts import get_object_or_404
-from core.views import BaseAPIView, BandDependentView
+from core.views import BandDependentView, BaseAPIView
 
 
 class BandsView(generics.ListCreateAPIView, BaseAPIView):
@@ -15,9 +14,15 @@ class BandsView(generics.ListCreateAPIView, BaseAPIView):
     serializer_class = BandSerializer
     permission_classes = (IsVerified,)
 
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        user: User = request.user
+        user.active_band_id = response.data.get("id")
+        user.save()
+        return self.user_bands_response(201)
+
     def get_queryset(self):
-        user: User = self.request.user
-        return list(chain(self.queryset.filter(owner=user), self.queryset.filter(banduser__user=user)))
+        return self.get_user_bands()
 
 
 class BandView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
@@ -31,16 +36,19 @@ class BandView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
             return [IsBandUser()]
         return [IsBandAdmin()]
 
+    def delete(self, request, *args, **kwargs):
+        super().delete(request, *args, **kwargs)
+        return self.user_bands_response()
 
-class BandUsersView(generics.CreateAPIView, BaseAPIView):
+
+class BandUsersView(generics.CreateAPIView, BandDependentView):
     serializer_class = BandUserSerializer
     permission_classes = (IsBandAdmin,)
     lookup_url_kwarg = "band_id"
 
-    def post(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
-        band = get_object_or_404(Band, id=kwargs.get("band_id"))
-        return Response(BandSerializer(band).data, 201)
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = self.band_response()
+        return super().finalize_response(request, response, *args, **kwargs)
 
 
 class BandUserView(generics.RetrieveUpdateDestroyAPIView, BandDependentView):
@@ -50,12 +58,6 @@ class BandUserView(generics.RetrieveUpdateDestroyAPIView, BandDependentView):
     lookup_url_kwarg = "banduser_id"
     lookup_field = "id"
 
-    def patch(self, request, *args, **kwargs):
-        band = self.get_object().band
-        super().patch(request, *args, **kwargs)
-        return Response(BandSerializer(band).data, 200)
-
-    def delete(self, request, *args, **kwargs):
-        band = self.get_object().band
-        super().delete(request, *args, **kwargs)
-        return Response(BandSerializer(band).data, 204)
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = self.band_response()
+        return super().finalize_response(request, response, *args, **kwargs)

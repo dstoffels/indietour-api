@@ -10,20 +10,24 @@ class ToursView(generics.ListCreateAPIView, BaseAPIView):
     serializer_class = TourSerializer
 
     def post(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
+        response = super().post(request, *args, **kwargs)
+        user = request.user
+        user.active_tour_id = response.data.get("id")
+        user.save()
         return self.band_response(201)
 
     def get_queryset(self):
-        return Tour.objects.filter(band_id=self.band_id)
+        self.band_id = self.kwargs.get("band_id")
+        tours = Tour.objects.filter(band_id=self.band_id)
+        archived = self.request.query_params.get("archived")
+        if not archived:
+            tours = tours.filter(is_archived=False)
+        return tours
 
     def get_permissions(self):
         if self.request.method == "GET":
             return (IsBandUser(),)
         return (IsBandAdmin(),)
-
-    def initial(self, request, *args, **kwargs):
-        self.band_id = self.kwargs.get("band_id")
-        return super().initial(request, *args, **kwargs)
 
 
 class TourView(generics.RetrieveUpdateDestroyAPIView, BandDependentView):
@@ -32,6 +36,11 @@ class TourView(generics.RetrieveUpdateDestroyAPIView, BandDependentView):
     lookup_field = "id"
     lookup_url_kwarg = "tour_id"
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [IsTourUser()]
+        return [IsTourAdmin()]
+
     def patch(self, request, *args, **kwargs):
         super().patch(request, *args, **kwargs)
         return self.band_response()
@@ -39,11 +48,6 @@ class TourView(generics.RetrieveUpdateDestroyAPIView, BandDependentView):
     def delete(self, request, *args, **kwargs):
         super().delete(request, *args, **kwargs)
         return self.band_response()
-
-    def get_permissions(self):
-        if self.request.method == "GET":
-            return [IsTourUser()]
-        return [IsTourAdmin()]
 
 
 class TourUsersView(generics.CreateAPIView, TourDependentView):

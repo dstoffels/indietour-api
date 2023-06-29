@@ -71,3 +71,13 @@ class BandSerializer(BaseSerializer):
     def create(self, validated_data):
         validated_data["owner"] = self.user
         return super().create(validated_data)
+
+    def to_representation(self, instance):
+        def tour_sorter(tour):
+            first_date = tour["dates"][0]["date"] if len(tour["dates"]) else 0
+            return first_date
+
+        rep = super().to_representation(instance)
+        tours = rep["tours"]
+        rep["tours"] = sorted(tours, key=tour_sorter)
+        return rep
