@@ -57,6 +57,7 @@ To verify, log in to your account at indietour.app/login and you will be directe
 
 # BAND SERIALIZER
 from tours.serializers import TourSerializer
+import json
 
 
 class BandSerializer(BaseSerializer):
@@ -66,7 +67,15 @@ class BandSerializer(BaseSerializer):
 
     owner = UserSerializer(read_only=True)
     users = BandUserSerializer(source="banduser_set", read_only=True, many=True)
-    tours = TourSerializer(source="tour_set", read_only=True, many=True)
+    tours = serializers.SerializerMethodField()
+
+    def get_tours(self, band: Band):
+        self.context
+        tours = band.tour_set.filter(band_id=band.id)
+        archived_tours = self.query_params.get("archived_tours")
+        if not archived_tours == "true":
+            tours = tours.filter(is_archived=False)
+        return TourSerializer(tours, many=True).data
 
     def create(self, validated_data):
         validated_data["owner"] = self.user

@@ -10,14 +10,51 @@ from itertools import chain
 from django.db.models import Q
 
 
+class QueryParam:
+    def __init__(self, name: str, accepted_values=[], boolean=False):
+        self.name = name
+        self.accepted_values = ["true", "false"] if boolean else accepted_values
+        self.value = ""
+
+    def validate(self, value: str):
+        self.value = value
+        return self.value is None or self.value.lower() in self.accepted_values if len(self.accepted_values) else True
+
+
 class BaseAPIView(generics.GenericAPIView):
     """Base for all indietour views.
 
     Path variables are automatically assigned to serializer context."""
 
+    query_params: list[QueryParam]
+    """add any QueryParams (type) expected for this view"""
+    invalid_params: list[QueryParam] = []
+
+    def validate_query_params(self):
+        self.invalid_params.clear()
+        for param in self.query_params:
+            value = self.request.query_params.get(param.name)
+            if not param.validate(value):
+                self.invalid_params.append(param)
+        if len(self.invalid_params):
+            raise ValidationError(
+                {
+                    "details": "Invalid query parameter value(s)",
+                    "invalid_params": [
+                        {param.name: param.value, "valid_values": param.accepted_values}
+                        for param in self.invalid_params
+                    ],
+                }
+            )
+
     def get_serializer_context(self):
+        """Adds path variables and query params to serializer context. Query params are validated before being added."""
         context = super().get_serializer_context()
         context.update(self.kwargs)
+
+        self.validate_query_params()
+        context.update({"query_params": {param.name: param.value for param in self.query_params}})
+
         return context
 
     def get_user_bands(self):

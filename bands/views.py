@@ -6,7 +6,7 @@ from .serializers import BandSerializer, Band, BandUserSerializer, BandUser
 from authentication.permissions import IsVerified
 from .permissions import IsBandUser, IsBandAdmin
 from django.shortcuts import get_object_or_404
-from core.views import BandDependentView, BaseAPIView
+from core.views import BandDependentView, BaseAPIView, QueryParam
 
 
 class BandsView(generics.ListCreateAPIView, BaseAPIView):
@@ -30,6 +30,7 @@ class BandView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
     serializer_class = BandSerializer
     lookup_url_kwarg = "band_id"
     lookup_field = "id"
+    query_params = [QueryParam("archived_tours", boolean=True)]
 
     def get_permissions(self):
         if self.request.method == "GET":
