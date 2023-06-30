@@ -2,6 +2,7 @@ from .models import Tour, TourUser
 from rest_framework.exceptions import ValidationError
 from bands.serializers import BandUserSerializer, serializers
 from core.serializers import BaseSerializer
+from datetime import datetime
 
 
 class TourUserSerializer(BaseSerializer):
@@ -44,7 +45,10 @@ class TourSerializer(BaseSerializer):
     dates = serializers.SerializerMethodField()
 
     def get_dates(self, tour: Tour):
+        past_dates = self.context.get("past_dates")
         dates = tour.dates.all()
+        if not past_dates:
+            dates = dates.filter(date__gte=datetime.now().date())
         return DateSerializer(dates, many=True, context=self.context).data
 
     def create(self, validated_data: dict):
@@ -58,7 +62,7 @@ class TourSerializer(BaseSerializer):
         tour_dict = super().to_representation(instance)
         include = self.context.get("include")
 
-        if include != "dates":
+        if include not in ["all", "dates"]:
             tour_dict.pop("dates")
         else:
             dates = tour_dict.get("dates")

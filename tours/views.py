@@ -8,7 +8,11 @@ from core.views import BaseAPIView, BandDependentView, TourDependentView, QueryP
 
 class ToursView(generics.ListCreateAPIView, BaseAPIView):
     serializer_class = TourSerializer
-    query_params = QueryParam("archived_tours", bool=True), QueryParam("include", ["all", "dates"])
+    query_params = (
+        QueryParam("archived_tours", bool=True),
+        QueryParam("include", ["all", "dates"]),
+        QueryParam("past_dates", bool=True),
+    )
 
     def post(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
@@ -28,19 +32,20 @@ class TourView(generics.RetrieveUpdateDestroyAPIView, BandDependentView):
     serializer_class = TourSerializer
     lookup_field = "id"
     lookup_url_kwarg = "tour_id"
+    query_params = QueryParam("include", ["all", "dates"]), QueryParam("past_dates", bool=True)
 
     def get_permissions(self):
         if self.request.method == "GET":
             return [IsTourUser()]
         return [IsTourAdmin()]
 
-    def patch(self, request, *args, **kwargs):
-        super().patch(request, *args, **kwargs)
-        return self.band_response()
+    # def patch(self, request, *args, **kwargs):
+    #     super().patch(request, *args, **kwargs)
+    #     return self.band_response()
 
-    def delete(self, request, *args, **kwargs):
-        super().delete(request, *args, **kwargs)
-        return self.band_response()
+    # def delete(self, request, *args, **kwargs):
+    #     super().delete(request, *args, **kwargs)
+    #     return self.band_response()
 
 
 class TourUsersView(generics.CreateAPIView, TourDependentView):

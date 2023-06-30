@@ -27,13 +27,13 @@ class QueryParam:
 
 
 class BaseAPIView(generics.GenericAPIView):
-    def initial(self, request, *args, **kwargs):
-        self.validate_query_params()
-        return super().initial(request, *args, **kwargs)
-
     """Base for all indietour views.
 
     Path variables are automatically assigned to serializer context."""
+
+    def initial(self, request, *args, **kwargs):
+        self.validate_query_params()
+        return super().initial(request, *args, **kwargs)
 
     query_params: list[QueryParam] = []
     validated_query_params: dict[str, str] = {}
@@ -60,9 +60,7 @@ class BaseAPIView(generics.GenericAPIView):
         """Adds path variables and query params to serializer context dict. Query params are validated before being added."""
         context = super().get_serializer_context()
         context.update(self.kwargs)
-
         context.update(self.validated_query_params)
-
         return context
 
     def get_bands_for_user(self):
