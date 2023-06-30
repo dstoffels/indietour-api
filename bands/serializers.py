@@ -62,10 +62,10 @@ from tours.serializers import TourSerializer
 class BandSerializer(BaseSerializer):
     class Meta:
         model = Band
-        fields = "id", "name", "is_archived", "owner", "bandusers", "tours"
+        fields = "id", "name", "is_archived", "owner", "band_users", "tours"
 
     owner = UserSerializer(read_only=True)
-    bandusers = BandUserSerializer(source="banduser_set", many=True, read_only=True)
+    band_users = BandUserSerializer(source="bandusers", many=True, read_only=True)
     tours = serializers.SerializerMethodField()
 
     def get_tours(self, band: Band):

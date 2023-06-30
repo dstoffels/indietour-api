@@ -6,7 +6,6 @@ from django.contrib import admin
 class Band(UUIDModel):
     name = models.CharField(max_length=255, unique=True)
     owner = models.ForeignKey("authentication.User", on_delete=models.CASCADE)
-    # users = models.ManyToManyField(to="authentication.User", through="BandUser", related_name="bands")
     is_archived = models.BooleanField(default=False)
 
     def __str__(self) -> str:
@@ -14,7 +13,7 @@ class Band(UUIDModel):
 
 
 class BandUser(UUIDModel):
-    band = models.ForeignKey(Band, on_delete=models.CASCADE)
+    band = models.ForeignKey(Band, on_delete=models.CASCADE, related_name="bandusers")
     user = models.ForeignKey("authentication.User", on_delete=models.CASCADE)
     is_admin = models.BooleanField(default=False)
 

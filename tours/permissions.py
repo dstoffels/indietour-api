@@ -13,7 +13,7 @@ class IsTourUser(IsBandUser):
         user: User = request.user
         tour_id = view.kwargs.get("tour_id")
         tour = get_object_or_404(Tour, id=tour_id)
-        touruser = tour.touruser_set.filter(banduser__user=user).first()
+        touruser = tour.tourusers.filter(banduser__user=user).first()
 
         return tour.band.owner == user or bool(touruser)
 
@@ -26,6 +26,6 @@ class IsTourAdmin(IsBandUser):
         user: User = request.user
         tour_id = view.kwargs.get("tour_id")
         tour = get_object_or_404(Tour, id=tour_id)
-        touruser = tour.touruser_set.filter(banduser__user=user, banduser__is_admin=True).first()
+        touruser = tour.tourusers.filter(banduser__user=user, banduser__is_admin=True).first()
 
         return tour.band.owner == user or bool(touruser)

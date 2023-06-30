@@ -13,7 +13,7 @@ class IsBandUser(IsVerified):
         user: User = request.user
         band_id = view.kwargs.get("band_id")
         band = get_object_or_404(Band, id=band_id)
-        banduser = band.banduser_set.filter(user=user).first()
+        banduser = band.bandusers.filter(user=user).first()
 
         return band.owner == user or bool(banduser)
 
@@ -26,6 +26,6 @@ class IsBandAdmin(IsBandUser):
         user: User = request.user
         band_id = view.kwargs.get("band_id")
         band = get_object_or_404(Band, id=band_id)
-        banduser = band.banduser_set.filter(user=user, is_admin=True).first()
+        banduser = band.bandusers.filter(user=user, is_admin=True).first()
 
         return band.owner == user or bool(banduser)

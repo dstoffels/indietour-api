@@ -36,8 +36,9 @@ class BaseAPIView(generics.GenericAPIView):
         return super().initial(request, *args, **kwargs)
 
     query_params: list[QueryParam] = []
-    validated_query_params: dict[str, str] = {}
     """Add QueryParams expected for this view"""
+    validated_query_params: dict[str, str] = {}
+    """dict containing python-validated query params"""
 
     def validate_query_params(self):
         invalid_params: list[QueryParam] = []
@@ -65,7 +66,7 @@ class BaseAPIView(generics.GenericAPIView):
 
     def get_bands_for_user(self):
         user = self.request.user
-        bands = Band.objects.filter(Q(owner=user) | Q(banduser__user=user)).order_by("name")
+        bands = Band.objects.filter(Q(owner=user) | Q(bandusers__user=user)).order_by("name")
         archived_bands = self.validated_query_params.get("archived_bands")
         if not archived_bands:
             bands = bands.filter(is_archived=False)

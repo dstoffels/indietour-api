@@ -43,7 +43,7 @@ Band:
     name,
     is_archived,
     owner: User
-    bandusers: [BandUser]
+    band_users: [BandUser]
     *tours: [Tour]
 }
 
@@ -86,7 +86,7 @@ Tour:
     id,
     name,
     is_archived,
-    users: [TourUser]
+    tour_users: [TourUser]
     *dates: [Date]
 }
 

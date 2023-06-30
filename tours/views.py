@@ -39,14 +39,6 @@ class TourView(generics.RetrieveUpdateDestroyAPIView, BandDependentView):
             return [IsTourUser()]
         return [IsTourAdmin()]
 
-    # def patch(self, request, *args, **kwargs):
-    #     super().patch(request, *args, **kwargs)
-    #     return self.band_response()
-
-    # def delete(self, request, *args, **kwargs):
-    #     super().delete(request, *args, **kwargs)
-    #     return self.band_response()
-
 
 class TourUsersView(generics.CreateAPIView, TourDependentView):
     queryset = TourUser.objects.all()
@@ -66,6 +58,5 @@ class TourUserView(generics.DestroyAPIView, TourDependentView):
     lookup_field = "id"
 
     def delete(self, request, *args, **kwargs):
-        tour = self.get_object().tour
         super().delete(request, *args, **kwargs)
-        return Response(TourSerializer(tour).data, 204)
+        return self.tour_response()

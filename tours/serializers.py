@@ -39,9 +39,9 @@ from dates.serializers import DateSerializer
 class TourSerializer(BaseSerializer):
     class Meta:
         model = Tour
-        fields = ("id", "name", "is_archived", "band_id", "users", "dates")
+        fields = ("id", "name", "is_archived", "band_id", "tour_users", "dates")
 
-    users = TourUserSerializer(source="touruser_set", read_only=True, many=True)
+    tour_users = TourUserSerializer(source="tourusers", read_only=True, many=True)
     dates = serializers.SerializerMethodField()
 
     def get_dates(self, tour: Tour):
