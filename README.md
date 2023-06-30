@@ -45,7 +45,7 @@ Band:
     name,
     is_archived,
     owner: User
-    users: [BandUser]
+    bandusers: [BandUser]
     *tours: [Tour]
 }
 

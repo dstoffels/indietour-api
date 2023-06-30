@@ -15,7 +15,7 @@ class BandUserSerializer(BaseSerializer):
 
     class Meta:
         model = BandUser
-        fields = "user", "id", "is_admin"
+        fields = "id", "is_admin", "user"
 
     def create(self, validated_data: dict):
         email = self.initial_data.get("email")
@@ -57,29 +57,28 @@ To verify, log in to your account at indietour.app/login and you will be directe
 
 # BAND SERIALIZER
 from tours.serializers import TourSerializer
-import json
 
 
 class BandSerializer(BaseSerializer):
     class Meta:
         model = Band
-        fields = "id", "name", "is_archived", "owner", "users", "tours"
+        fields = "id", "name", "is_archived", "owner", "bandusers", "tours"
 
     owner = UserSerializer(read_only=True)
-    users = BandUserSerializer(source="banduser_set", many=True, read_only=True)
-    tours = TourSerializer(source="tour_set", many=True, read_only=True)
+    bandusers = BandUserSerializer(source="banduser_set", many=True, read_only=True)
+    tours = serializers.SerializerMethodField()
+
+    def get_tours(self, band: Band):
+        archived_tours = self.context.get("archived_tours")
+        tours = band.tour_set.filter(band_id=band.id, is_archived=archived_tours)
+        return TourSerializer(tours, many=True).data
 
     def create(self, validated_data):
         validated_data["owner"] = self.user
         return super().create(validated_data)
 
     def to_representation(self, instance: Band):
-        many = self.context.get("many")
-        archived_bands = self.context.get("archived_bands")
         include = self.context.get("include")
-
-        if many and not archived_bands and instance.is_archived:
-            return None
 
         band_dict = super().to_representation(instance)
 
@@ -88,12 +87,7 @@ class BandSerializer(BaseSerializer):
             return band_dict
 
         if include in ["dates", "all"]:
-
-            def tour_sorter(tour):
-                first_date = tour.get("dates")[0].get("date") if len(tour.get("date")) else ""
-                return first_date
-
             tours = band_dict.get("tours")
-            band_dict["tours"] = sorted(tours, key=tour_sorter)
+            band_dict["tours"] = sorted(tours, key=lambda t: t.get("name"))
 
         return band_dict

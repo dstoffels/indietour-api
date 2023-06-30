@@ -13,8 +13,8 @@ class BandsView(generics.ListCreateAPIView, BaseAPIView):
     serializer_class = BandSerializer
     permission_classes = (IsVerified,)
     query_params = [
-        QueryParam("archived_tours", ["true"]),
-        QueryParam("archived_bands", ["true"]),
+        QueryParam("archived_tours", bool=True),
+        QueryParam("archived_bands", bool=True),
         QueryParam("include", ["all", "tours", "dates"]),
     ]
 
@@ -35,9 +35,9 @@ class BandView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
     lookup_url_kwarg = "band_id"
     lookup_field = "id"
     query_params = [
-        QueryParam("archived_tours", ["true"]),
-        QueryParam("archived_bands", ["true"]),
-        QueryParam("include", ["any", "tours", "dates"]),
+        QueryParam("archived_tours", bool=True),
+        QueryParam("archived_bands", bool=True),
+        QueryParam("include", ["all", "tours", "dates"]),
     ]
 
     def get_permissions(self):

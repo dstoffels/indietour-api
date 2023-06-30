@@ -10,17 +10,16 @@ from django.db.models import Q
 
 
 class QueryParam:
-    def __init__(self, name: str, accepted_values=[]):
+    def __init__(self, name: str, accepted_values=[], bool=False):
         self.name = name
-        self.accepted_values = accepted_values
+        self.accepted_values = [True, False] if bool else [None, *accepted_values]
         self.value = ""
+        self.bool = bool
 
     def validate(self, value: str):
-        self.value = value
-        is_valid = (
-            self.value is None or self.value.lower() in self.accepted_values if len(self.accepted_values) else True
-        )
-        self.value = self.value == "true" if self.value == "true" else value
+        value = value.lower() if type(value) is str else value
+        self.value = value == "true" if self.bool else value
+        is_valid = self.value in self.accepted_values
         return is_valid
 
     def __repr__(self) -> str:
@@ -28,6 +27,10 @@ class QueryParam:
 
 
 class BaseAPIView(generics.GenericAPIView):
+    def initial(self, request, *args, **kwargs):
+        self.validate_query_params()
+        return super().initial(request, *args, **kwargs)
+
     """Base for all indietour views.
 
     Path variables are automatically assigned to serializer context."""
@@ -58,7 +61,7 @@ class BaseAPIView(generics.GenericAPIView):
         context = super().get_serializer_context()
         context.update(self.kwargs)
 
-        self.validate_query_params()
+        # self.validate_query_params()
         context.update(self.validated_query_params)
 
         return context
@@ -66,6 +69,9 @@ class BaseAPIView(generics.GenericAPIView):
     def get_bands_for_user(self):
         user = self.request.user
         bands = Band.objects.filter(Q(owner=user) | Q(banduser__user=user)).order_by("name")
+        archived_bands = self.validated_query_params.get("archived_bands")
+        if not archived_bands:
+            bands = bands.filter(is_archived=False)
         return bands
 
     def user_bands_response(self, status_code=200):

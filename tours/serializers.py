@@ -64,12 +64,7 @@ class TourSerializer(BaseSerializer):
 
     def to_representation(self, instance: Tour):
         tour_dict = super().to_representation(instance)
-        many = self.context.get("many")
         include = self.context.get("include")
-        archived_tours = self.context.get("archived_tours")
-
-        if many and archived_tours != "true" and instance.is_archived:
-            return None
 
         if include != "dates":
             tour_dict.pop("dates")
