@@ -66,37 +66,34 @@ class BandSerializer(BaseSerializer):
         fields = "id", "name", "is_archived", "owner", "users", "tours"
 
     owner = UserSerializer(read_only=True)
-    users = BandUserSerializer(source="banduser_set", read_only=True)
-    tours = serializers.SerializerMethodField()
-
-    def get_tours(self, band: Band):
-        tours = band.tour_set.filter(band_id=band.id)
-        archived_tours = self.context.get("archived_tours")
-        if archived_tours != "true":
-            tours = tours.filter(is_archived=False)
-        return TourSerializer(tours, many=True, context=self.context).data
+    users = BandUserSerializer(source="banduser_set", many=True, read_only=True)
+    tours = TourSerializer(source="tour_set", many=True, read_only=True)
 
     def create(self, validated_data):
         validated_data["owner"] = self.user
         return super().create(validated_data)
 
     def to_representation(self, instance: Band):
+        many = self.context.get("many")
         archived_bands = self.context.get("archived_bands")
         include = self.context.get("include")
 
-        if self.context.get("many") and not archived_bands and instance.is_archived:
+        if many and not archived_bands and instance.is_archived:
             return None
 
-        rep = super().to_representation(instance)
+        band_dict = super().to_representation(instance)
 
         if include is None:
-            rep.pop("tours")
-            return rep
+            band_dict.pop("tours")
+            return band_dict
 
-        def tour_sorter(tour):
-            first_date = tour["dates"][0]["date"] if len(tour["dates"]) else 0
-            return first_date
+        if include in ["dates", "all"]:
 
-        tours = rep["tours"]
-        rep["tours"] = sorted(tours, key=tour_sorter)
-        return rep
+            def tour_sorter(tour):
+                first_date = tour.get("dates")[0].get("date") if len(tour.get("date")) else ""
+                return first_date
+
+            tours = band_dict.get("tours")
+            band_dict["tours"] = sorted(tours, key=tour_sorter)
+
+        return band_dict

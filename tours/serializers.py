@@ -64,11 +64,17 @@ class TourSerializer(BaseSerializer):
 
     def to_representation(self, instance: Tour):
         tour_dict = super().to_representation(instance)
-        dates = tour_dict.get("dates")
-        tour_dict["dates"] = sorted(dates, key=lambda d: d["date"]) if dates else []
-
+        many = self.context.get("many")
+        include = self.context.get("include")
         archived_tours = self.context.get("archived_tours")
-        if self.context.get("many") and archived_tours != "true" and instance.is_archived:
+
+        if many and archived_tours != "true" and instance.is_archived:
             return None
+
+        if include != "dates":
+            tour_dict.pop("dates")
+        else:
+            dates = tour_dict.get("dates")
+            tour_dict["dates"] = sorted(dates, key=lambda d: d["date"]) if dates else []
 
         return tour_dict

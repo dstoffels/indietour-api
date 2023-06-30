@@ -1,5 +1,5 @@
 from django.db import models
-from uuid_model import UUIDModel
+from core.uuid_model import UUIDModel
 
 
 class Date(UUIDModel):
