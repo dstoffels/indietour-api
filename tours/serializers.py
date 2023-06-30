@@ -62,8 +62,13 @@ class TourSerializer(BaseSerializer):
             raise ValidationError({"details": "Cannot have duplicate tours.", "code": "DUPLICATE"})
         return super().create(validated_data)
 
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        dates = rep["dates"]
-        rep["dates"] = sorted(dates, key=lambda d: d["date"])
-        return rep
+    def to_representation(self, instance: Tour):
+        tour_dict = super().to_representation(instance)
+        dates = tour_dict.get("dates")
+        tour_dict["dates"] = sorted(dates, key=lambda d: d["date"]) if dates else []
+
+        archived_tours = self.context.get("archived_tours")
+        if self.context.get("many") and archived_tours != "true" and instance.is_archived:
+            return None
+
+        return tour_dict

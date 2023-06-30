@@ -6,19 +6,25 @@ from dates.serializers import Date, DateSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.request import Request
-from itertools import chain
 from django.db.models import Q
 
 
 class QueryParam:
-    def __init__(self, name: str, accepted_values=[], boolean=False):
+    def __init__(self, name: str, accepted_values=[]):
         self.name = name
-        self.accepted_values = ["true", "false"] if boolean else accepted_values
+        self.accepted_values = accepted_values
         self.value = ""
 
     def validate(self, value: str):
         self.value = value
-        return self.value is None or self.value.lower() in self.accepted_values if len(self.accepted_values) else True
+        is_valid = (
+            self.value is None or self.value.lower() in self.accepted_values if len(self.accepted_values) else True
+        )
+        self.value = self.value == "true" if self.value == "true" else value
+        return is_valid
+
+    def __repr__(self) -> str:
+        return self.name
 
 
 class BaseAPIView(generics.GenericAPIView):
@@ -27,33 +33,33 @@ class BaseAPIView(generics.GenericAPIView):
     Path variables are automatically assigned to serializer context."""
 
     query_params: list[QueryParam] = []
-    """add any QueryParams (type) expected for this view"""
-    invalid_params: list[QueryParam] = []
+    validated_query_params: dict[str, str] = {}
+    """Add QueryParams expected for this view"""
 
     def validate_query_params(self):
-        self.invalid_params.clear()
+        invalid_params: list[QueryParam] = []
         for param in self.query_params:
             value = self.request.query_params.get(param.name)
             if not param.validate(value):
-                self.invalid_params.append(param)
-        if len(self.invalid_params):
+                invalid_params.append(param)
+        if len(invalid_params):
             raise ValidationError(
                 {
                     "details": "Invalid query parameter value(s)",
                     "invalid_params": [
-                        {param.name: param.value, "valid_values": param.accepted_values}
-                        for param in self.invalid_params
+                        {param.name: param.value, "accepted values": param.accepted_values} for param in invalid_params
                     ],
                 }
             )
+        self.validated_query_params = {param.name: param.value for param in self.query_params}
 
     def get_serializer_context(self):
-        """Adds path variables and query params to serializer context. Query params are validated before being added."""
+        """Adds path variables and query params to serializer context dict. Query params are validated before being added."""
         context = super().get_serializer_context()
         context.update(self.kwargs)
 
         self.validate_query_params()
-        context.update({"query_params": {param.name: param.value for param in self.query_params}})
+        context.update(self.validated_query_params)
 
         return context
 
@@ -67,15 +73,18 @@ class BaseAPIView(generics.GenericAPIView):
 
     def user_bands_response(self, status_code=200):
         bands = self.get_bands_for_user()
-        return Response(self.get_serializer(bands, many=True).data, status_code)
+        ser = BandSerializer(bands, many=True, context=self.get_serializer_context())
+        return Response(ser.data, status_code)
 
     def band_response(self, status_code=200):
         band = get_object_or_404(Band, id=self.kwargs.get("band_id"))
-        return Response(self.get_serializer(band).data, status_code)
+        ser = BandSerializer(band, context=self.get_serializer_context())
+        return Response(ser.data, status_code)
 
     def tour_response(self, status_code=200):
         tour = get_object_or_404(Tour, id=self.kwargs.get("tour_id"))
-        return Response(self.get_serializer().data, status_code)
+        ser = TourSerializer(tour, context=self.get_serializer_context())
+        return Response(ser.data, status_code)
 
 
 class BandDependentView(BaseAPIView):
