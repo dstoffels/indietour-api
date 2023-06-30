@@ -23,8 +23,6 @@ User: (encoded in JWT)
 - PATCH -> JWT
     - body: {username|active_band_id|active_tour_id}
 
-<!-- /auth/logout -->
-
 # /auth/register
 - POST -> JWT
     - body: {email, password, username}
@@ -67,17 +65,17 @@ BandUser:
     - body: {name}
 - GET -> [Band]
 
-# /bands/<pk>
+# /bands/<band_id>
 - GET -> Band
 - PATCH -> Band
     - body: {name|is_archived}
 - DELETE
 
-# /bands/<pk>/users
+# /bands/<band_id>/users
 - POST -> Band
     - body: {email, is_admin}
 
-# /bands/<pk>/users/<pk>
+# /bands/<band_id>/users/<banduser_id>
 - PATCH -> Band
     - body {is_admin}
 - DELETE -> Band
@@ -101,25 +99,26 @@ TourUser:
 - params: (for all non-nested tour endpoints excl. /users)
     - include: Options for nesting depth. No nesting by default. 
         - options: all, dates, contacts, prospects, timeslots
+    - past-dates: Set true to include past dates.
 
-# /bands/<pk>/tours (filtered by band_id)
+# /bands/<band_id>/tours (filtered by band_id)
 - params:
     - archives: Set true to include archived tours
 - POST -> [Tour]
     - body: {name}
 - GET -> [Tour]
 
-# /bands/<pk>/tours/<pk>
+# /bands/<band_id>/tours/<tour_id>
 - GET -> Tour
 - PATCH -> Tour
     - body: {name, is_archived}
 - DELETE
 
-# /bands/<pk>/tours/<pk>/users
+# /bands/<band_id>/tours/<tour_id>/users
 - POST -> Tour
     - body: {email, is_admin}
 
-# /bands/<pk>/tours/<pk>/users/<pk>
+# /bands/<band_id>/tours/<tour_id>/users/<touruser_id>
 - DELETE -> Tour
 
 **DATES**
@@ -138,15 +137,16 @@ Date:
     *prospects: [Prospect]
     *contacts: [DateContact]
 }
-# /bands/<pk>/tours/<pk>/dates (filtered by tour_id)
+# /bands/<band_id>/tours/<tour_id>/dates (filtered by tour_id)
 - params: 
     - include: Options for nesting depth. No nesting by default
         - options: all, contacts, prospects, timeslots
+    - past-dates: Set true to include past dates.
 - POST -> [Date]
     - body: {date}
 - GET -> [Date]
 
-# /bands/<pk>/tours/<pk>/dates/<pk>
+# /bands/<band_id>/tours/<tour_id>/dates/<date_id>
 - GET -> Date (nested)
 - PATCH -> Date (nested)
     - body: {date|notes|is_show_day|is_confirmed|title|place_id}
@@ -169,19 +169,19 @@ Timeslot:
     type: (type_option - default: 'Event')
 }
 
-# /bands/<pk>/tours/<pk>/dates/<pk>/timeslots
+# /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots
 - POST -> Date (nested)
     - body: {description, start_time, starts_after_midnight|origin|end_time|ends_after_midnight|destination|details|type}
-# /bands/<pk>/tours/<pk>/dates/<pk>/timeslots/<pk>
+# /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots/<pk>
 - PATCH -> Date (nested)
     - body: {description|start_time|starts_after_midnight|origin|end_time|ends_after_midnight|destination|details|type}
 - DELETE -> Date (nested)
-# <!-- /bands/<pk>/tours/<pk>/dates/<pk>/prospects -->
-# <!-- /bands/<pk>/tours/<pk>/dates/<pk>/prospects/<pk> -->
-# <!-- /bands/<pk>/tours/<pk>/dates/<pk>/prospects/<pk>/notes -->
-# <!-- /bands/<pk>/tours/<pk>/dates/<pk>/prospects/<pk>/notes/<pk> -->
-# <!-- /bands/<pk>/tours/<pk>/dates/<pk>/contacts -->
-# <!-- /bands/<pk>/tours/<pk>/dates/<pk>/contacts/<pk> -->
+# <!-- /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects -->
+# <!-- /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<pk> -->
+# <!-- /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<pk>/notes -->
+# <!-- /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<pk>/notes/<pk> -->
+# <!-- /bands/<band_id>/tours/<tour_id>/dates/<date_id>/contacts -->
+# <!-- /bands/<band_id>/tours/<tour_id>/dates/<date_id>/contacts/<pk> -->
 # <!-- /contacts -->
 # <!-- /contacts/<pk> -->
 

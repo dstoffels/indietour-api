@@ -4,8 +4,8 @@ from core.uuid_model import UUIDModel
 
 class Tour(UUIDModel):
     name = models.CharField(max_length=255, error_messages={"unique": "Name must be unique."})
-    band = models.ForeignKey("bands.Band", on_delete=models.CASCADE)
-    users = models.ManyToManyField(to="TourUser", related_name="tours")
+    band = models.ForeignKey("bands.Band", on_delete=models.CASCADE, related_name="tours")
+    users = models.ManyToManyField(to="TourUser", related_name="tourusers")
     is_archived = models.BooleanField(default=False)
 
     def __str__(self) -> str:

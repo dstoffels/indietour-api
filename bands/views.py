@@ -19,10 +19,7 @@ class BandsView(generics.ListCreateAPIView, BaseAPIView):
     ]
 
     def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        user: User = request.user
-        user.active_band_id = response.data.get("id")
-        user.save()
+        super().post(request, *args, **kwargs)
         return self.user_bands_response(201)
 
     def get_queryset(self):
@@ -36,7 +33,6 @@ class BandView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
     lookup_field = "id"
     query_params = [
         QueryParam("archived_tours", bool=True),
-        QueryParam("archived_bands", bool=True),
         QueryParam("include", ["all", "tours", "dates"]),
     ]
 
@@ -45,9 +41,9 @@ class BandView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
             return [IsBandUser()]
         return [IsBandAdmin()]
 
-    def delete(self, request, *args, **kwargs):
-        super().delete(request, *args, **kwargs)
-        return self.user_bands_response()
+    # def delete(self, request, *args, **kwargs):
+    #     super().delete(request, *args, **kwargs)
+    #     return self.users_bands_response()
 
 
 class BandUsersView(generics.CreateAPIView, BandDependentView):
@@ -60,7 +56,7 @@ class BandUsersView(generics.CreateAPIView, BandDependentView):
         return super().finalize_response(request, response, *args, **kwargs)
 
 
-class BandUserView(generics.RetrieveUpdateDestroyAPIView, BandDependentView):
+class BandUserView(generics.DestroyAPIView, BandDependentView):
     queryset = BandUser.objects.all()
     serializer_class = BandUserSerializer
     permission_classes = (IsBandAdmin,)

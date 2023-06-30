@@ -1,19 +1,7 @@
 from .models import Tour, TourUser
 from rest_framework.exceptions import ValidationError
-from bands.serializers import BandUserSerializer
+from bands.serializers import BandUserSerializer, serializers
 from core.serializers import BaseSerializer
-
-
-class TourSerializerBase(BaseSerializer):
-    def validate(self, attrs):
-        band_id = self.context.get("band_id")
-        tour_id = self.context.get("tour_id")
-        if tour_id:
-            tour = Tour.objects.only("band_id").get(id=tour_id)
-
-            if str(tour.band.id) != band_id:
-                raise ValidationError({"details": "Tour does no belong to this Band.", "code": "INVALID"})
-        return super().validate(attrs)
 
 
 class TourUserSerializer(BaseSerializer):
@@ -53,7 +41,11 @@ class TourSerializer(BaseSerializer):
         fields = ("id", "name", "is_archived", "band_id", "users", "dates")
 
     users = TourUserSerializer(source="touruser_set", read_only=True, many=True)
-    dates = DateSerializer(read_only=True, many=True)
+    dates = serializers.SerializerMethodField()
+
+    def get_dates(self, tour: Tour):
+        dates = tour.dates.all()
+        return DateSerializer(dates, many=True, context=self.context).data
 
     def create(self, validated_data: dict):
         validated_data["band_id"] = self.context.get("band_id")

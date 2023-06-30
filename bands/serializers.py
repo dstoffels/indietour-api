@@ -70,7 +70,9 @@ class BandSerializer(BaseSerializer):
 
     def get_tours(self, band: Band):
         archived_tours = self.context.get("archived_tours")
-        tours = band.tour_set.filter(band_id=band.id, is_archived=archived_tours)
+        tours = band.tours.filter(band_id=band.id)
+        if not archived_tours:
+            tours = tours.filter(is_archived=False)
         return TourSerializer(tours, many=True).data
 
     def create(self, validated_data):

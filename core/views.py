@@ -61,7 +61,6 @@ class BaseAPIView(generics.GenericAPIView):
         context = super().get_serializer_context()
         context.update(self.kwargs)
 
-        # self.validate_query_params()
         context.update(self.validated_query_params)
 
         return context
@@ -77,6 +76,19 @@ class BaseAPIView(generics.GenericAPIView):
     def user_bands_response(self, status_code=200):
         bands = self.get_bands_for_user()
         ser = BandSerializer(bands, many=True, context=self.get_serializer_context())
+        return Response(ser.data, status_code)
+
+    def get_tours_for_band(self):
+        band_id = self.kwargs.get("band_id")
+        tours = Tour.objects.filter(band_id=band_id)
+        archived_tours = self.validated_query_params.get("archived_tours")
+        if not archived_tours:
+            tours = tours.filter(is_archived=False)
+        return tours
+
+    def band_tours_response(self, status_code=200):
+        tours = self.get_tours_for_band()
+        ser = TourSerializer(tours, many=True, context=self.get_serializer_context())
         return Response(ser.data, status_code)
 
     def band_response(self, status_code=200):
