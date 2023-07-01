@@ -7,7 +7,12 @@ from core.views import BaseAPIView, BandDependentView, TourDependentView
 from core.query_params import BooleanQueryParam, ListQueryParam, QueryParam
 
 
-class ToursView(generics.ListCreateAPIView, BaseAPIView):
+class BaseTourView(BaseAPIView):
+    def get_query_params(self) -> list[QueryParam]:
+        return [BooleanQueryParam("past_dates")]
+
+
+class ToursView(generics.ListCreateAPIView, BaseTourView):
     serializer_class = ToursSerializer
 
     def post(self, request, *args, **kwargs):
@@ -23,14 +28,11 @@ class ToursView(generics.ListCreateAPIView, BaseAPIView):
         return (IsBandAdmin(),)
 
     def get_query_params(self) -> list[QueryParam]:
-        return [
-            QueryParam("include", ["all", "dates"]),
-            BooleanQueryParam("past_dates"),
-            BooleanQueryParam("archived_tours"),
-        ]
+        params = super().get_query_params()
+        return [*params, QueryParam("include", ["all", "dates"]), BooleanQueryParam("archived_tours")]
 
 
-class TourView(generics.RetrieveUpdateDestroyAPIView, BandDependentView):
+class TourView(generics.RetrieveUpdateDestroyAPIView, BandDependentView, BaseTourView):
     queryset = Tour.objects.all()
     serializer_class = TourSerializer
     lookup_field = "id"
@@ -42,7 +44,12 @@ class TourView(generics.RetrieveUpdateDestroyAPIView, BandDependentView):
         return [IsTourAdmin()]
 
     def get_query_params(self) -> list[QueryParam]:
-        return [QueryParam("include", ["all", "dates"]), BooleanQueryParam("past_dates")]
+        params = super().get_query_params()
+        return [*params, QueryParam("include", ["all"])]
+
+    def delete(self, request, *args, **kwargs):
+        super().delete(request, *args, **kwargs)
+        return self.band_response()
 
 
 class TourUsersView(generics.CreateAPIView, TourDependentView):

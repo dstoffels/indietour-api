@@ -85,23 +85,19 @@ class BandSerializer(BaseSerializer):
         validated_data["owner"] = self.user
         return super().create(validated_data)
 
+    def init_query_params(self):
+        self.archived_tours = False
+        self.include = ""
+
     def get_fields(self):
         fields = super().get_fields()
         if self.include not in ["tours", "dates", "all"]:
             fields.pop("tours")
         return fields
 
-    def init_query_params(self):
-        self.archived_tours = False
-        self.include = ""
-
 
 class BandsSerializer(BandSerializer):
     many = True
-
-    def get_fields(self):
-        fields = super().get_fields()
-        return fields
 
     def init_query_params(self):
         super().init_query_params()

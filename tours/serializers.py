@@ -68,15 +68,15 @@ class TourSerializer(BaseSerializer):
             raise ValidationError({"details": "Cannot have duplicate tours.", "code": "DUPLICATE"})
         return super().create(validated_data)
 
+    def init_query_params(self):
+        self.past_dates = False
+        self.include = ""
+
     def get_fields(self):
         fields = super().get_fields()
         if self.include not in ["dates", "all"]:
             fields.pop("dates")
         return fields
-
-    def init_query_params(self):
-        self.past_dates = False
-        self.include = ""
 
 
 class ToursSerializer(TourSerializer):

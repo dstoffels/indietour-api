@@ -2,7 +2,7 @@ from typing import Any
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
 from bands.serializers import Band, BandSerializer
-from tours.serializers import Tour, TourSerializer
+from tours.serializers import Tour, TourSerializer, ToursSerializer
 from dates.serializers import Date, DateSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -56,7 +56,7 @@ class BaseAPIView(generics.GenericAPIView):
 
     def band_tours_response(self, status_code=200):
         tours = self.get_tours_for_band()
-        ser = TourSerializer(tours, many=True, context=self.get_serializer_context())
+        ser = ToursSerializer(tours, many=True, context=self.get_serializer_context())
         return Response(ser.data, status_code)
 
     def band_response(self, status_code=200):

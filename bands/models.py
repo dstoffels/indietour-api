@@ -1,5 +1,5 @@
 from django.db import models
-from core.uuid_model import UUIDModel
+from core.models import UUIDModel
 from django.contrib import admin
 
 
