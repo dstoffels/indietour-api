@@ -1,17 +1,24 @@
 from rest_framework import generics
 from rest_framework.request import Request
 from rest_framework.response import Response
-from core.query_params import QueryParam
 from authentication.models import User
 from .serializers import BandSerializer, BandsSerializer, Band, BandUserSerializer, BandUser
 from authentication.permissions import IsVerified
 from .permissions import IsBandUser, IsBandAdmin
 from django.shortcuts import get_object_or_404
 from core.views import BandDependentView, BaseAPIView
-from core.query_params import BooleanQueryParam, QueryParam, QueryParamsManager
+from core.query_params import BooleanQueryParam, QueryParam
 
 
-class BandsView(generics.ListCreateAPIView, BaseAPIView):
+class BaseBandView(BaseAPIView):
+    def get_query_params(self) -> list[QueryParam]:
+        return [
+            BooleanQueryParam("archived_tours"),
+            QueryParam("include", ["tours", "dates", "all"]),
+        ]
+
+
+class BandsView(generics.ListCreateAPIView, BaseBandView):
     serializer_class = BandsSerializer
     permission_classes = (IsVerified,)
     # query_params = QueryParamsManager()
@@ -24,22 +31,10 @@ class BandsView(generics.ListCreateAPIView, BaseAPIView):
         return self.get_bands_for_user()
 
     def get_query_params(self) -> list[QueryParam]:
-        return [
-            BooleanQueryParam("archived_tours"),
-            BooleanQueryParam("archived_bands"),
-            QueryParam("include", ["tours", "dates", "all"]),
-        ]
+        params = super().get_query_params()
+        return [*params, BooleanQueryParam("archived_bands")]
 
 
-class BaseBandView(BaseAPIView):
-    def get_query_params(self) -> list[QueryParam]:
-        return [
-            BooleanQueryParam("archived_tours"),
-            QueryParam("include", ["tours", "dates", "all"]),
-        ]
-
-
-# test, refactor params
 class BandView(generics.RetrieveUpdateDestroyAPIView, BaseBandView):
     queryset = Band.objects.all()
     serializer_class = BandSerializer

@@ -87,7 +87,7 @@ class BandSerializer(BaseSerializer):
 
     def get_fields(self):
         fields = super().get_fields()
-        if self.include not in ["tours", "dates"]:
+        if self.include not in ["tours", "dates", "all"]:
             fields.pop("tours")
         return fields
 
