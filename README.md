@@ -138,17 +138,14 @@ Date:
     *contacts: [DateContact]
 }
 # /bands/<band_id>/tours/<tour_id>/dates (filtered by tour_id)
-- params: 
-    - include: Options for nesting depth. No nesting by default
-        - options: all, contacts, prospects, timeslots
+- params
     - past-dates: Set true to include past dates.
-- POST -> [Date]
+- POST -> Tour
     - body: {date}
-- GET -> [Date]
 
 # /bands/<band_id>/tours/<tour_id>/dates/<date_id>
-- GET -> Date (nested)
-- PATCH -> Date (nested)
+- GET -> Date
+- PATCH -> Date
     - body: {date|notes|is_show_day|is_confirmed|title|place_id}
 - DELETE
 
@@ -170,20 +167,21 @@ Timeslot:
 }
 
 # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots
-- POST -> Date (nested)
+- POST -> Date
     - body: {description, start_time, starts_after_midnight|origin|end_time|ends_after_midnight|destination|details|type}
 # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots/<pk>
-- PATCH -> Date (nested)
+- PATCH -> Date
     - body: {description|start_time|starts_after_midnight|origin|end_time|ends_after_midnight|destination|details|type}
-- DELETE -> Date (nested)
-# <!-- /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects -->
-# <!-- /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<pk> -->
-# <!-- /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<pk>/notes -->
-# <!-- /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<pk>/notes/<pk> -->
-# <!-- /bands/<band_id>/tours/<tour_id>/dates/<date_id>/contacts -->
-# <!-- /bands/<band_id>/tours/<tour_id>/dates/<date_id>/contacts/<pk> -->
-# <!-- /contacts -->
-# <!-- /contacts/<pk> -->
+- DELETE -> Date
+<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects -->
+<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<pk> -->
+<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<pk>/confirm -->
+<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<pk>/notes -->
+<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<pk>/notes/<pk> --> -->
+<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/contacts -->
+<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/contacts/<pk> -->
+<!-- # /contacts -->
+<!-- # <!-- /contacts/<pk> -->
 
 **PLACES** 
 Places are fetched directly from the Google Place API by place_id, formatted and stored in the database, when fetched for the first time.

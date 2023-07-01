@@ -3,13 +3,20 @@ from .models import Date
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from timeslots.serializers import TimeslotSerializer
+from places.serializers import PlaceSerializer
 
 
 class DateSerializer(serializers.ModelSerializer):
+    include_timeslots = False
+    include_prospect = False
+    include_contacts = False
+
     class Meta:
         model = Date
-        fields = ("id", "date", "notes", "is_show_day", "is_confirmed", "title", "tour_id", "timeslots")
+        fields = ("id", "date", "title", "place", "place_id", "notes", "is_show_day", "is_confirmed", "timeslots")
 
+    place = PlaceSerializer(read_only=True)
+    place_id = serializers.CharField(write_only=True)
     timeslots = TimeslotSerializer(read_only=True, many=True)
 
     def create(self, validated_data):
@@ -21,7 +28,10 @@ class DateSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        timeslots = rep["timeslots"]
-        rep["timeslots"] = sorted(timeslots, key=lambda d: d["start_time"])
-        return rep
+        date_dict = super().to_representation(instance)
+        timeslots = date_dict["timeslots"]
+        if not self.include_timeslots:
+            date_dict.pop("timeslots")
+        else:
+            date_dict["timeslots"] = sorted(timeslots, key=lambda d: d["start_time"])
+        return date_dict

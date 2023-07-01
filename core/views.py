@@ -1,3 +1,4 @@
+from typing import Any
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
 from bands.serializers import Band, BandSerializer
@@ -7,23 +8,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.request import Request
 from django.db.models import Q
-
-
-class QueryParam:
-    def __init__(self, name: str, accepted_values=[], bool=False):
-        self.name = name
-        self.accepted_values = [True, False] if bool else [None, *accepted_values]
-        self.value = ""
-        self.bool = bool
-
-    def validate(self, value: str):
-        value = value.lower() if type(value) is str else value
-        self.value = value == "true" if self.bool else value
-        is_valid = self.value in self.accepted_values
-        return is_valid
-
-    def __repr__(self) -> str:
-        return self.name
+from .query_params import QueryParam, QueryParamsManager
 
 
 class BaseAPIView(generics.GenericAPIView):
@@ -32,42 +17,26 @@ class BaseAPIView(generics.GenericAPIView):
     Path variables are automatically assigned to serializer context."""
 
     def initial(self, request, *args, **kwargs):
-        self.validate_query_params()
+        query_params = self.init_query_params()
+        self.query_params = QueryParamsManager(query_params)
+        self.query_params.validate(request)
         return super().initial(request, *args, **kwargs)
 
-    query_params: list[QueryParam] = []
-    """Add QueryParams expected for this view"""
-    validated_query_params: dict[str, str] = {}
-    """dict containing python-validated query params"""
-
-    def validate_query_params(self):
-        invalid_params: list[QueryParam] = []
-        for param in self.query_params:
-            value = self.request.query_params.get(param.name)
-            if not param.validate(value):
-                invalid_params.append(param)
-        if len(invalid_params):
-            raise ValidationError(
-                {
-                    "details": "Invalid query parameter value(s)",
-                    "invalid_params": [
-                        {param.name: param.value, "accepted values": param.accepted_values} for param in invalid_params
-                    ],
-                }
-            )
-        self.validated_query_params = {param.name: param.value for param in self.query_params}
+    def init_query_params(self) -> list[QueryParam]:
+        """Add QueryParams expected for this view. Must return a list of QueryParam"""
+        return []
 
     def get_serializer_context(self):
         """Adds path variables and query params to serializer context dict. Query params are validated before being added."""
         context = super().get_serializer_context()
         context.update(self.kwargs)
-        context.update(self.validated_query_params)
+        self.query_params.update_context(context)
         return context
 
     def get_bands_for_user(self):
         user = self.request.user
         bands = Band.objects.filter(Q(owner=user) | Q(bandusers__user=user)).order_by("name")
-        archived_bands = self.validated_query_params.get("archived_bands")
+        archived_bands = self.query_params.get("archived_bands")
         if not archived_bands:
             bands = bands.filter(is_archived=False)
         return bands

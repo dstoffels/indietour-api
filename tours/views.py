@@ -3,16 +3,17 @@ from rest_framework.response import Response
 from .serializers import Tour, TourSerializer, TourUser, TourUserSerializer
 from .permissions import IsTourUser, IsTourAdmin, IsBandUser
 from bands.permissions import IsBandAdmin
-from core.views import BaseAPIView, BandDependentView, TourDependentView, QueryParam
+from core.views import BaseAPIView, BandDependentView, TourDependentView
+from core.query_params import BooleanQueryParam, ListQueryParam, QueryParamsManager
 
 
 class ToursView(generics.ListCreateAPIView, BaseAPIView):
     serializer_class = TourSerializer
-    query_params = (
-        QueryParam("archived_tours", bool=True),
-        QueryParam("include", ["all", "dates"]),
-        QueryParam("past_dates", bool=True),
-    )
+    # query_params = QueryParamsManager(
+    #     BooleanQueryParam("archived_tours"),
+    #     ListQueryParam("include", ["all", "dates"]),
+    #     BooleanQueryParam("past_dates"),
+    # )
 
     def post(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
@@ -32,7 +33,7 @@ class TourView(generics.RetrieveUpdateDestroyAPIView, BandDependentView):
     serializer_class = TourSerializer
     lookup_field = "id"
     lookup_url_kwarg = "tour_id"
-    query_params = QueryParam("include", ["all", "dates"]), QueryParam("past_dates", bool=True)
+    # query_params = QueryParamsManager(ListQueryParam("include", ["all", "dates"]), BooleanQueryParam("past_dates"))
 
     def get_permissions(self):
         if self.request.method == "GET":

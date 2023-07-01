@@ -44,6 +44,10 @@ class TourSerializer(BaseSerializer):
     tour_users = TourUserSerializer(source="tourusers", read_only=True, many=True)
     dates = serializers.SerializerMethodField()
 
+    # QUERY PARAMS
+    past_dates = False
+    include = ""
+
     def get_dates(self, tour: Tour):
         past_dates = self.context.get("past_dates")
         dates = tour.dates.all()

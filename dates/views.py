@@ -12,20 +12,22 @@ from tours.serializers import TourSerializer, Tour
 from core.views import TourDependentView
 
 
-class DatesView(generics.ListCreateAPIView, TourDependentView):
+class DatesView(generics.CreateAPIView, TourDependentView):
     serializer_class = DateSerializer
 
     def post(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
         return self.tour_response(201)
 
-    def get_queryset(self):
-        return Date.objects.filter(tour_id=self.kwargs.get("tour_id"))
-
     def get_permissions(self):
         if self.request.method == "GET":
             return (IsTourUser(),)
         return (IsTourAdmin(),)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"include": "dates"})
+        return context
 
 
 class DateView(generics.RetrieveUpdateDestroyAPIView, TourDependentView):

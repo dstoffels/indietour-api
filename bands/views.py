@@ -1,22 +1,20 @@
 from rest_framework import generics
 from rest_framework.request import Request
 from rest_framework.response import Response
+from core.query_params import QueryParam
 from authentication.models import User
-from .serializers import BandSerializer, Band, BandUserSerializer, BandUser
+from .serializers import BandSerializer, BandsSerializer, Band, BandUserSerializer, BandUser
 from authentication.permissions import IsVerified
 from .permissions import IsBandUser, IsBandAdmin
 from django.shortcuts import get_object_or_404
-from core.views import BandDependentView, BaseAPIView, QueryParam
+from core.views import BandDependentView, BaseAPIView
+from core.query_params import BooleanQueryParam, QueryParam, QueryParamsManager
 
 
 class BandsView(generics.ListCreateAPIView, BaseAPIView):
-    serializer_class = BandSerializer
+    serializer_class = BandsSerializer
     permission_classes = (IsVerified,)
-    query_params = [
-        QueryParam("archived_tours", bool=True),
-        QueryParam("archived_bands", bool=True),
-        QueryParam("include", ["all", "tours", "dates"]),
-    ]
+    # query_params = QueryParamsManager()
 
     def post(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
@@ -25,25 +23,28 @@ class BandsView(generics.ListCreateAPIView, BaseAPIView):
     def get_queryset(self):
         return self.get_bands_for_user()
 
+    def init_query_params(self) -> list[QueryParam]:
+        return [
+            BooleanQueryParam("archived_tours"),
+            BooleanQueryParam("archived_bands"),
+            QueryParam("include", ["tours", "dates"]),
+        ]
+
 
 class BandView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
     queryset = Band.objects.all()
     serializer_class = BandSerializer
     lookup_url_kwarg = "band_id"
     lookup_field = "id"
-    query_params = [
-        QueryParam("archived_tours", bool=True),
-        QueryParam("include", ["all", "tours", "dates"]),
-    ]
+    # query_params = QueryParamsManager(
+    #     BooleanQueryParam("archived_tours"),
+    #     QueryParam("include", ["tours", "dates"]),
+    # )
 
     def get_permissions(self):
         if self.request.method == "GET":
             return [IsBandUser()]
         return [IsBandAdmin()]
-
-    # def delete(self, request, *args, **kwargs):
-    #     super().delete(request, *args, **kwargs)
-    #     return self.users_bands_response()
 
 
 class BandUsersView(generics.CreateAPIView, BandDependentView):

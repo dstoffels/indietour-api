@@ -11,11 +11,14 @@ from django.shortcuts import get_object_or_404
 
 
 class BandUserSerializer(BaseSerializer):
-    user = UserSerializer(read_only=True)
+    include_tours = False
+    archived_tours = False
 
     class Meta:
         model = BandUser
         fields = "id", "is_admin", "user"
+
+    user = UserSerializer(read_only=True)
 
     def create(self, validated_data: dict):
         email = self.initial_data.get("email")
@@ -69,10 +72,8 @@ class BandSerializer(BaseSerializer):
     tours = serializers.SerializerMethodField()
 
     def get_tours(self, band: Band):
-        archived_tours = self.context.get("archived_tours")
-
-        tours = band.tours.all()
-        if not archived_tours:
+        tours = band.tours.all().order_by("name")
+        if not self.archived_tours:
             tours = tours.filter(is_archived=False)
         return TourSerializer(tours, many=True, context=self.context).data
 
@@ -80,17 +81,24 @@ class BandSerializer(BaseSerializer):
         validated_data["owner"] = self.user
         return super().create(validated_data)
 
-    def to_representation(self, instance: Band):
-        include = self.context.get("include")
+    def get_fields(self):
+        fields = super().get_fields()
+        if self.include not in ["tours", "dates"]:
+            fields.pop("tours")
+        return fields
 
-        band_dict = super().to_representation(instance)
+    def init_query_params(self):
+        self.archived_tours = False
+        self.include = ""
 
-        if include is None:
-            band_dict.pop("tours")
-            return band_dict
 
-        if include in ["dates", "all"]:
-            tours = band_dict.get("tours")
-            band_dict["tours"] = sorted(tours, key=lambda t: t.get("name"))
+class BandsSerializer(BandSerializer):
+    many = True
 
-        return band_dict
+    def get_fields(self):
+        fields = super().get_fields()
+        return fields
+
+    def init_query_params(self):
+        super().init_query_params()
+        self.archived_bands = False
