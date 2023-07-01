@@ -98,12 +98,12 @@ TourUser:
 
 - params: (for all non-nested tour endpoints excl. /users)
     - include: Options for nesting depth. No nesting by default. 
-        - options: all, dates, contacts, prospects, timeslots
+        - options: all, dates
     - past-dates: Set true to include past dates.
 
 # /bands/<band_id>/tours (filtered by band_id)
 - params:
-    - archives: Set true to include archived tours
+    - archived_tours: Set true to include archived tours
 - POST -> [Tour]
     - body: {name}
 - GET -> [Tour]

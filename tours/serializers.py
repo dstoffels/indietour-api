@@ -8,9 +8,20 @@ from datetime import datetime
 class TourUserSerializer(BaseSerializer):
     class Meta:
         model = TourUser
-        fields = "id", "banduser"
+        fields = "id", "banduser_id", "email", "username", "is_admin"
 
-    banduser = BandUserSerializer(read_only=True)
+    email = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
+    is_admin = serializers.SerializerMethodField()
+
+    def get_email(self, touruser: TourUser):
+        return touruser.banduser.user.email
+
+    def get_username(self, touruser: TourUser):
+        return touruser.banduser.user.username
+
+    def get_is_admin(self, touruser: TourUser):
+        return touruser.banduser.is_admin
 
     def create(self, validated_data):
         from bands.serializers import BandUserSerializer, BandUser
@@ -44,14 +55,9 @@ class TourSerializer(BaseSerializer):
     tour_users = TourUserSerializer(source="tourusers", read_only=True, many=True)
     dates = serializers.SerializerMethodField()
 
-    # QUERY PARAMS
-    past_dates = False
-    include = ""
-
     def get_dates(self, tour: Tour):
-        past_dates = self.context.get("past_dates")
-        dates = tour.dates.all()
-        if not past_dates:
+        dates = tour.dates.all().order_by("date")
+        if not self.past_dates:
             dates = dates.filter(date__gte=datetime.now().date())
         return DateSerializer(dates, many=True, context=self.context).data
 
@@ -62,14 +68,20 @@ class TourSerializer(BaseSerializer):
             raise ValidationError({"details": "Cannot have duplicate tours.", "code": "DUPLICATE"})
         return super().create(validated_data)
 
-    def to_representation(self, instance: Tour):
-        tour_dict = super().to_representation(instance)
-        include = self.context.get("include")
+    def get_fields(self):
+        fields = super().get_fields()
+        if self.include not in ["dates", "all"]:
+            fields.pop("dates")
+        return fields
 
-        if include not in ["all", "dates"]:
-            tour_dict.pop("dates")
-        else:
-            dates = tour_dict.get("dates")
-            tour_dict["dates"] = sorted(dates, key=lambda d: d["date"]) if dates else []
+    def init_query_params(self):
+        self.past_dates = False
+        self.include = ""
 
-        return tour_dict
+
+class ToursSerializer(TourSerializer):
+    many = True
+
+    def init_query_params(self):
+        super().init_query_params()
+        self.archived_tours = False

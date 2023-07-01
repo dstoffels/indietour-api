@@ -11,18 +11,22 @@ from django.shortcuts import get_object_or_404
 
 
 class BandUserSerializer(BaseSerializer):
-    include_tours = False
-    archived_tours = False
-
     class Meta:
         model = BandUser
-        fields = "id", "is_admin", "user"
+        fields = "id", "email", "is_admin", "username"
 
-    user = UserSerializer(read_only=True)
+    email = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField(read_only=True)
+
+    def get_email(self, banduser: BandUser):
+        return banduser.user.email
+
+    def get_username(self, banduser: BandUser):
+        return banduser.user.username
 
     def create(self, validated_data: dict):
         email = self.initial_data.get("email")
-        is_admin = self.initial_data.get("is_admin")
+        is_admin = validated_data.get("is_admin")
         band_id = self.context.get("band_id")
 
         user, created = User.objects.get_or_create(email=email)

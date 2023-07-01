@@ -1,19 +1,14 @@
 from rest_framework import generics
 from rest_framework.response import Response
-from .serializers import Tour, TourSerializer, TourUser, TourUserSerializer
+from .serializers import Tour, TourSerializer, TourUser, TourUserSerializer, ToursSerializer
 from .permissions import IsTourUser, IsTourAdmin, IsBandUser
 from bands.permissions import IsBandAdmin
 from core.views import BaseAPIView, BandDependentView, TourDependentView
-from core.query_params import BooleanQueryParam, ListQueryParam, QueryParamsManager
+from core.query_params import BooleanQueryParam, ListQueryParam, QueryParam
 
 
 class ToursView(generics.ListCreateAPIView, BaseAPIView):
-    serializer_class = TourSerializer
-    # query_params = QueryParamsManager(
-    #     BooleanQueryParam("archived_tours"),
-    #     ListQueryParam("include", ["all", "dates"]),
-    #     BooleanQueryParam("past_dates"),
-    # )
+    serializer_class = ToursSerializer
 
     def post(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
@@ -27,18 +22,27 @@ class ToursView(generics.ListCreateAPIView, BaseAPIView):
             return (IsBandUser(),)
         return (IsBandAdmin(),)
 
+    def get_query_params(self) -> list[QueryParam]:
+        return [
+            QueryParam("include", ["all", "dates"]),
+            BooleanQueryParam("past_dates"),
+            BooleanQueryParam("archived_tours"),
+        ]
+
 
 class TourView(generics.RetrieveUpdateDestroyAPIView, BandDependentView):
     queryset = Tour.objects.all()
     serializer_class = TourSerializer
     lookup_field = "id"
     lookup_url_kwarg = "tour_id"
-    # query_params = QueryParamsManager(ListQueryParam("include", ["all", "dates"]), BooleanQueryParam("past_dates"))
 
     def get_permissions(self):
         if self.request.method == "GET":
             return [IsTourUser()]
         return [IsTourAdmin()]
+
+    def get_query_params(self) -> list[QueryParam]:
+        return [QueryParam("include", ["all", "dates"]), BooleanQueryParam("past_dates")]
 
 
 class TourUsersView(generics.CreateAPIView, TourDependentView):

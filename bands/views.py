@@ -23,23 +23,28 @@ class BandsView(generics.ListCreateAPIView, BaseAPIView):
     def get_queryset(self):
         return self.get_bands_for_user()
 
-    def init_query_params(self) -> list[QueryParam]:
+    def get_query_params(self) -> list[QueryParam]:
         return [
             BooleanQueryParam("archived_tours"),
             BooleanQueryParam("archived_bands"),
-            QueryParam("include", ["tours", "dates"]),
+            QueryParam("include", ["tours", "dates", "all"]),
         ]
 
 
-class BandView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
+class BaseBandView(BaseAPIView):
+    def get_query_params(self) -> list[QueryParam]:
+        return [
+            BooleanQueryParam("archived_tours"),
+            QueryParam("include", ["tours", "dates", "all"]),
+        ]
+
+
+# test, refactor params
+class BandView(generics.RetrieveUpdateDestroyAPIView, BaseBandView):
     queryset = Band.objects.all()
     serializer_class = BandSerializer
     lookup_url_kwarg = "band_id"
     lookup_field = "id"
-    # query_params = QueryParamsManager(
-    #     BooleanQueryParam("archived_tours"),
-    #     QueryParam("include", ["tours", "dates"]),
-    # )
 
     def get_permissions(self):
         if self.request.method == "GET":
@@ -47,7 +52,7 @@ class BandView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
         return [IsBandAdmin()]
 
 
-class BandUsersView(generics.CreateAPIView, BandDependentView):
+class BandUsersView(generics.CreateAPIView, BandDependentView, BaseBandView):
     serializer_class = BandUserSerializer
     permission_classes = (IsBandAdmin,)
     lookup_url_kwarg = "band_id"
@@ -57,7 +62,7 @@ class BandUsersView(generics.CreateAPIView, BandDependentView):
         return super().finalize_response(request, response, *args, **kwargs)
 
 
-class BandUserView(generics.DestroyAPIView, BandDependentView):
+class BandUserView(generics.UpdateAPIView, generics.DestroyAPIView, BandDependentView, BaseBandView):
     queryset = BandUser.objects.all()
     serializer_class = BandUserSerializer
     permission_classes = (IsBandAdmin,)

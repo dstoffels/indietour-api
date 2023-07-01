@@ -17,13 +17,13 @@ class BaseAPIView(generics.GenericAPIView):
     Path variables are automatically assigned to serializer context."""
 
     def initial(self, request, *args, **kwargs):
-        query_params = self.init_query_params()
+        query_params = self.get_query_params()
         self.query_params = QueryParamsManager(query_params)
         self.query_params.validate(request)
         return super().initial(request, *args, **kwargs)
 
-    def init_query_params(self) -> list[QueryParam]:
-        """Add QueryParams expected for this view. Must return a list of QueryParam"""
+    def get_query_params(self) -> list[QueryParam]:
+        """Override with a list of QueryParams"""
         return []
 
     def get_serializer_context(self):
@@ -49,7 +49,7 @@ class BaseAPIView(generics.GenericAPIView):
     def get_tours_for_band(self):
         band_id = self.kwargs.get("band_id")
         tours = Tour.objects.filter(band_id=band_id)
-        archived_tours = self.validated_query_params.get("archived_tours")
+        archived_tours = self.query_params.get("archived_tours")
         if not archived_tours:
             tours = tours.filter(is_archived=False)
         return tours
