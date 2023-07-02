@@ -4,9 +4,10 @@ from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from places.utils import fetch_place
 from places.serializers import PlaceSerializer
+from core.serializers import BaseSerializer
 
 
-class TimeslotSerializer(serializers.ModelSerializer):
+class TimeslotSerializer(BaseSerializer):
     class Meta:
         model = Timeslot
         exclude = ["date"]
@@ -50,16 +51,3 @@ class TimeslotSerializer(serializers.ModelSerializer):
         ser.is_valid()
         ser.save()
         return ser.instance
-
-    def is_valid(self, *, raise_exception=True):
-        from tours.models import Tour
-        from dates.models import Date
-
-        tour_id = self.context.get("tour_id")
-        date_id = self.context.get("date_id")
-        date = get_object_or_404(Date, id=date_id)
-
-        if str(date.tour_id) != tour_id:
-            raise ValidationError({"details": "Date does no belong to this Tour.", "code": "INVALID"})
-
-        return super().is_valid(raise_exception=raise_exception)
