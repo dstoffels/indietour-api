@@ -2,7 +2,7 @@ from typing import Any
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
 from bands.serializers import Band, BandSerializer
-from tours.serializers import Tour, TourSerializer, ToursSerializer
+from tours.serializers import Tour, TourSerializer
 from dates.serializers import Date, DateSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -17,13 +17,18 @@ class BaseAPIView(generics.GenericAPIView):
     Path variables are automatically assigned to serializer context."""
 
     def initial(self, request, *args, **kwargs):
-        query_params = self.get_query_params()
-        self.query_params = QueryParamsManager(query_params)
-        self.query_params.validate(request)
+        self.init_query_params(request)
         return super().initial(request, *args, **kwargs)
 
-    def get_query_params(self) -> list[QueryParam]:
-        """Override with a list of QueryParams"""
+    def init_query_params(self, request: Request):
+        """(OPTIONAL) Can be overridden to create instance vars for each query param. For intellisense only. Called in self.initial()
+
+        Syntax: self.instance_variable: QueryParam (do not assign a value)"""
+        self.query_params = QueryParamsManager(self.get_query_params(), request)
+        self.query_params.set_to_obj_attrs(self)
+
+    def get_query_params(self):
+        """Must return a list of core.query_params.QueryParam. Called in self.initial() to set self.query_params"""
         return []
 
     def get_serializer_context(self):
@@ -32,32 +37,6 @@ class BaseAPIView(generics.GenericAPIView):
         context.update(self.kwargs)
         self.query_params.update_context(context)
         return context
-
-    def get_bands_for_user(self):
-        user = self.request.user
-        bands = Band.objects.filter(Q(owner=user) | Q(bandusers__user=user)).order_by("name")
-        archived_bands = self.query_params.get("archived_bands")
-        if not archived_bands:
-            bands = bands.filter(is_archived=False)
-        return bands
-
-    def user_bands_response(self, status_code=200):
-        bands = self.get_bands_for_user()
-        ser = BandSerializer(bands, many=True, context=self.get_serializer_context())
-        return Response(ser.data, status_code)
-
-    def get_tours_for_band(self):
-        band_id = self.kwargs.get("band_id")
-        tours = Tour.objects.filter(band_id=band_id)
-        archived_tours = self.query_params.get("archived_tours")
-        if not archived_tours:
-            tours = tours.filter(is_archived=False)
-        return tours
-
-    def band_tours_response(self, status_code=200):
-        tours = self.get_tours_for_band()
-        ser = ToursSerializer(tours, many=True, context=self.get_serializer_context())
-        return Response(ser.data, status_code)
 
     def band_response(self, status_code=200):
         band = get_object_or_404(Band, id=self.kwargs.get("band_id"))

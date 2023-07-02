@@ -12,6 +12,10 @@ class User(AbstractUser):
     username = models.CharField(unique=False, max_length=255, null=False)
     email_verified = models.BooleanField(default=False)
     verification_code = models.CharField(max_length=6, default=generate_verification_code)
+    member_bands = models.ManyToManyField("bands.Band", through="bands.BandUser", related_name="users")
+
+    def get_bands(self):
+        return (self.member_bands.all() | self.owned_bands.all()).order_by("name")
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username", "password"]

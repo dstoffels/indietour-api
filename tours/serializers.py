@@ -2,7 +2,8 @@ from .models import Tour, TourUser
 from rest_framework.exceptions import ValidationError
 from bands.serializers import BandUserSerializer, serializers
 from core.serializers import BaseSerializer
-from datetime import datetime
+from core.query_params import QueryParam
+from datetime import date
 
 
 class TourUserSerializer(BaseSerializer):
@@ -57,8 +58,8 @@ class TourSerializer(BaseSerializer):
 
     def get_dates(self, tour: Tour):
         dates = tour.dates.all().order_by("date")
-        if not self.past_dates:
-            dates = dates.filter(date__gte=datetime.now().date())
+        if self.past_dates.is_invalid():
+            dates = dates.filter(date__gte=date.today())
         return DateSerializer(dates, many=True, context=self.context).data
 
     def create(self, validated_data: dict):
@@ -69,19 +70,12 @@ class TourSerializer(BaseSerializer):
         return super().create(validated_data)
 
     def init_query_params(self):
-        self.past_dates = False
-        self.include = ""
+        self.past_dates: QueryParam
+        self.include = QueryParam
+        self.archived_tours: QueryParam
 
     def get_fields(self):
         fields = super().get_fields()
-        if self.include not in ["dates", "all"]:
+        if self.include.is_invalid():
             fields.pop("dates")
         return fields
-
-
-class ToursSerializer(TourSerializer):
-    many = True
-
-    def init_query_params(self):
-        super().init_query_params()
-        self.archived_tours = False

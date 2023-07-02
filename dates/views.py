@@ -9,40 +9,44 @@ from itertools import chain
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from tours.serializers import TourSerializer, Tour
-from core.views import TourDependentView
+from core.views import TourDependentView, BandDependentView
+from core.query_params import ListQueryParam, BooleanQueryParam, QueryParam
+from datetime import date
 
 
-class DatesView(generics.CreateAPIView, TourDependentView):
+class BaseDatesView(BandDependentView):
+    def get_query_params(self) -> list[QueryParam]:
+        return [
+            ListQueryParam("include", ["all", "timeslots", "contacts", "prospects", "lodgings"]),
+            BooleanQueryParam("past_dates"),
+        ]
+
+
+class DatesView(generics.ListCreateAPIView, BaseDatesView):
     serializer_class = DateSerializer
-
-    def post(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
-        return self.tour_response(201)
 
     def get_permissions(self):
         if self.request.method == "GET":
             return (IsTourUser(),)
         return (IsTourAdmin(),)
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context.update({"include": "dates"})
-        return context
+    def get_queryset(self):
+        tourdates = Date.objects.filter(tour_id=self.kwargs.get("tour_id")).order_by("date")
+        if self.past_dates.is_invalid():
+            tourdates = tourdates.filter(date__gte=date.today())
+        return tourdates
+
+    def init_query_params(self, request: Request):
+        super().init_query_params(request)
+        self.include: ListQueryParam
+        self.past_dates: BooleanQueryParam
 
 
-class DateView(generics.RetrieveUpdateDestroyAPIView, TourDependentView):
+class DateView(generics.RetrieveUpdateDestroyAPIView, TourDependentView, BaseDatesView):
     queryset = Date.objects.all()
     serializer_class = DateSerializer
     lookup_field = "id"
     lookup_url_kwarg = "date_id"
-
-    def patch(self, request, *args, **kwargs):
-        super().patch(request, *args, **kwargs)
-        return self.tour_response()
-
-    def delete(self, request, *args, **kwargs):
-        super().delete(request, *args, **kwargs)
-        return self.tour_response()
 
     def get_permissions(self):
         if self.request.method == "GET":

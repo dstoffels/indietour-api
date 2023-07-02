@@ -1,6 +1,7 @@
 from rest_framework import generics
+from rest_framework.request import Request
 from rest_framework.response import Response
-from .serializers import Tour, TourSerializer, TourUser, TourUserSerializer, ToursSerializer
+from .serializers import Tour, TourSerializer, TourUser, TourUserSerializer
 from .permissions import IsTourUser, IsTourAdmin, IsBandUser
 from bands.permissions import IsBandAdmin
 from core.views import BaseAPIView, BandDependentView, TourDependentView
@@ -9,27 +10,32 @@ from core.query_params import BooleanQueryParam, ListQueryParam, QueryParam
 
 class BaseTourView(BaseAPIView):
     def get_query_params(self) -> list[QueryParam]:
-        return [BooleanQueryParam("past_dates")]
+        return [
+            QueryParam("include", ["all", "dates"]),
+            BooleanQueryParam("past_dates"),
+            BooleanQueryParam("archived_tours"),
+        ]
+
+    def init_query_params(self, request: Request):
+        super().init_query_params(request)
+        self.include: QueryParam
+        self.past_dates: QueryParam
+        self.archived_tours: QueryParam
 
 
 class ToursView(generics.ListCreateAPIView, BaseTourView):
-    serializer_class = ToursSerializer
-
-    def post(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
-        return self.band_tours_response(201)
+    serializer_class = TourSerializer
 
     def get_queryset(self):
-        return self.get_tours_for_band()
+        tours = Tour.objects.filter(band_id=self.kwargs.get("band_id")).order_by("name")
+        if self.archived_tours.is_invalid():
+            tours = tours.filter(is_archived=False)
+        return tours
 
     def get_permissions(self):
         if self.request.method == "GET":
             return (IsBandUser(),)
         return (IsBandAdmin(),)
-
-    def get_query_params(self) -> list[QueryParam]:
-        params = super().get_query_params()
-        return [*params, QueryParam("include", ["all", "dates"]), BooleanQueryParam("archived_tours")]
 
 
 class TourView(generics.RetrieveUpdateDestroyAPIView, BandDependentView, BaseTourView):
@@ -43,16 +49,8 @@ class TourView(generics.RetrieveUpdateDestroyAPIView, BandDependentView, BaseTou
             return [IsTourUser()]
         return [IsTourAdmin()]
 
-    def get_query_params(self) -> list[QueryParam]:
-        params = super().get_query_params()
-        return [*params, QueryParam("include", ["all"])]
 
-    def delete(self, request, *args, **kwargs):
-        super().delete(request, *args, **kwargs)
-        return self.band_response()
-
-
-class TourUsersView(generics.CreateAPIView, TourDependentView):
+class TourUsersView(generics.CreateAPIView, TourDependentView, BaseTourView):
     queryset = TourUser.objects.all()
     permission_classes = (IsTourAdmin,)
     serializer_class = TourUserSerializer
@@ -62,7 +60,7 @@ class TourUsersView(generics.CreateAPIView, TourDependentView):
         return self.tour_response(201)
 
 
-class TourUserView(generics.DestroyAPIView, TourDependentView):
+class TourUserView(generics.DestroyAPIView, TourDependentView, BaseTourView):
     queryset = TourUser.objects.all()
     permission_classes = (IsTourAdmin,)
     serializer_class = TourUserSerializer

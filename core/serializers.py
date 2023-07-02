@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from core.query_params import QueryParamsManager
+from typing import Optional
 
 
 class BaseSerializer(serializers.ModelSerializer):
@@ -14,10 +15,14 @@ class BaseSerializer(serializers.ModelSerializer):
 
     def get_fields(self):
         self.init_query_params()
-        self.query_params: QueryParamsManager = self.context.get("query_params")
-        self.query_params.set_serializer(self)
+        self.query_params = self.context.get("query_params")
+        if isinstance(self.query_params, QueryParamsManager):
+            self.query_params.set_to_obj_attrs(self)
         return super().get_fields()
 
     def init_query_params(self):
-        """Override to assign instance vars for any query params. Called with get_fields"""
+        """(OPTIONAL) Override to create instance vars for QueryParams. This is for intellisense only, vars must not be assigned a value. Called first in self.get_fields()
+
+        Syntax: self.instance_var: QueryParam
+        """
         pass

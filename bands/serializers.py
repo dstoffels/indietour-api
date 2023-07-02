@@ -7,6 +7,7 @@ from authentication.utils import generate_password
 from django.core.mail import send_mail
 from django.conf import settings
 from core.serializers import BaseSerializer
+from core.query_params import QueryParam
 from django.shortcuts import get_object_or_404
 
 
@@ -77,7 +78,7 @@ class BandSerializer(BaseSerializer):
 
     def get_tours(self, band: Band):
         tours = band.tours.all().order_by("name")
-        if not self.archived_tours:
+        if self.archived_tours.is_invalid():
             tours = tours.filter(is_archived=False)
         return TourSerializer(tours, many=True, context=self.context).data
 
@@ -86,19 +87,17 @@ class BandSerializer(BaseSerializer):
         return super().create(validated_data)
 
     def init_query_params(self):
-        self.archived_tours = False
-        self.include = ""
+        self.archived_tours: QueryParam
+        self.include: QueryParam
 
     def get_fields(self):
         fields = super().get_fields()
-        if self.include not in ["tours", "dates", "all"]:
+        if self.include.is_invalid():
             fields.pop("tours")
         return fields
 
 
 class BandsSerializer(BandSerializer):
-    many = True
-
     def init_query_params(self):
         super().init_query_params()
-        self.archived_bands = False
+        self.archived_bands: QueryParam

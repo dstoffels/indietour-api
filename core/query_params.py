@@ -1,12 +1,31 @@
-class QueryParam:
-    def __init__(self, name: str, accepted_values=[]):
-        self.name = name
-        self.accepted_values = accepted_values
-        self.value: str = None
+from rest_framework.request import Request
+from rest_framework.exceptions import ValidationError
 
-    def is_valid(self, value: str):
-        self.value = value.lower()
+
+class QueryParam:
+    def __init__(self, name: str, accepted_values: list[str] = []):
+        self.name = name
+        self.value: str = None
+        self.accepted_values = accepted_values
+
+    def set_value(self, value: str):
+        if value is not None:
+            self.value = value.lower()
+
+    def validate_value(self):
+        return self._is_null() or self.value in self.accepted_values
+
+    def is_valid(self):
         return self.value in self.accepted_values
+
+    def is_invalid(self):
+        return not self.is_valid()
+
+    def contains(self, value):
+        return self.value == value
+
+    def _is_null(self):
+        return self.value is None
 
     def __repr__(self) -> str:
         return f"QueryParam <{self.name}: {self.value}>"
@@ -16,42 +35,44 @@ class BooleanQueryParam(QueryParam):
     def __init__(self, name: str):
         super().__init__(name, [True, False])
 
-    def is_valid(self, value: str):
-        self.value = value.lower() == "true"
-        return self.value in self.accepted_values
+    def set_value(self, value: str):
+        super().set_value(value)
+        self.value = self.value == "true"
+
+    def is_valid(self):
+        return self.value
 
 
 class ListQueryParam(QueryParam):
     def __init__(self, name: str, accepted_values=[]):
         super().__init__(name, accepted_values)
 
-    def is_valid(self, value: str):
-        self.value = value.split(",")
-        for val in self.value:
-            if val not in self.accepted_values:
-                return False
-        return True
+    def set_value(self, value: str):
+        super().set_value(value)
+        if not self._is_null():
+            self.value = self.value.split(",")
 
+    def contains(self, value):
+        return not self._is_null() and value in self.value
 
-from rest_framework.request import Request, HttpRequest
-from rest_framework.exceptions import ValidationError
+    def validate_value(self):
+        return self._is_null() or bool(set(self.value) & set(self.accepted_values))
 
 
 class QueryParamsManager:
-    def __init__(self, query_params: list[QueryParam]) -> None:
+    def __init__(self, query_params: list[QueryParam], request: Request) -> None:
         self.query_params = query_params
+        self.request = request
         self.validated_query_params: dict[str, QueryParam] = {}
+        self.__set_values()
+        self.validate()
 
-    def validate(self, request: Request):
+    def validate(self):
         invalid_params: list[QueryParam] = []
         for param in self.query_params:
-            value = request.query_params.get(param.name)
-
-            if value is not None:
-                if not param.is_valid(value):
+            if param.value is not None:
+                if not param.validate_value():
                     invalid_params.append(param)
-                else:
-                    self.validated_query_params.update({param.name: param})
 
         if len(invalid_params):
             raise ValidationError(
@@ -64,17 +85,20 @@ class QueryParamsManager:
             )
 
     def update_context(self, context: dict):
-        """Adds itself to a serializer context["query_params"]"""
+        """Adds itself to a serializer's context["query_params"]"""
         context.update({"query_params": self})
         return context
 
-    def set_serializer(self, serializer):
-        for param in self.validated_query_params.values():
-            if hasattr(serializer, param.name):
-                setattr(serializer, param.name, param.value)
+    def set_to_obj_attrs(self, obj):
+        for param in self.query_params:
+            setattr(obj, param.name, param)
 
-    def get(self, param: str):
-        return self.validated_query_params.get(param)
+    def get(self, param_name: str):
+        return next((param for param in self.query_params if param.name == param_name), None)
+
+    def __set_values(self):
+        for param in self.query_params:
+            param.set_value(self.request.query_params.get(param.name))
 
     def __repr__(self) -> str:
         return [f"{param.name}: {param.value}" for param in self.query_params]

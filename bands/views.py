@@ -8,12 +8,14 @@ from .permissions import IsBandUser, IsBandAdmin
 from django.shortcuts import get_object_or_404
 from core.views import BandDependentView, BaseAPIView
 from core.query_params import BooleanQueryParam, QueryParam
+from django.db.models import Q
 
 
 class BaseBandView(BaseAPIView):
     def get_query_params(self) -> list[QueryParam]:
         return [
             BooleanQueryParam("archived_tours"),
+            BooleanQueryParam("past_dates"),
             QueryParam("include", ["tours", "dates", "all"]),
         ]
 
@@ -21,18 +23,24 @@ class BaseBandView(BaseAPIView):
 class BandsView(generics.ListCreateAPIView, BaseBandView):
     serializer_class = BandsSerializer
     permission_classes = (IsVerified,)
-    # query_params = QueryParamsManager()
-
-    def post(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
-        return self.user_bands_response(201)
 
     def get_queryset(self):
-        return self.get_bands_for_user()
+        user: User = self.request.user
+        bands = user.get_bands()
+        if self.archived_bands.is_invalid():
+            bands = bands.filter(is_archived=False)
+
+        return bands
 
     def get_query_params(self) -> list[QueryParam]:
         params = super().get_query_params()
         return [*params, BooleanQueryParam("archived_bands")]
+
+    def init_query_params(self, request: Request):
+        self.archived_bands: QueryParam
+        self.archived_tours: QueryParam
+        self.include: QueryParam
+        super().init_query_params(request)
 
 
 class BandView(generics.RetrieveUpdateDestroyAPIView, BaseBandView):
