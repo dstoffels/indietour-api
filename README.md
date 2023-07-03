@@ -5,7 +5,6 @@
 
 ## AUTH
 All auth endpoints return a JWT with the following User object encoded within:
-User: (encoded in JWT)
 ```json
 {
     "email": "example@site.com",
@@ -15,6 +14,8 @@ User: (encoded in JWT)
     "active_tour_id": "7cbf34ac-d750-4973-93a7-012433ced43b",
 }
 ```
+
+### Endpoints
 
 **/auth/login**
 - POST -> JWT
