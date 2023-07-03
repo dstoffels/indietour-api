@@ -53,9 +53,8 @@ Request Body:
     "email": "example@site.com",
     "password": "password1@"
 }
-&nbsp;
-// is there some way to great vertical whitespace between these two sections?
 ```
+&nbsp;
 ## Refresh JWT
 ### /auth/refresh
 ### POST
