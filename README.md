@@ -9,7 +9,17 @@
     - [Register New User](#register-new-user)
     - [Verify User Email](#verify-user-email)
     - [Change Password](#change-password)
-- [Bands](#bands)
+- [Band](#band)
+    - [Bands](#bands)
+    - [Band Detail](#band-detail)
+    - [Band Users](#band-users)
+- [Tour](#tour)
+    - [Tours](#tours)
+    - [Tour Detail](#tour-detail)
+    - [Tour Users](#tour-users)
+- [Date](#date) 
+    - [Dates](#dates) 
+    - [Date Detail](#date-detail) 
 
 
 
@@ -44,7 +54,7 @@ Request Body:
     "password": "password1@"
 }
 ```
-
+  
 ## Refresh JWT
 ### /auth/refresh
 ### POST
@@ -108,7 +118,7 @@ Response Body:
 }
 ```
 
-# Bands
+# Band
 Band:
 {
     id,
@@ -130,7 +140,8 @@ BandUser:
     - include (optional): Options for nesting depth. No nesting by default. 
         - options: all|tours|dates
 
-# /bands (filtered by owner_id)
+## Bands
+### /bands
 - params:
     - archives: Set true to include archived bands
 - POST -> [Band] 
