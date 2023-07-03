@@ -20,10 +20,12 @@ class PlaceSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         place_id = validated_data.get("place_id")
-        result: dict = fetch_place(place_id)
-        place, created = Place.objects.get_or_create(id=place_id)
+        place = Place.objects.filter(id=place_id).first()
 
-        if created:
+        if not place:
+            result: dict = fetch_place(place_id)
+            place = Place.objects.create(id=place_id)
+
             address_components = result.get("address_components")
 
             political_address = []

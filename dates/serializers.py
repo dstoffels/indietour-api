@@ -18,7 +18,7 @@ class DateSerializer(BaseSerializer):
     timeslots = TimeslotSerializer(read_only=True, many=True)
 
     def create(self, validated_data: dict):
-        tour_id = self.context.get("tour_id")
+        tour_id = self.path_vars.tour_id
         validated_data["tour_id"] = tour_id
         duplicate = Date.objects.filter(tour_id=tour_id, date=validated_data.get("date")).first()
         if duplicate:
@@ -29,6 +29,12 @@ class DateSerializer(BaseSerializer):
         ser.save()
 
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        ser = PlaceSerializer(data=validated_data)
+        ser.is_valid()
+        ser.save()
+        return super().update(instance, validated_data)
 
     def init_query_params(self):
         self.include: ListQueryParam
