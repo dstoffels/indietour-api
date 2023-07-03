@@ -188,10 +188,14 @@ Request Body
 
 ```all``` returns the band resource with nested tours, dates and all nested date resources.
 
+
+
 ```archived_tours```
+
     ?archived_tours=true
 
 ```past_dates```
+
     ?past_dates=true
 
 ```/bands?include=tours``` 
