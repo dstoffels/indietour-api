@@ -8,7 +8,6 @@ class Prospect(UUIDModel):
     notes = models.TextField(blank=True, default="")
     status = models.CharField(max_length=50)
     hold = models.IntegerField(default=0)
-
     log: models.QuerySet = None
 
     STATUS_CHOICES = ["UNCONFIRMED", "INQURY SENT", "HOLD", "UNAVAILABLE", "OFFER", "CONFIRMED"]

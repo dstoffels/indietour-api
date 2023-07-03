@@ -12,8 +12,12 @@ class LogEntrySerializer(BaseSerializer):
         model = LogEntry
         fields = "id", "timestamp", "note"
 
-        timestamp = serializers.DateTimeField(read_only=True)
-        note = serializers.CharField()
+    timestamp = serializers.DateTimeField(read_only=True)
+    note = serializers.CharField()
+
+    def create(self, validated_data):
+        validated_data["prospect_id"] = self.path_vars.prospect_id
+        return super().create(validated_data)
 
 
 class ProspectSerializer(BaseSerializer):
@@ -36,12 +40,6 @@ class ProspectSerializer(BaseSerializer):
     def update(self, instance, validated_data):
         self._set_place()
         return super().update(instance, validated_data)
-
-    def get_fields(self):
-        fields = super().get_fields()
-        if fields.get("status") != "HOLD":
-            fields.pop("hold")
-        return fields
 
     def _set_place(self):
         place_id = self.validated_data.get("place_id")

@@ -23,3 +23,21 @@ class ProspectView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
 
     def get_queryset(self):
         return Prospect.objects.filter(date_id=self.path_vars.date_id)
+
+
+class LogView(generics.ListCreateAPIView, BaseAPIView):
+    serializer_class = LogEntrySerializer
+    permission_classes = (IsTourAdmin,)
+
+    def get_queryset(self):
+        return LogEntry.objects.filter(prospect_id=self.path_vars.prospect_id).order_by("timestamp")
+
+
+class LogEntryView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
+    serializer_class = LogEntrySerializer
+    permission_classes = (IsTourAdmin,)
+    lookup_field = "id"
+    lookup_url_kwarg = "logentry_id"
+
+    def get_queryset(self):
+        return LogEntry.objects.filter(prospect_id=self.path_vars.prospect_id).order_by("timestamp")
