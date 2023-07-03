@@ -37,6 +37,12 @@ class ProspectSerializer(BaseSerializer):
         self._set_place()
         return super().update(instance, validated_data)
 
+    def get_fields(self):
+        fields = super().get_fields()
+        if fields.get("status") != "HOLD":
+            fields.pop("hold")
+        return fields
+
     def _set_place(self):
         place_id = self.validated_data.get("place_id")
         if place_id:

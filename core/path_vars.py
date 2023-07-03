@@ -41,7 +41,7 @@ class PathVars:
                     self._validate_id(date.timeslots, self.timeslot_id, "date")
                     prospect = self._validate_id(date.prospects, self.prospect_id, "date")
                     # TODO: validate prospect notes
-                    self._validate_id(date.lodgings, self.prospect_id, "date")
+                    self._validate_id(date.lodgings, self.lodging_id, "date")
 
     def _validate_id(self, queryset: models.QuerySet, id, model_name: str):
         if id:
