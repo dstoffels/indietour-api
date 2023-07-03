@@ -1,9 +1,13 @@
 # indietour api
 
 ## Contents
-- [Authentication](#auth)
-    - [Login](#authlogin)
-    - [Refresh](#authrefresh)
+- [/auth](#auth)
+    - [/login](#authlogin)
+    - [/refresh](#authrefresh)
+    - [/user](#authuser)
+    - [/register](#authregister)
+    - [/verify](#authverify)
+    - [/password](#authpassword)
 - [Bands](#bands)
 
 
@@ -87,8 +91,6 @@ Response Body:
     "detail": "An email with a new verification code has been sent to dan.stoffels@gmail.com. "
 }
 ```
-
-
 
 ## /auth/password
 ### POST
