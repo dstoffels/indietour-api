@@ -158,32 +158,32 @@ Request Body:
 &nbsp;
 # Band
 ## Collection
-    **Path** 
-    ```markdown
-    /bands
-    ```
+**Path** 
+```markdown
+/bands
+```
 
-    **POST**
+**POST**
 
-    Request Body
-    ```json
-    {
-        "name": "Bob's Band"
-    }
-    ```
-    Params
-    ```markdown
-    /bands?include=tours
-    ```
-    Returns the band resource with a nested array of its tours.
-    ```markdown
-    /bands?include=dates
-    ```
-    Returns the band resource with a nested array of its tours, each with a nested array of their tour dates.
+Request Body
+```json
+{
+    "name": "Bob's Band"
+}
+```
+Params
+```markdown
+/bands?include=tours
+```
+Returns the band resource with a nested array of its tours.
+```markdown
+/bands?include=dates
+```
+Returns the band resource with a nested array of its tours, each with a nested array of their tour dates.
 
-    - params:
-        - archives: Set true to include archived bands
-    - GET -> [Band]
+- params:
+    - archives: Set true to include archived bands
+- GET -> [Band]
 
 ## Resource
 # /bands/<band_id>
