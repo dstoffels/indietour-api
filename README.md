@@ -1,6 +1,6 @@
 # indietour api
 
-## Contents
+<!-- ## Contents
 ### Endpoints
 - [Authentication](#authentication)
     - [Login](#login)
@@ -19,7 +19,7 @@
     - [Tour Users](#tour-users)
 - [Date](#date) 
     - [Dates](#dates) 
-    - [Date Detail](#date-detail) 
+    - [Date Detail](#date-detail)  -->
 
 
 &nbsp;
