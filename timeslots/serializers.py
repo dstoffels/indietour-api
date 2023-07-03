@@ -35,7 +35,7 @@ class TimeslotSerializer(BaseSerializer):
     destination_id = serializers.CharField(write_only=True, required=False, allow_null=True)
 
     def create(self, validated_data: dict):
-        validated_data["date_id"] = self.date_id
+        validated_data["date_id"] = self.path_vars.date_id
         origin_id = validated_data.get("origin_id")
         if origin_id:
             validated_data["origin"] = self._new_place(origin_id)

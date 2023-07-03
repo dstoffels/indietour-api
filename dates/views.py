@@ -1,14 +1,7 @@
 from rest_framework import generics
 from rest_framework.request import Request
-from rest_framework.response import Response
-from authentication.models import User
 from .serializers import Date, DateSerializer
 from tours.permissions import IsTourUser, IsTourAdmin
-from bands.permissions import IsBandAdmin
-from itertools import chain
-from rest_framework.exceptions import ValidationError
-from django.shortcuts import get_object_or_404
-from tours.serializers import TourSerializer, Tour
 from core.views import BaseAPIView
 from core.query_params import ListQueryParam, BooleanQueryParam, QueryParam
 from datetime import date

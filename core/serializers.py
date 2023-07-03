@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from core.query_params import QueryParamsManager
 from core.path_vars import PathVars
-from typing import Optional
 
 
 class BaseSerializer(serializers.ModelSerializer):
