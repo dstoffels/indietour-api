@@ -165,6 +165,8 @@ Request Body:
 
 **POST**
 
+&nbsp;
+
 Request Body
 ```json
 {
@@ -172,14 +174,18 @@ Request Body
 }
 ```
 Params
-```markdown
-/bands?include=tours
-```
+
+    /bands?include=tours
+
 Returns the band resource with a nested array of its tours.
-```markdown
-/bands?include=dates
-```
+
+&nbsp;
+
+    /bands?include=dates
+
 Returns the band resource with a nested array of its tours, each with a nested array of their tour dates.
+
+&nbsp;
 
 - params:
     - archives: Set true to include archived bands
