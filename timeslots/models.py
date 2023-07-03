@@ -1,7 +1,5 @@
-from typing import Iterable, Optional
 from django.db import models
 from core.models import UUIDModel
-from django.core.exceptions import ValidationError
 
 
 class Timeslot(UUIDModel):
