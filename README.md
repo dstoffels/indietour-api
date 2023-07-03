@@ -176,15 +176,27 @@ Request Body
 
 **Params**
 
-    include
+```include```
+
+    ?include=tours
+    ?include=dates
+    ?include=all
+
+```tours``` returns the band resource with a nested array of its tours.
+```dates``` returns the band resource with a nested array of its tours, each with a nested array of their tour dates.
+```all``` returns the band resource with nested tours, dates and all nested date resources.
+
+```archived_tours```
+    ?archived_tours=true
+
+```past_dates```
+    ?past_dates=true
 
 ```/bands?include=tours``` 
 
-Returns the band resource with a nested array of its tours.
 
 ```/bands?include=dates``` 
 
-Returns the band resource with a nested array of its tours, each with a nested array of their tour dates.
 
 
 
