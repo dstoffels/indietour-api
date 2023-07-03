@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "places",
     "timeslots",
     "prospects",
+    "lodgings",
 ]
 
 MIDDLEWARE = [
