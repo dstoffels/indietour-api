@@ -3,6 +3,7 @@
 ## Contents
 - [Auth Endpoints](#auth)
     - [Login](#authlogin)
+    - [Refresh](#authrefresh)
 - [Bands](#bands)
 
 
@@ -34,8 +35,8 @@ Decoded User object
 ### Endpoints
 
 #### /auth/login
-***POST***
-Body
+**POST**
+Body:
 ```json
 {
     "email": "example@site.com",
@@ -50,7 +51,7 @@ Response
 - POST -> JWT
     - body: {email, password}
 
-# /auth/refresh
+#### /auth/refresh
 - POST -> JWT
     - body: {refresh: (JWT refresh)}
 
