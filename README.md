@@ -158,7 +158,8 @@ Request Body:
 &nbsp;
 # Band
 ## Collection
-**Path** 
+**Path**
+
     /bands
 
 
