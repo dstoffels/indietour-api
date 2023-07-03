@@ -29,8 +29,8 @@ All auth endpoints return a JWT with the User object encoded within:
 JWT Response Body
 ```json
 {
-    "refresh": "<refresh token>",
-    "access": "<access token>"
+    "refresh": "<REFRESH TOKEN>",
+    "access": "<ACCESS TOKEN>"
 }
 ```
 
@@ -53,15 +53,16 @@ Request Body:
     "email": "example@site.com",
     "password": "password1@"
 }
+
+// is there some way to great vertical whitespace between these two sections?
 ```
-##
 ## Refresh JWT
 ### /auth/refresh
 ### POST
 Request Body:
 ```json
 {
-    "refresh": "{{REFRESH}}"
+    "refresh": "<REFRESH TOKEN>"
 }
 ```
 
