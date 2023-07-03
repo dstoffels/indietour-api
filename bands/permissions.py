@@ -1,31 +1,35 @@
-from authentication.permissions import IsVerified
+from core.permissions import IsVerified
 from rest_framework.request import Request
 from authentication.models import User
 from .models import Band
-from django.shortcuts import get_object_or_404
+from core.models import get_or_404
+from core.views import BaseAPIView
 
 
-class IsBandUser(IsVerified):
-    def has_permission(self, request: Request, view):
-        if not super().has_permission(request, view):
-            return False
+class IsBandOwner(IsVerified):
+    def get_permission(self):
+        return super().get_permission() and self.band.owner == self.user
+
+    def initial(self, request: Request, view: BaseAPIView):
+        super().initial(request, view)
+        self.band = Band.objects.filter(id=self.path_vars.band_id).first()
+
+
+class IsBandUser(IsBandOwner):
+    def get_permission(self):
+        return super().get_permission() or bool(self.banduser)
+
+    def set_error_msg(self):
         self.message = {"details": "User must be added to this band.", "code": "UNAUTHORIZED"}
-        user: User = request.user
-        band_id = view.kwargs.get("band_id")
-        band = get_object_or_404(Band, id=band_id)
-        banduser = band.bandusers.filter(user=user).first()
 
-        return band.owner == user or bool(banduser)
+    def initial(self, request: Request, view: BaseAPIView):
+        super().initial(request, view)
+        self.banduser = self.band.bandusers.filter(user=self.user).first()
 
 
 class IsBandAdmin(IsBandUser):
-    def has_permission(self, request: Request, view):
-        if not super().has_permission(request, view):
-            return False
-        self.message = {"details": "User must be a band admin.", "code": "REQUIRES_ADMIN"}
-        user: User = request.user
-        band_id = view.kwargs.get("band_id")
-        band = get_object_or_404(Band, id=band_id)
-        banduser = band.bandusers.filter(user=user, is_admin=True).first()
+    def get_permission(self):
+        return super().get_permission() or bool(self.banduser) and self.banduser.is_admin
 
-        return band.owner == user or bool(banduser)
+    def set_error_msg(self):
+        self.message = {"details": "User must be a band admin.", "code": "REQUIRES_ADMIN"}

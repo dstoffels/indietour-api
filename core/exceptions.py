@@ -1,9 +1,13 @@
 from rest_framework.views import exception_handler
 from rest_framework.response import Response
+from django.http import Http404
 
 
 def globals(exc, context):
     print(type(exc))
+
+    if isinstance(exc, Http404):
+        return Response(data={"detail": exc.args[0], "code": "INVALID"}, status=404)
 
     # standard view handling
     response = exception_handler(exc, context)

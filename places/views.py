@@ -3,14 +3,15 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from authentication.models import User
 from .serializers import Place, PlaceSerializer
-from authentication.permissions import IsVerified
+from core.permissions import IsVerified
+from core.views import BaseAPIView
 from django.shortcuts import get_object_or_404
 import requests
 import os
 from .utils import GAPI_BASE_URL
 
 
-class PlaceView(generics.RetrieveAPIView):
+class PlaceView(generics.RetrieveAPIView, BaseAPIView):
     permission_classes = (IsVerified,)
     queryset = Place.objects.all()
     serializer_class = PlaceSerializer
@@ -18,7 +19,7 @@ class PlaceView(generics.RetrieveAPIView):
     lookup_field = "id"
 
 
-class AutocompleteView(generics.RetrieveAPIView):
+class AutocompleteView(generics.RetrieveAPIView, BaseAPIView):
     permission_classes = (IsVerified,)
 
     def get(self, request: Request, *args, **kwargs):
@@ -29,7 +30,7 @@ class AutocompleteView(generics.RetrieveAPIView):
         return Response(response.json())
 
 
-class DirectionsView(generics.RetrieveAPIView):
+class DirectionsView(generics.RetrieveAPIView, BaseAPIView):
     permission_classes = (IsVerified,)
 
     def get(self, request, *args, **kwargs):

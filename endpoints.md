@@ -5,24 +5,7 @@
 /auth/user
 /auth/verify
 /auth/password
-/bands
-/bands/<pk>
-/bands/<pk>/users
-/bands/<pk>/users/<pk>
-/bands/<pk>/tours
-/bands/<pk>/tours/<pk>
-/bands/<pk>/tours/<pk>/users
-/bands/<pk>/tours/<pk>/users/<pk>
-/bands/<pk>/tours/<pk>/dates
-/bands/<pk>/tours/<pk>/dates/<pk>
-/bands/<pk>/tours/<pk>/dates/<pk>/timeslots
-/bands/<pk>/tours/<pk>/dates/<pk>/timeslots/<pk>
-<!-- /bands/<pk>/tours/<pk>/dates/<pk>/prospects -->
-<!-- /bands/<pk>/tours/<pk>/dates/<pk>/prospects/<pk> -->
-<!-- /bands/<pk>/tours/<pk>/dates/<pk>/prospects/<pk>/notes -->
-<!-- /bands/<pk>/tours/<pk>/dates/<pk>/prospects/<pk>/notes/<pk> -->
-<!-- /bands/<pk>/tours/<pk>/dates/<pk>/contacts -->
-<!-- /bands/<pk>/tours/<pk>/dates/<pk>/contacts/<pk> -->
+
 <!-- /contacts -->
 <!-- /contacts/<pk> -->
 /places/<pk>
@@ -31,3 +14,22 @@
 <!-- /places/<pk>/commments/<pk> -->
 /places/autocomplete (proxy)
 /places/directions (proxy)
+
+/bands
+/bands/<band_id>
+/bands/<band_id>/users
+/bands/<band_id>/users/<banduser_id>
+/bands/<band_id>/tours 
+/tours/<tour_id>
+/tours/<tour_id>/users
+/tours/<tour_id>/users/<touruser_id>
+/tours/<tour_id>/dates
+/dates/<date_id>
+/dates/<date_id>/timeslots
+/dates/<date_id>/prospects 
+/dates/<date_id>/lodgings
+/timeslots/<timeslot_id>
+/prospects/<prospect_id>
+/prospects/<prospect_id>/logentries
+/prospects/<prospect_id>/logentries/<logentry_id>
+/lodgings/<lodging_id>

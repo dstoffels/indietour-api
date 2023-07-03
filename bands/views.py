@@ -3,7 +3,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from authentication.models import User
 from .serializers import BandSerializer, BandsSerializer, Band, BandUserSerializer, BandUser
-from authentication.permissions import IsVerified
+from core.permissions import IsVerified
 from .permissions import IsBandUser, IsBandAdmin
 from django.shortcuts import get_object_or_404
 from core.views import BaseAPIView

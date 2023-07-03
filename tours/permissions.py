@@ -1,31 +1,28 @@
-from bands.permissions import IsBandUser, IsBandAdmin
+from core.views import BaseAPIView
+from core.views import BaseAPIView
+from bands.permissions import IsBandUser, IsBandOwner
 from rest_framework.request import Request
 from authentication.models import User
-from .models import Tour
-from django.shortcuts import get_object_or_404
+from .models import Tour, TourUser
 
 
-class IsTourUser(IsBandUser):
-    def has_permission(self, request: Request, view):
-        if not super().has_permission(request, view):
-            return False
-        self.message = {"details": "User must be added to this tour.", "code": "UNAUTHORIZED"}
-        user: User = request.user
-        tour_id = view.kwargs.get("tour_id")
-        tour = get_object_or_404(Tour, id=tour_id)
-        touruser = tour.tourusers.filter(banduser__user=user).first()
+class IsTourUser(IsBandOwner):
+    def get_permission(self):
+        return super().get_permission() or bool(self.touruser)
 
-        return tour.band.owner == user or bool(touruser)
+    def set_error_msg(self):
+        self.message = {"details": "Must be a tour user to access this resource.", "code": "UNAUTHORIZED"}
+
+    def initial(self, request: Request, view: BaseAPIView):
+        super().initial(request, view)
+        self.tour: Tour = Tour.objects.filter(id=self.path_vars.tour_id).first()
+        self.band = self.tour.band
+        self.touruser: TourUser = self.tour.tourusers.filter(banduser__user=self.user).first()
 
 
-class IsTourAdmin(IsBandUser):
-    def has_permission(self, request: Request, view):
-        if not super().has_permission(request, view):
-            return False
-        self.message = {"details": "User must be a tour admin", "code": "REQUIRES_ADMIN"}
-        user: User = request.user
-        tour_id = view.kwargs.get("tour_id")
-        tour = get_object_or_404(Tour, id=tour_id)
-        touruser = tour.tourusers.filter(banduser__user=user, is_admin=True).first()
+class IsTourAdmin(IsTourUser):
+    def get_permission(self):
+        return super().get_permission() or bool(self.touruser) and self.touruser.is_admin
 
-        return tour.band.owner == user or bool(touruser)
+    def set_error_msg(self):
+        self.message = {"details": "Must be a tour admin to access this resource.", "code": "REQUIRES_ADMIN"}
