@@ -4,7 +4,17 @@
 
 
 ## AUTH
-All auth endpoints return a JWT with the following User object encoded within:
+All auth endpoints return a JWT with the User object encoded within:
+
+JWT Response Body
+```json
+{
+    "refresh": "<refresh token>",
+    "access": "<access token>"
+}
+```
+
+Decoded User object
 ```json
 {
     "email": "example@site.com",
@@ -15,9 +25,24 @@ All auth endpoints return a JWT with the following User object encoded within:
 }
 ```
 
+
+
 ### Endpoints
 
 **/auth/login**
+***POST***
+Body
+```json
+{
+    "email": "example@site.com",
+    "password": "password1@"
+}
+```
+
+Response
+```json
+```
+
 - POST -> JWT
     - body: {email, password}
 
