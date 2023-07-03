@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from authentication.models import User
 from .serializers import BandSerializer, BandsSerializer, Band, BandUserSerializer, BandUser
 from core.permissions import IsVerified
-from .permissions import IsBandUser, IsBandAdmin
+from .permissions import IsBandUser, IsBandAdmin, IsBandOwner
 from django.shortcuts import get_object_or_404
 from core.views import BaseAPIView
 from core.query_params import BooleanQueryParam, QueryParam
@@ -51,8 +51,10 @@ class BandView(generics.RetrieveUpdateDestroyAPIView, BaseBandView):
 
     def get_permissions(self):
         if self.request.method == "GET":
-            return [IsBandUser()]
-        return [IsBandAdmin()]
+            return (IsBandUser(),)
+        if self.request.method == "DELETE":
+            return (IsBandOwner(),)
+        return (IsBandAdmin(),)
 
 
 class BandUsersView(generics.CreateAPIView, BaseBandView):

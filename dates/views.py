@@ -43,5 +43,5 @@ class DateView(generics.RetrieveUpdateDestroyAPIView, BaseDatesView):
 
     def get_permissions(self):
         if self.request.method == "GET":
-            return [IsTourUser()]
-        return [IsTourAdmin()]
+            return (IsTourUser(),)
+        return (IsTourAdmin(),)

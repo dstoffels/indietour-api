@@ -1,8 +1,7 @@
 from core.views import BaseAPIView
 from core.views import BaseAPIView
-from bands.permissions import IsBandUser, IsBandOwner
+from bands.permissions import IsBandOwner
 from rest_framework.request import Request
-from authentication.models import User
 from .models import Tour, TourUser
 
 
@@ -15,8 +14,7 @@ class IsTourUser(IsBandOwner):
 
     def initial(self, request: Request, view: BaseAPIView):
         super().initial(request, view)
-        self.tour: Tour = Tour.objects.filter(id=self.path_vars.tour_id).first()
-        self.band = self.tour.band
+        self.tour: Tour = self.band.tours.filter(id=self.path_vars.tour_id).first()
         self.touruser: TourUser = self.tour.tourusers.filter(banduser__user=self.user).first()
 
 

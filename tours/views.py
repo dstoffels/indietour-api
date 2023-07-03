@@ -2,8 +2,8 @@ from rest_framework import generics
 from rest_framework.request import Request
 from rest_framework.response import Response
 from .serializers import Tour, TourSerializer, TourUser, TourUserSerializer
-from .permissions import IsTourUser, IsTourAdmin, IsBandUser
-from bands.permissions import IsBandAdmin
+from .permissions import IsTourUser, IsTourAdmin
+from bands.permissions import IsBandAdmin, IsBandUser, IsBandOwner
 from core.views import BaseAPIView
 from core.query_params import BooleanQueryParam, ListQueryParam, QueryParam
 
