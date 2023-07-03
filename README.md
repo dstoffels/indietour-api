@@ -127,7 +127,7 @@ Response Body:
 &nbsp;
 ## Change Password
 **Path**
-```shell
+```markdown
 /auth/password
 ```
 
