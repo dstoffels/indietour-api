@@ -44,6 +44,8 @@ Decoded User object
     "active_tour_id": "7cbf34ac-d750-4973-93a7-012433ced43b",
 }
 ```
+
+&nbsp;
 ## Login
 ### /auth/login
 ### POST
