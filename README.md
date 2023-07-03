@@ -1,7 +1,8 @@
 # indietour api
 
 ## Contents
-- [/auth](#auth)
+### Endpoints
+- [/auth](#authentication)
     - [/login](#authlogin)
     - [/refresh](#authrefresh)
     - [/user](#authuser)
