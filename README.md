@@ -165,7 +165,6 @@ Request Body:
 
 **POST**
 
-&nbsp;
 
 Request Body
 ```json
@@ -173,6 +172,8 @@ Request Body
     "name": "Bob's Band"
 }
 ```
+
+
 Params
 
     /bands?include=tours
