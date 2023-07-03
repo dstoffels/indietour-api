@@ -1,6 +1,6 @@
-## indietour-api
+# indietour-api
 
-**AUTH**
+## AUTH
 
 User: (encoded in JWT)
 {
