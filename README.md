@@ -1,7 +1,9 @@
 # indietour api
 
 ## Contents
-- [AUTH](#auth)
+- [Auth Endpoints](#auth)
+    - [Login](#authlogin)
+- [Bands](#bands)
 
 
 
@@ -31,7 +33,7 @@ Decoded User object
 
 ### Endpoints
 
-**/auth/login**
+#### /auth/login
 ***POST***
 Body
 ```json
@@ -69,7 +71,7 @@ Response
 - POST -> JWT
     - body: {old_password, new_password}
 
-**BANDS**
+## BANDS
 Band:
 {
     id,
