@@ -163,7 +163,7 @@ Request Body:
     /bands
 
 
-**POST**
+### POST
 
 
 Request Body
