@@ -49,9 +49,9 @@ Decoded User object
 &nbsp;
 ## Login
 **Path**  
-```markdown
-/auth/login
-```
+
+    /auth/login
+
 **POST**  
 
 Request Body:
@@ -64,9 +64,9 @@ Request Body:
 &nbsp;
 ## Refresh JWT
 **Path**  
-```markdown
-/auth/refresh
-```
+
+    /auth/refresh
+
 **POST**
 
 Request Body:
@@ -79,9 +79,9 @@ Request Body:
 &nbsp;
 ## Update User
 **Path**  
-```markdown
-/auth/user
-```
+
+    /auth/user
+
 **PATCH**
 
 Request Body:
@@ -96,9 +96,9 @@ Request Body:
 &nbsp;
 ## Register New User
 **Path**  
-```markdown
-/auth/register
-```
+
+    /auth/register
+
 **POST**
 
 Request Body:
@@ -113,9 +113,8 @@ Request Body:
 &nbsp;
 ## Verify User Email
 **Path**
-```markdown
-/auth/verify
-```
+
+    /auth/verify
 
 **POST**
 
@@ -140,9 +139,8 @@ Response Body:
 &nbsp;
 ## Change Password
 **Path**
-```markdown
-/auth/password
-```
+
+    /auth/password
 
 **POST**
 
