@@ -126,7 +126,10 @@ Response Body:
 
 &nbsp;
 ## Change Password
-**Path ```/auth/password```**
+**Path**
+```shell
+/auth/password
+```
 
 **POST**
 
