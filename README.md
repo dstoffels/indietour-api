@@ -174,13 +174,14 @@ Request Body
 ```
 
 
-Params
+**Params**
+
+include
 
     /bands?include=tours
 
 Returns the band resource with a nested array of its tours.
 
-&nbsp;
 
     /bands?include=dates
 
