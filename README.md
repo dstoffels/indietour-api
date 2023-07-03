@@ -48,9 +48,9 @@ Decoded User object
 
 &nbsp;
 ## Login
-**__/auth/login__**
-&nbsp;
-**POST**
+**__/auth/login__**  
+&nbsp;  
+**POST**  
 Request Body:
 ```json
 {
