@@ -151,14 +151,15 @@ BandUser:
     - include (optional): Options for nesting depth. No nesting by default. 
         - options: all|tours|dates
 
-## Bands
-### /bands
+## Collection
+Path: ```/bands```
 - params:
     - archives: Set true to include archived bands
 - POST -> [Band] 
     - body: {name}
 - GET -> [Band]
 
+## Resource
 # /bands/<band_id>
 - GET -> Band
 - PATCH -> Band

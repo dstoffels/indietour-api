@@ -60,9 +60,9 @@ class BandUsersView(generics.CreateAPIView, BaseBandView):
     permission_classes = (IsBandAdmin,)
     lookup_url_kwarg = "band_id"
 
-    def finalize_response(self, request, response, *args, **kwargs):
-        response = self.band_response()
-        return super().finalize_response(request, response, *args, **kwargs)
+    def post(self, request, *args, **kwargs):
+        super().post(request, *args, **kwargs)
+        return self.band_response()
 
 
 class BandUserView(generics.UpdateAPIView, generics.DestroyAPIView, BaseBandView):
@@ -72,6 +72,6 @@ class BandUserView(generics.UpdateAPIView, generics.DestroyAPIView, BaseBandView
     lookup_url_kwarg = "banduser_id"
     lookup_field = "id"
 
-    def finalize_response(self, request, response, *args, **kwargs):
-        response = self.band_response()
-        return super().finalize_response(request, response, *args, **kwargs)
+    def delete(self, request, *args, **kwargs):
+        super().delete(request, *args, **kwargs)
+        return self.band_response()
