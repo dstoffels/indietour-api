@@ -54,7 +54,7 @@ Request Body:
     "password": "password1@"
 }
 ```
-  
+##
 ## Refresh JWT
 ### /auth/refresh
 ### POST
