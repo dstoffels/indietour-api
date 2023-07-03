@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from .serializers import Tour, TourSerializer, TourUser, TourUserSerializer
 from .permissions import IsTourUser, IsTourAdmin, IsBandUser
 from bands.permissions import IsBandAdmin
-from core.views import BaseAPIView, BandDependentView, TourDependentView
+from core.views import BaseAPIView
 from core.query_params import BooleanQueryParam, ListQueryParam, QueryParam
 
 
@@ -38,7 +38,7 @@ class ToursView(generics.ListCreateAPIView, BaseTourView):
         return (IsBandAdmin(),)
 
 
-class TourView(generics.RetrieveUpdateDestroyAPIView, BandDependentView, BaseTourView):
+class TourView(generics.RetrieveUpdateDestroyAPIView, BaseTourView):
     queryset = Tour.objects.all()
     serializer_class = TourSerializer
     lookup_field = "id"
@@ -50,7 +50,7 @@ class TourView(generics.RetrieveUpdateDestroyAPIView, BandDependentView, BaseTou
         return [IsTourAdmin()]
 
 
-class TourUsersView(generics.CreateAPIView, TourDependentView, BaseTourView):
+class TourUsersView(generics.CreateAPIView, BaseTourView):
     queryset = TourUser.objects.all()
     permission_classes = (IsTourAdmin,)
     serializer_class = TourUserSerializer
@@ -60,7 +60,7 @@ class TourUsersView(generics.CreateAPIView, TourDependentView, BaseTourView):
         return self.tour_response(201)
 
 
-class TourUserView(generics.RetrieveUpdateDestroyAPIView, TourDependentView, BaseTourView):
+class TourUserView(generics.RetrieveUpdateDestroyAPIView, BaseTourView):
     queryset = TourUser.objects.all()
     permission_classes = (IsTourAdmin,)
     serializer_class = TourUserSerializer

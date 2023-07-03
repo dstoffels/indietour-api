@@ -6,7 +6,7 @@ from .serializers import BandSerializer, BandsSerializer, Band, BandUserSerializ
 from authentication.permissions import IsVerified
 from .permissions import IsBandUser, IsBandAdmin
 from django.shortcuts import get_object_or_404
-from core.views import BandDependentView, BaseAPIView
+from core.views import BaseAPIView
 from core.query_params import BooleanQueryParam, QueryParam
 from django.db.models import Q
 
@@ -55,7 +55,7 @@ class BandView(generics.RetrieveUpdateDestroyAPIView, BaseBandView):
         return [IsBandAdmin()]
 
 
-class BandUsersView(generics.CreateAPIView, BandDependentView, BaseBandView):
+class BandUsersView(generics.CreateAPIView, BaseBandView):
     serializer_class = BandUserSerializer
     permission_classes = (IsBandAdmin,)
     lookup_url_kwarg = "band_id"
@@ -65,7 +65,7 @@ class BandUsersView(generics.CreateAPIView, BandDependentView, BaseBandView):
         return super().finalize_response(request, response, *args, **kwargs)
 
 
-class BandUserView(generics.UpdateAPIView, generics.DestroyAPIView, BandDependentView, BaseBandView):
+class BandUserView(generics.UpdateAPIView, generics.DestroyAPIView, BaseBandView):
     queryset = BandUser.objects.all()
     serializer_class = BandUserSerializer
     permission_classes = (IsBandAdmin,)

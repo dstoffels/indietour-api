@@ -9,12 +9,12 @@ from itertools import chain
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from tours.serializers import TourSerializer, Tour
-from core.views import TourDependentView, BandDependentView
+from core.views import BaseAPIView
 from core.query_params import ListQueryParam, BooleanQueryParam, QueryParam
 from datetime import date
 
 
-class BaseDatesView(BandDependentView):
+class BaseDatesView(BaseAPIView):
     def get_query_params(self) -> list[QueryParam]:
         return [
             ListQueryParam("include", ["all", "timeslots", "contacts", "prospects", "lodgings"]),
@@ -42,7 +42,7 @@ class DatesView(generics.ListCreateAPIView, BaseDatesView):
         self.past_dates: BooleanQueryParam
 
 
-class DateView(generics.RetrieveUpdateDestroyAPIView, TourDependentView, BaseDatesView):
+class DateView(generics.RetrieveUpdateDestroyAPIView, BaseDatesView):
     queryset = Date.objects.all()
     serializer_class = DateSerializer
     lookup_field = "id"
