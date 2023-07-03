@@ -144,7 +144,7 @@ Response Body:
 
 **POST**
 
-Response Body:
+Request Body:
 ```json
 {
     "old_password": "PxwbSaef6Eh1",
@@ -155,33 +155,31 @@ Response Body:
 &nbsp;
 &nbsp;
 # Band
-Band:
-{
-    id,
-    name,
-    is_archived,
-    owner: User
-    band_users: [BandUser]
-    *tours: [Tour]
-}
-
-BandUser:
-{
-    id,
-    is_admin,
-    user: User,
-}
-
-- params: (for all non-nested band endpoints excl. /users)
-    - include (optional): Options for nesting depth. No nesting by default. 
-        - options: all|tours|dates
-
 ## Collection
-Path: ```/bands```
+**Path** 
+```markdown
+/bands
+```
+
+**POST**
+Request Body
+```json
+{
+    "name": "Bob's Band"
+}
+```
+Params
+```markdown
+/bands?include=tours
+```
+Returns the band resource with a nested array of its tours.
+```markdown
+/bands?include=dates
+```
+Returns the band resource with a nested array of its tours, each with a nested array of their tour dates.
+
 - params:
     - archives: Set true to include archived bands
-- POST -> [Band] 
-    - body: {name}
 - GET -> [Band]
 
 ## Resource
