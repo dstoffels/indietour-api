@@ -2,13 +2,13 @@
 
 ## Contents
 ### Endpoints
-- [/auth](#authentication)
-    - [/login](#authlogin)
-    - [/refresh](#authrefresh)
-    - [/user](#authuser)
-    - [/register](#authregister)
-    - [/verify](#authverify)
-    - [/password](#authpassword)
+- [Authentication](#authentication)
+    - [Login](#login)
+    - [Refresh JWT](#refresh-jwt)
+    - [Update User](#update-user)
+    - [Register New User](#register-new-user)
+    - [Verify User Email](#verify-user-email)
+    - [Change Password](#change-password)
 - [Bands](#bands)
 
 
@@ -34,8 +34,8 @@ Decoded User object
     "active_tour_id": "7cbf34ac-d750-4973-93a7-012433ced43b",
 }
 ```
-
-## /auth/login
+## Login
+### /auth/login
 ### POST
 Request Body:
 ```json
@@ -45,7 +45,8 @@ Request Body:
 }
 ```
 
-## /auth/refresh
+## Refresh JWT
+### /auth/refresh
 ### POST
 Request Body:
 ```json
@@ -54,7 +55,8 @@ Request Body:
 }
 ```
 
-## /auth/user
+## Update User
+### /auth/user
 ### PATCH
 Request Body:
 ```json
@@ -65,7 +67,8 @@ Request Body:
 }   
 ```
 
-## /auth/register
+## Register New User
+### /auth/register
 ### POST
 Request Body:
 ```json
@@ -76,7 +79,8 @@ Request Body:
 }
 ```
 
-## /auth/verify
+## Verify User Email
+### /auth/verify
 ### POST
 Request Body:
 ```json
@@ -93,7 +97,8 @@ Response Body:
 }
 ```
 
-## /auth/password
+## Change Password
+### /auth/password
 ### POST
 Response Body:
 ```json
