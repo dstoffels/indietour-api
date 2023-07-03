@@ -5,14 +5,14 @@
 
 ## AUTH
 
-```json
 User: (encoded in JWT)
+```json
 {
-    email,
-    username,
-    email_verified: bool,
-    active_band_id: uuid,
-    active_tour_id: uuid,
+    "email": "example@site.com",
+    "username": "Bob",
+    "email_verified": true,
+    "active_band_id": "5e54b079-4302-41e6-bc53-1cffb3a45545",
+    "active_tour_id": "7cbf34ac-d750-4973-93a7-012433ced43b",
 }
 ```
 
