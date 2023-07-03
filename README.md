@@ -32,7 +32,7 @@ Decoded User object
 
 ## /auth/login
 ### POST
-Body:
+Request Body:
 ```json
 {
     "email": "example@site.com",
@@ -40,28 +40,67 @@ Body:
 }
 ```
 
-### /auth/refresh
-- POST -> JWT
-    - body: {refresh: (JWT refresh)}
+## /auth/refresh
+### POST
+Request Body:
+```json
+{
+    "refresh": "{{REFRESH}}"
+}
+```
 
-# /auth/user
-- PATCH -> JWT
-    - body: {username|active_band_id|active_tour_id}
+## /auth/user
+### PATCH
+Request Body:
+```json
+{
+    "username": "Robert",
+    "active_band_id": "aa32f727-82ea-470f-882b-4649aee2a36d",
+    "active_tour_id": "aa32f727-82ea-470f-882b-4649aee2a36d",
+}   
+```
 
-# /auth/register
-- POST -> JWT
-    - body: {email, password, username}
+## /auth/register
+### POST
+Request Body:
+```json
+{
+    "email": "bob@bob.com",
+    "password": "password1@",
+    "username": "Bobert"
+}
+```
 
-# /auth/verify
-- POST -> JWT
-    - body: {verification_code}
-- GET -> str
+## /auth/verify
+### POST
+Request Body:
+```json
+{
+    "verification_code": "592353"
+}
+```
 
-# /auth/password
-- POST -> JWT
-    - body: {old_password, new_password}
+### GET
+Response Body:
+```json
+{
+    "detail": "An email with a new verification code has been sent to dan.stoffels@gmail.com. "
+}
+```
 
-## BANDS
+
+
+## /auth/password
+### POST
+Response Body:
+```json
+{
+    "old_password": "PxwbSaef6Eh1",
+    "new_password": "Spades42!"
+}
+```
+
+# Bands
 Band:
 {
     id,

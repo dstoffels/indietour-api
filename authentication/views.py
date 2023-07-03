@@ -87,7 +87,9 @@ To verify, log in to your account at indietour.app/login and you will be directe
             [user.email],
             fail_silently=False,
         )
-        return Response("Email sent", 200)
+        return Response(
+            {"detail": f"An email with a new verification code has been sent to {user.email}. "}, status=200
+        )
 
     def post(self, request: Request, *args, **kwargs):
         verification_code = request.data.get("verification_code")
