@@ -4,7 +4,7 @@
 
 
 ## AUTH
-
+All auth endpoints return a JWT with the following User object encoded within:
 User: (encoded in JWT)
 ```json
 {
@@ -16,7 +16,7 @@ User: (encoded in JWT)
 }
 ```
 
-# /auth/login
+**/auth/login**
 - POST -> JWT
     - body: {email, password}
 
