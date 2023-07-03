@@ -183,7 +183,9 @@ Request Body
     ?include=all
 
 ```tours``` returns the band resource with a nested array of its tours.
+
 ```dates``` returns the band resource with a nested array of its tours, each with a nested array of their tour dates.
+
 ```all``` returns the band resource with nested tours, dates and all nested date resources.
 
 ```archived_tours```
