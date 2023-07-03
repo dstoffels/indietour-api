@@ -10,18 +10,29 @@ from core.serializers import BaseSerializer
 class TimeslotSerializer(BaseSerializer):
     class Meta:
         model = Timeslot
-        exclude = ["date"]
+        fields = (
+            "id",
+            "title",
+            "details",
+            "type",
+            "start_time",
+            "origin_id",
+            "origin",
+            "start_after_midnight",
+            "end_time",
+            "destination_id",
+            "destination",
+            "end_after_midnight",
+        )
 
-    start_time = serializers.TimeField(required=True)
-    date_id = serializers.UUIDField(write_only=True, required=False)
-    origin_id = serializers.CharField(write_only=True, required=False)
-    destination_id = serializers.CharField(write_only=True, required=False)
+    title = serializers.CharField(required=True)
+    type = serializers.ChoiceField(choices=Timeslot.TYPES, required=True)
+    start_time = serializers.TimeField(required=True, format="%H:%M")
+    origin_id = serializers.CharField(write_only=True, required=False, allow_null=True)
     origin = PlaceSerializer(read_only=True)
+    end_time = serializers.TimeField(required=False, format="%H:%M")
     destination = PlaceSerializer(read_only=True)
-    type_options = serializers.SerializerMethodField()
-
-    def get_type_options(self, timeslot):
-        return Timeslot.TYPES
+    destination_id = serializers.CharField(write_only=True, required=False, allow_null=True)
 
     def create(self, validated_data: dict):
         validated_data["date_id"] = self.date_id
