@@ -14,6 +14,8 @@ class User(AbstractUser):
     verification_code = models.CharField(max_length=6, default=generate_verification_code)
     member_bands = models.ManyToManyField("bands.Band", through="bands.BandUser", related_name="users")
 
+    contacts: models.QuerySet = None
+
     def get_bands(self):
         return (self.member_bands.all() | self.owned_bands.all()).order_by("name")
 

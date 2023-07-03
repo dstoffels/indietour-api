@@ -1,4 +1,5 @@
 from django.db import models
+from core.models import UUIDModel
 
 
 class Place(models.Model):
@@ -8,8 +9,22 @@ class Place(models.Model):
     political_address = models.CharField(max_length=100)
     lat = models.DecimalField(max_digits=13, decimal_places=10, default=0)
     lng = models.DecimalField(max_digits=13, decimal_places=10, default=0)
-    dates: models.QuerySet
-    # contacts = models.ManyToManyField("contacts.Contact", through="contacts.PlaceContact" related_name="places", blank=True)
+    dates: models.QuerySet = None
+    reviews: models.QuerySet = None
+    contacts: models.QuerySet = None
 
     def __str__(self) -> str:
         return self.description
+
+
+class PlaceReview(UUIDModel):
+    place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name="reviews")
+    user = models.ForeignKey("authentication.User", on_delete=models.CASCADE, related_name="reviews")
+    rating = models.IntegerField()
+    review = models.TextField()
+
+
+class PlaceContact(UUIDModel):
+    place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name="contacts")
+    contact = models.ForeignKey("contacts.Contact", on_delete=models.CASCADE, related_name="places")
+    title = models.CharField(max_length=255)
