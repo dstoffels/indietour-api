@@ -22,7 +22,8 @@
     - [Date Detail](#date-detail) 
 
 
-
+&nbsp;
+&nbsp;
 # Authentication
 All auth endpoints return a JWT with the User object encoded within:
 
