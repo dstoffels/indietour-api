@@ -125,7 +125,9 @@ Request Body:
     "verification_code": "592353"
 }
 ```
-&nbsp;
+
+
+
 **GET**
 
 Response Body:
@@ -143,7 +145,6 @@ Response Body:
 ```
 
 **POST**
-
 
 Request Body:
 ```json
