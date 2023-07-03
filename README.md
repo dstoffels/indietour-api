@@ -1,14 +1,14 @@
 # indietour api
 
 ## Contents
-- [Auth Endpoints](#auth)
+- [Auth](#auth)
     - [Login](#authlogin)
     - [Refresh](#authrefresh)
 - [Bands](#bands)
 
 
 
-## AUTH
+# AUTH
 All auth endpoints return a JWT with the User object encoded within:
 
 JWT Response Body
@@ -30,11 +30,8 @@ Decoded User object
 }
 ```
 
-
-
-
-### /auth/login
-#### POST
+## /auth/login
+### POST
 Body:
 ```json
 {
@@ -43,14 +40,7 @@ Body:
 }
 ```
 
-Response
-```json
-```
-
-- POST -> JWT
-    - body: {email, password}
-
-#### /auth/refresh
+### /auth/refresh
 - POST -> JWT
     - body: {refresh: (JWT refresh)}
 
