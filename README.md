@@ -159,9 +159,8 @@ Request Body:
 # Band
 ## Collection
 **Path** 
-```markdown
-/bands
-```
+    /bands
+
 
 **POST**
 
