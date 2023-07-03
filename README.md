@@ -194,14 +194,11 @@ Request Body
 
     ?archived_tours=true
 
+&nbsp;
+
 ```past_dates```
 
     ?past_dates=true
-
-```/bands?include=tours``` 
-
-
-```/bands?include=dates``` 
 
 
 
