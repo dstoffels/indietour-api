@@ -1,7 +1,11 @@
-# indietour-api
+# indietour api
+
+
+
 
 ## AUTH
 
+```json
 User: (encoded in JWT)
 {
     email,
@@ -10,6 +14,7 @@ User: (encoded in JWT)
     active_band_id: uuid,
     active_tour_id: uuid,
 }
+```
 
 # /auth/login
 - POST -> JWT
