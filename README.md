@@ -32,10 +32,9 @@ Decoded User object
 
 
 
-### Endpoints
 
-#### /auth/login
-**POST**
+### /auth/login
+#### POST
 Body:
 ```json
 {
