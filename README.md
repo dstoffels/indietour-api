@@ -65,6 +65,7 @@ Request Body:
 }
 ```
 
+&nbsp;
 ## Update User
 ### /auth/user
 ### PATCH
@@ -77,6 +78,7 @@ Request Body:
 }   
 ```
 
+&nbsp;
 ## Register New User
 ### /auth/register
 ### POST
@@ -89,6 +91,7 @@ Request Body:
 }
 ```
 
+&nbsp;
 ## Verify User Email
 ### /auth/verify
 ### POST
@@ -107,6 +110,7 @@ Response Body:
 }
 ```
 
+&nbsp;
 ## Change Password
 ### /auth/password
 ### POST
@@ -118,6 +122,8 @@ Response Body:
 }
 ```
 
+&nbsp;
+&nbsp;
 # Band
 Band:
 {
