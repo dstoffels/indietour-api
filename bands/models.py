@@ -7,6 +7,8 @@ class Band(UUIDModel):
     name = models.CharField(max_length=255, unique=True)
     owner = models.ForeignKey("authentication.User", on_delete=models.CASCADE, related_name="owned_bands")
     is_archived = models.BooleanField(default=False)
+    tours: models.QuerySet
+    bandusers: models.QuerySet
 
     def __str__(self) -> str:
         return f"Band: {self.name}"

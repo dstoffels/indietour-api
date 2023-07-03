@@ -23,8 +23,8 @@ class TimeslotSerializer(BaseSerializer):
     def get_type_options(self, timeslot):
         return Timeslot.TYPES
 
-    def create(self, validated_data):
-        validated_data["date_id"] = self.context.get("date_id")
+    def create(self, validated_data: dict):
+        validated_data["date_id"] = self.date_id
         origin_id = validated_data.get("origin_id")
         if origin_id:
             validated_data["origin"] = self._new_place(origin_id)

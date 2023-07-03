@@ -89,7 +89,7 @@ class QueryParamsManager:
         context.update({"query_params": self})
         return context
 
-    def set_to_obj_attrs(self, obj):
+    def to_obj_attrs(self, obj):
         for param in self.query_params:
             setattr(obj, param.name, param)
 

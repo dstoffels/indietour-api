@@ -13,7 +13,6 @@ class TourUserSerializer(BaseSerializer):
 
     email = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()
-    is_admin = serializers.SerializerMethodField()
 
     def get_email(self, touruser: TourUser):
         return touruser.banduser.user.email
@@ -21,26 +20,25 @@ class TourUserSerializer(BaseSerializer):
     def get_username(self, touruser: TourUser):
         return touruser.banduser.user.username
 
-    def get_is_admin(self, touruser: TourUser):
-        return touruser.banduser.is_admin
-
     def create(self, validated_data):
         from bands.serializers import BandUserSerializer, BandUser
 
         email = self.initial_data.get("email")
-        tour_id = self.context.get("tour_id")
+        tour_id = self.path_vars.tour_id
 
         try:
             banduser = BandUser.objects.get(user__email=email)
         except:
-            ser = BandUserSerializer(data=self.initial_data, context=self.context)
+            ser = BandUserSerializer(data={"email": email}, context=self.context)
             ser.is_valid(raise_exception=True)
             ser.save()
             banduser = ser.instance
 
         touruser = TourUser.objects.filter(tour_id=tour_id, banduser=banduser).first()
         if not touruser:
-            touruser = TourUser.objects.create(tour_id=tour_id, banduser=banduser)
+            touruser = TourUser.objects.create(
+                tour_id=tour_id, banduser=banduser, is_admin=validated_data.get("is_admin")
+            )
         return touruser
 
 
@@ -51,9 +49,9 @@ from dates.serializers import DateSerializer
 class TourSerializer(BaseSerializer):
     class Meta:
         model = Tour
-        fields = ("id", "name", "is_archived", "band_id", "tour_users", "dates")
+        fields = ("id", "name", "is_archived", "band_id", "tourusers", "dates")
 
-    tour_users = TourUserSerializer(source="tourusers", read_only=True, many=True)
+    tourusers = TourUserSerializer(read_only=True, many=True)
     dates = serializers.SerializerMethodField()
 
     def get_dates(self, tour: Tour):

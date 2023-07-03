@@ -60,12 +60,16 @@ class TourUsersView(generics.CreateAPIView, TourDependentView, BaseTourView):
         return self.tour_response(201)
 
 
-class TourUserView(generics.DestroyAPIView, TourDependentView, BaseTourView):
+class TourUserView(generics.RetrieveUpdateDestroyAPIView, TourDependentView, BaseTourView):
     queryset = TourUser.objects.all()
     permission_classes = (IsTourAdmin,)
     serializer_class = TourUserSerializer
     lookup_url_kwarg = "touruser_id"
     lookup_field = "id"
+
+    def patch(self, request, *args, **kwargs):
+        super().patch(request, *args, **kwargs)
+        return self.tour_response()
 
     def delete(self, request, *args, **kwargs):
         super().delete(request, *args, **kwargs)

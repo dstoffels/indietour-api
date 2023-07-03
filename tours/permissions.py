@@ -22,10 +22,10 @@ class IsTourAdmin(IsBandUser):
     def has_permission(self, request: Request, view):
         if not super().has_permission(request, view):
             return False
-        self.message = {"details": "User must be a band admin", "code": "REQUIRES_ADMIN"}
+        self.message = {"details": "User must be a tour admin", "code": "REQUIRES_ADMIN"}
         user: User = request.user
         tour_id = view.kwargs.get("tour_id")
         tour = get_object_or_404(Tour, id=tour_id)
-        touruser = tour.tourusers.filter(banduser__user=user, banduser__is_admin=True).first()
+        touruser = tour.tourusers.filter(banduser__user=user, is_admin=True).first()
 
         return tour.band.owner == user or bool(touruser)

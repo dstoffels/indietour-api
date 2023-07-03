@@ -18,6 +18,7 @@ class BandUserSerializer(BaseSerializer):
 
     email = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField(read_only=True)
+    is_admin = serializers.BooleanField(required=False)
 
     def get_email(self, banduser: BandUser):
         return banduser.user.email
@@ -27,7 +28,7 @@ class BandUserSerializer(BaseSerializer):
 
     def create(self, validated_data: dict):
         email = self.initial_data.get("email")
-        is_admin = validated_data.get("is_admin")
+        is_admin = bool(validated_data.get("is_admin"))
         band_id = self.context.get("band_id")
 
         user, created = User.objects.get_or_create(email=email)
@@ -70,10 +71,10 @@ from tours.serializers import TourSerializer
 class BandSerializer(BaseSerializer):
     class Meta:
         model = Band
-        fields = "id", "name", "is_archived", "owner", "band_users", "tours"
+        fields = "id", "name", "is_archived", "owner", "bandusers", "tours"
 
     owner = UserSerializer(read_only=True)
-    band_users = BandUserSerializer(source="bandusers", many=True, read_only=True)
+    bandusers = BandUserSerializer(many=True, read_only=True)
     tours = serializers.SerializerMethodField()
 
     def get_tours(self, band: Band):

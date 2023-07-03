@@ -174,14 +174,12 @@ Timeslot:
     - body: {description|start_time|starts_after_midnight|origin|end_time|ends_after_midnight|destination|details|type}
 - DELETE -> Date
 <!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects -->
-<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<pk> -->
-<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<pk>/confirm -->
-<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<pk>/notes -->
-<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<pk>/notes/<pk> --> -->
-<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/contacts -->
-<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/contacts/<pk> -->
+<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<prospect_id> -->
+<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<prospect_id>/confirm -->
+<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<prospect_id>/notes -->
+<!-- # /bands/<band_id>/tours/<tour_id>/dates/<date_id>/prospects/<prospect_id>/notes/<prospectnote_id> --> -->
 <!-- # /contacts -->
-<!-- # <!-- /contacts/<pk> -->
+<!-- # <!-- /contacts/<contact_id> -->
 
 **PLACES** 
 Places are fetched directly from the Google Place API by place_id, formatted and stored in the database, when fetched for the first time.
@@ -198,9 +196,10 @@ Place:
 
 # /places/<pk>
 - GET -> Place
-# <!-- /places/<pk>/contacts -->
-# <!-- /places/<pk>/commments -->
-# <!-- /places/<pk>/commments/<pk> -->
+# <!-- /places/<place_id>/contacts -->
+# <!-- /places/<place_id>/contacts/<contact_id> -->
+# <!-- /places/<place_id>/commments -->
+# <!-- /places/<place_id>/commments/<placecomment_id> -->
 # /places/autocomplete (proxy)
 - GET -> Google Places API predictions obj
 # /places/directions (proxy)

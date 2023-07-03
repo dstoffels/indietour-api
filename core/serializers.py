@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from core.query_params import QueryParamsManager
+from core.path_vars import PathVars
 from typing import Optional
 
 
@@ -15,9 +16,12 @@ class BaseSerializer(serializers.ModelSerializer):
 
     def get_fields(self):
         self.init_query_params()
-        self.query_params = self.context.get("query_params")
+        self.path_vars: PathVars = self.context.get("path_vars")
+        self.path_vars.to_obj_attrs(self)
+
+        self.query_params: QueryParamsManager = self.context.get("query_params")
         if isinstance(self.query_params, QueryParamsManager):
-            self.query_params.set_to_obj_attrs(self)
+            self.query_params.to_obj_attrs(self)
         return super().get_fields()
 
     def init_query_params(self):
