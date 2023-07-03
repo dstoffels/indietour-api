@@ -179,8 +179,11 @@ Request Body
     include
 
 ```/bands?include=tours``` 
+
 Returns the band resource with a nested array of its tours.
+
 ```/bands?include=dates``` 
+
 Returns the band resource with a nested array of its tours, each with a nested array of their tour dates.
 
 
