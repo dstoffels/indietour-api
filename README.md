@@ -48,7 +48,7 @@ Decoded User object
 
 &nbsp;
 ## Login
-### __/auth/login__
+**Path ```__/auth/login__```**
 &nbsp;  
 **POST**  
 &nbsp;  
@@ -61,8 +61,10 @@ Request Body:
 ```
 &nbsp;
 ## Refresh JWT
-### /auth/refresh
-### POST
+**Path ```/auth/refresh```**
+&nbsp;
+**POST**
+&nbsp;
 Request Body:
 ```json
 {
@@ -72,8 +74,10 @@ Request Body:
 
 &nbsp;
 ## Update User
-### /auth/user
-### PATCH
+**Path ```/auth/user```**
+&nbsp;
+**PATCH**
+&nbsp;
 Request Body:
 ```json
 {
@@ -85,8 +89,10 @@ Request Body:
 
 &nbsp;
 ## Register New User
-### /auth/register
-### POST
+**Path ```/auth/register```**
+&nbsp;
+**POST**
+&nbsp;
 Request Body:
 ```json
 {
@@ -98,16 +104,19 @@ Request Body:
 
 &nbsp;
 ## Verify User Email
-### /auth/verify
-### POST
+Path ```/auth/verify```
+&nbsp;
+**POST**
+&nbsp;
 Request Body:
 ```json
 {
     "verification_code": "592353"
 }
 ```
-
-### GET
+&nbsp;
+**GET**
+&nbsp;
 Response Body:
 ```json
 {
@@ -117,8 +126,10 @@ Response Body:
 
 &nbsp;
 ## Change Password
-### /auth/password
-### POST
+Path ```/auth/password```
+&nbsp;
+**POST**
+&nbsp;
 Response Body:
 ```json
 {
