@@ -12,7 +12,7 @@ class ProspectsView(generics.ListCreateAPIView, BaseAPIView):
     permission_classes = (IsTourAdmin,)
 
     def get_queryset(self):
-        return Prospect.objects.filter(date_id=self.path_vars.date_id)
+        return Prospect.objects.filter(tour_id=self.path_vars.tour_id)
 
 
 class ProspectView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
@@ -22,7 +22,7 @@ class ProspectView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
     lookup_url_kwarg = "prospect_id"
 
     def get_queryset(self):
-        return Prospect.objects.filter(date_id=self.path_vars.date_id)
+        return Prospect.objects.filter(tour_id=self.path_vars.tour_id)
 
 
 class LogView(generics.ListCreateAPIView, BaseAPIView):

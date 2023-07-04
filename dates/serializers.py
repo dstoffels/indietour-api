@@ -3,7 +3,6 @@ from .models import Date
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from timeslots.serializers import TimeslotSerializer
-from prospects.serializers import ProspectSerializer
 from lodgings.serializers import LodgingSerializer
 from places.serializers import PlaceSerializer, Place
 from core.serializers import BaseSerializer
@@ -23,14 +22,12 @@ class DateSerializer(BaseSerializer):
             "is_show_day",
             "is_confirmed",
             "timeslots",
-            "prospects",
             "lodgings",
         )
 
     place = PlaceSerializer(read_only=True)
     place_id = serializers.CharField(write_only=True)  # TODO: Do I want place_id to be required?
     timeslots = TimeslotSerializer(read_only=True, many=True)
-    prospects = ProspectSerializer(read_only=True, many=True)
     lodgings = LodgingSerializer(read_only=True, many=True)
 
     def create(self, validated_data: dict):
@@ -61,10 +58,7 @@ class DateSerializer(BaseSerializer):
         if not self.include.contains("all"):
             if not self.include.contains("timeslots"):
                 fields.pop("timeslots")
-
-            if not self.include.contains("prospects"):
-                fields.pop("prospects")
-
             if not self.include.contains("lodgings"):
                 fields.pop("lodgings")
+
         return fields

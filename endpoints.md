@@ -15,7 +15,6 @@
 /places/autocomplete (proxy)
 /places/directions (proxy)
 
-#1
 /bands
 /bands/<band_id>
 /bands/<band_id>/users
@@ -28,16 +27,18 @@
 /bands/<band_id>/tours/<tour_id>/prospects/<prospect_id>
 /bands/<band_id>/tours/<tour_id>/prospects/<prospect_id>/logentries
 /bands/<band_id>/tours/<tour_id>/prospects/<prospect_id>/logentries/<logentry_id>
-/bands/<band_id>/tours/<tour_id>/dates/<date_id>/lodgings
-/bands/<band_id>/tours/<tour_id>/dates/<date_id>/lodgings/<lodging_id>
 /bands/<band_id>/tours/<tour_id>/dates
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>
+/bands/<band_id>/tours/<tour_id>/dates/<date_id>/lodgings
+/bands/<band_id>/tours/<tour_id>/dates/<date_id>/lodgings/<lodging_id>
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots/<timeslot_id>
 
 
 How will I handle venues and places?
 venues have a 1-1 relationship with places
+Does the confirmation process create a new venue for the place? (if none exists)
+- venue can be marked public, but ONLY ONE can be public.
 
 How will I contend w changing google data?
 - cache expiration: attach a timestamp to every place and implement 

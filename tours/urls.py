@@ -9,4 +9,5 @@ urlpatterns = [
     path("/<tour_id>/users", views.TourUsersView.as_view(), name="tourusers"),
     path("/<tour_id>/users/<touruser_id>", views.TourUserView.as_view(), name="touruser"),
     path("/<tour_id>/dates", include("dates.urls")),
+    path("/<tour_id>/prospects", include("prospects.urls")),
 ]

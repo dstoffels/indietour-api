@@ -4,7 +4,6 @@ from core.models import UUIDModel
 
 class Prospect(UUIDModel):
     tour = models.ForeignKey("tours.Tour", on_delete=models.CASCADE, related_name="prospects")
-    # date = models.ForeignKey("dates.Date", on_delete=models.SET_NULL, null=True, related_name="prospects")
     date = models.DateField()
     venue = models.ForeignKey("venues.Venue", on_delete=models.SET_NULL, null=True)
     notes = models.TextField(blank=True, default="")

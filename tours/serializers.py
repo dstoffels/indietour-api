@@ -2,8 +2,9 @@ from .models import Tour, TourUser
 from rest_framework.exceptions import ValidationError
 from bands.serializers import BandUserSerializer, serializers
 from core.serializers import BaseSerializer
-from core.query_params import QueryParam
+from core.query_params import QueryParam, ListQueryParam
 from datetime import date
+from prospects.serializers import ProspectSerializer
 
 
 class TourUserSerializer(BaseSerializer):
@@ -49,10 +50,11 @@ from dates.serializers import DateSerializer
 class TourSerializer(BaseSerializer):
     class Meta:
         model = Tour
-        fields = ("id", "name", "is_archived", "band_id", "tourusers", "dates")
+        fields = ("id", "name", "is_archived", "band_id", "tourusers", "dates", "prospects")
 
     tourusers = TourUserSerializer(read_only=True, many=True)
     dates = serializers.SerializerMethodField()
+    prospects = ProspectSerializer(read_only=True, many=True)
 
     def get_dates(self, tour: Tour):
         dates = tour.dates.all().order_by("date")
@@ -69,11 +71,15 @@ class TourSerializer(BaseSerializer):
 
     def init_query_params(self):
         self.past_dates: QueryParam
-        self.include = QueryParam
+        self.include = ListQueryParam
         self.archived_tours: QueryParam
 
     def get_fields(self):
         fields = super().get_fields()
-        if self.include.is_invalid():
-            fields.pop("dates")
+        if not self.include.contains("all"):
+            if not self.include.contains("dates"):
+                fields.pop("dates")
+            if not self.include.contains("prospects"):
+                fields.pop("prospects")
+
         return fields

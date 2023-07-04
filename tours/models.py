@@ -8,6 +8,7 @@ class Tour(UUIDModel):
     is_archived = models.BooleanField(default=False)
     tourusers: models.QuerySet
     dates: models.QuerySet
+    prospects: models.QuerySet
 
     def __str__(self) -> str:
         return f"Tour: {self.name} (band: {self.band.name})"

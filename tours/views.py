@@ -11,7 +11,7 @@ from core.query_params import BooleanQueryParam, ListQueryParam, QueryParam
 class BaseTourView(BaseAPIView):
     def get_query_params(self) -> list[QueryParam]:
         return [
-            QueryParam("include", ["all", "dates"]),
+            QueryParam("include", ["all", "dates", "prospects"]),
             BooleanQueryParam("past_dates"),
             BooleanQueryParam("archived_tours"),
         ]

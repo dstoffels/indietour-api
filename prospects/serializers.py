@@ -23,18 +23,18 @@ class LogEntrySerializer(BaseSerializer):
 class ProspectSerializer(BaseSerializer):
     class Meta:
         model = Prospect
-        fields = "id", "date", "notes", "status", "hold", "log", "place_id"
+        fields = "id", "date", "notes", "status", "hold", "log"
 
-    place = PlaceSerializer(read_only=True)
-    place_id = serializers.CharField(write_only=True)
+    # place = PlaceSerializer(read_only=True)
+    # place_id = serializers.CharField(write_only=True)
     notes = serializers.CharField(required=False)
     status = serializers.ChoiceField(choices=Prospect.STATUS_CHOICES, default=Prospect.STATUS_CHOICES[0])
     hold = serializers.IntegerField(required=False)
     log = LogEntrySerializer(many=True, read_only=True, required=False)
 
     def create(self, validated_data: dict):
-        validated_data["date_id"] = self.path_vars.date_id
-        self._set_place()
+        validated_data["tour_id"] = self.path_vars.tour_id
+        # self._set_place()
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
