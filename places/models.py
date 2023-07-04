@@ -9,9 +9,9 @@ class Place(models.Model):
     political_address = models.CharField(max_length=100)
     lat = models.DecimalField(max_digits=13, decimal_places=10, default=0)
     lng = models.DecimalField(max_digits=13, decimal_places=10, default=0)
-    overview = models.TextField(default="")
-    types = models.CharField(max_length=255, default="")
-    business_status = models.CharField(max_length=50, default="")
+    overview = models.TextField(default="", null=True)
+    types = models.JSONField(default=list)
+    business_status = models.CharField(max_length=50, default="", null=True)
 
     dates: models.QuerySet = None
     venues: models.QuerySet = None

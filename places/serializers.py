@@ -11,10 +11,10 @@ class PlaceSerializer(serializers.ModelSerializer):
     name = serializers.CharField(read_only=True)
     formatted_address = serializers.CharField(read_only=True)
     political_address = serializers.CharField(read_only=True)
-    lat = serializers.DecimalField(max_digits=13, decimal_places=10, read_only=True)
-    lng = serializers.DecimalField(max_digits=13, decimal_places=10, read_only=True)
+    lat = serializers.DecimalField(max_digits=13, decimal_places=10, read_only=True, coerce_to_string=False)
+    lng = serializers.DecimalField(max_digits=13, decimal_places=10, read_only=True, coerce_to_string=False)
     overview = serializers.CharField(read_only=True)
-    types = serializers.CharField(read_only=True)
+    types = serializers.JSONField(read_only=True)
     business_status = serializers.CharField(read_only=True)
 
     class Meta:
@@ -27,13 +27,19 @@ class PlaceSerializer(serializers.ModelSerializer):
 
         if not place:
             result: dict = fetch_place(place_id)
-            place = Place.objects.create(id=place_id)
 
-            overview = result.get("editorial_summary").get("overview")
+            name = result.get("name")
+            lat = result.get("geometry", {}).get("location", {}).get("lat")
+            lng = result.get("geometry", {}).get("location", {}).get("lng")
+
+            overview = None
+            summary = result.get("editorial_summary")
+            if summary:
+                overview = summary.get("overview")
+
             business_status = result.get("business_status")
 
             types = result.get("types")
-            types = ",".join(item for item in types)
 
             address_components = result.get("address_components")
             political_address = []
@@ -55,10 +61,11 @@ class PlaceSerializer(serializers.ModelSerializer):
 
             political_address = ", ".join(political_address)
 
+            place = Place.objects.create(id=place_id)
             place.formatted_address = result.get("formatted_address")
-            place.name = result.get("name")
-            place.lat = result.get("geometry", {}).get("location", {}).get("lat")
-            place.lng = result.get("geometry", {}).get("location", {}).get("lng")
+            place.name = name
+            place.lat = lat
+            place.lng = lng
             place.political_address = political_address
             place.overview = overview
             place.types = types
