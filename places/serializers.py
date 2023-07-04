@@ -13,6 +13,9 @@ class PlaceSerializer(serializers.ModelSerializer):
     political_address = serializers.CharField(read_only=True)
     lat = serializers.DecimalField(max_digits=13, decimal_places=10, read_only=True)
     lng = serializers.DecimalField(max_digits=13, decimal_places=10, read_only=True)
+    overview = serializers.CharField(read_only=True)
+    types = serializers.CharField(read_only=True)
+    business_status = serializers.CharField(read_only=True)
 
     class Meta:
         model = Place
@@ -26,8 +29,13 @@ class PlaceSerializer(serializers.ModelSerializer):
             result: dict = fetch_place(place_id)
             place = Place.objects.create(id=place_id)
 
-            address_components = result.get("address_components")
+            overview = result.get("editorial_summary").get("overview")
+            business_status = result.get("business_status")
 
+            types = result.get("types")
+            types = ",".join(item for item in types)
+
+            address_components = result.get("address_components")
             political_address = []
 
             locality = next((comp["short_name"] for comp in address_components if "locality" in comp["types"]), None)
@@ -52,6 +60,9 @@ class PlaceSerializer(serializers.ModelSerializer):
             place.lat = result.get("geometry", {}).get("location", {}).get("lat")
             place.lng = result.get("geometry", {}).get("location", {}).get("lng")
             place.political_address = political_address
+            place.overview = overview
+            place.types = types
+            place.business_status = business_status
 
             place.save()
 

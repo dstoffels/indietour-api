@@ -8,7 +8,7 @@ from core.views import BaseAPIView
 from django.shortcuts import get_object_or_404
 import requests
 import os
-from .utils import GAPI_BASE_URL
+from .utils import GAPI_BASE_URL, fetch_place
 from core.query_params import QueryParam
 
 
@@ -18,6 +18,18 @@ class PlaceView(generics.RetrieveAPIView, BaseAPIView):
     serializer_class = PlaceSerializer
     lookup_url_kwarg = "place_id"
     lookup_field = "id"
+
+    def get(self, request, *args, **kwargs):
+        try:
+            response = super().get(request, *args, **kwargs)
+        except:
+            place = fetch_place(self.path_vars.place_id)
+            ser = PlaceSerializer(data=place)
+            ser.is_valid()
+            ser.save()
+            response = Response(ser.data)
+
+        return response
 
 
 class AutocompleteView(generics.RetrieveAPIView, BaseAPIView):
