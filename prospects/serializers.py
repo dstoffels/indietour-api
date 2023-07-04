@@ -23,7 +23,7 @@ class LogEntrySerializer(BaseSerializer):
 class ProspectSerializer(BaseSerializer):
     class Meta:
         model = Prospect
-        fields = "id", "place", "notes", "status", "hold", "log", "place_id"
+        fields = "id", "date", "notes", "status", "hold", "log", "place_id"
 
     place = PlaceSerializer(read_only=True)
     place_id = serializers.CharField(write_only=True)
