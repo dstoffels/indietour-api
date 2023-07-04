@@ -6,4 +6,5 @@ urlpatterns = [
     path("auth", include("authentication.urls")),
     path("bands", include("bands.urls")),
     path("places", include("places.urls")),
+    path("venues", include("venues.urls")),
 ]
