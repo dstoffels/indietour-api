@@ -9,6 +9,12 @@ from prospects.serializers import ProspectSerializer
 from rest_framework.exceptions import ValidationError
 
 
+class VenueNoteSerializer(BaseSerializer):
+    class Meta:
+        models = VenueNote
+        fields = "id", "user", "note"
+
+
 class VenueSerializer(BaseSerializer):
     class Meta:
         model = Venue
@@ -19,6 +25,7 @@ class VenueSerializer(BaseSerializer):
     capacity = serializers.IntegerField(required=False, default=0)
     type = serializers.CharField(required=False, default="")
     creator = serializers.SerializerMethodField()
+    notes = VenueNoteSerializer(many=True, read_only=True)
 
     def get_creator(self, venue: Venue):
         return venue.creator.username

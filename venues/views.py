@@ -15,7 +15,21 @@ class VenueCollectionView(generics.ListCreateAPIView, BaseAPIView):
 
     def get_queryset(self):
         venues = Venue.objects.filter(Q(is_public=True) | Q(creator=self.request.user)).order_by("place__name")
+        if self.query.is_valid():
+            if self.search_by.is_valid():
+                return venues.filter(**{self.search_by.value: self.query.value})
+            venues = venues.filter(
+                Q(place__name__icontains=self.query.value) | Q(place__formatted_address__icontains=self.query.value)
+            )
         return venues
+
+    def get_query_params(self):
+        return [QueryParam("query"), QueryParam("search_by", ["capacity", "type"])]
+
+    def init_query_params(self, request: Request):
+        super().init_query_params(request)
+        self.query: QueryParam
+        self.search_by: QueryParam
 
 
 class VenueView(generics.RetrieveUpdateAPIView, BaseAPIView):

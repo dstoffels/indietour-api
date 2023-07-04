@@ -15,7 +15,7 @@ class QueryParam:
         return self._is_null() or not bool(self.accepted_values) or self.value in self.accepted_values
 
     def is_valid(self):
-        return self.value in self.accepted_values
+        return not bool(self.accepted_values) or self.value in self.accepted_values
 
     def is_invalid(self):
         return not self.is_valid()
