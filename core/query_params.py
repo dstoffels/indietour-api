@@ -50,7 +50,7 @@ class ListQueryParam(QueryParam):
     def set_value(self, value: str):
         super().set_value(value)
         if not self._is_null():
-            self.value = self.value.split(",")
+            self.value = self.value.replace(" ", "").split(",")
 
     def contains(self, value):
         return not self._is_null() and value in self.value

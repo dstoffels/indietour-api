@@ -5,7 +5,7 @@ from rest_framework.exceptions import ValidationError
 from .serializers import Timeslot, TimeslotSerializer
 from tours.serializers import Tour, TourSerializer
 from dates.serializers import Date, DateSerializer
-from tours.permissions import IsTourUser, IsTourAdmin, IsBandUser
+from tours.permissions import IsTourUser, IsTourAdmin
 from bands.permissions import IsBandAdmin
 from django.shortcuts import get_object_or_404
 from core.views import BaseAPIView
