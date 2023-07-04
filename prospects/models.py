@@ -3,8 +3,10 @@ from core.models import UUIDModel
 
 
 class Prospect(UUIDModel):
-    date = models.ForeignKey("dates.Date", on_delete=models.SET_NULL, null=True, related_name="prospects")
-    place = models.ForeignKey("places.Place", on_delete=models.SET_NULL, null=True)
+    tour = models.ForeignKey("tours.Tour", on_delete=models.CASCADE, related_name="prospects")
+    # date = models.ForeignKey("dates.Date", on_delete=models.SET_NULL, null=True, related_name="prospects")
+    date = models.DateField()
+    venue = models.ForeignKey("venues.Venue", on_delete=models.SET_NULL, null=True)
     notes = models.TextField(blank=True, default="")
     status = models.CharField(max_length=50)
     hold = models.IntegerField(default=0)

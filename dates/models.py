@@ -9,7 +9,7 @@ class Date(UUIDModel):
     is_show_day = models.BooleanField(default=False)
     is_confirmed = models.BooleanField(default=False)
     tour = models.ForeignKey("tours.Tour", on_delete=models.CASCADE, related_name="dates")
-    place = models.ForeignKey("places.Place", on_delete=models.SET_NULL, null=True, related_name="dates")
+    place = models.ForeignKey("places.Place", on_delete=models.DO_NOTHING, null=True, related_name="dates")
     timeslots: models.QuerySet = None
     prospects: models.QuerySet = None
     lodgings = models.QuerySet = None

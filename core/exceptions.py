@@ -14,7 +14,7 @@ def globals(exc, context):
     if response:
         return response
 
-    # handle django erros
+    # handle django errors
     from django.core.exceptions import ValidationError
 
     if isinstance(exc, ValidationError):

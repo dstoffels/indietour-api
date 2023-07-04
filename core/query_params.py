@@ -9,11 +9,10 @@ class QueryParam:
         self.accepted_values = accepted_values
 
     def set_value(self, value: str):
-        if value is not None:
-            self.value = value.lower()
+        self.value = value
 
     def validate_value(self):
-        return self._is_null() or self.value in self.accepted_values
+        return self._is_null() or not bool(self.accepted_values) or self.value in self.accepted_values
 
     def is_valid(self):
         return self.value in self.accepted_values

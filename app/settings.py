@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "prospects",
     "lodgings",
     "contacts",
+    "venues",
 ]
 
 MIDDLEWARE = [

@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 import requests
 import os
 from .utils import GAPI_BASE_URL
+from core.query_params import QueryParam
 
 
 class PlaceView(generics.RetrieveAPIView, BaseAPIView):
@@ -33,10 +34,27 @@ class AutocompleteView(generics.RetrieveAPIView, BaseAPIView):
 class DirectionsView(generics.RetrieveAPIView, BaseAPIView):
     permission_classes = (IsVerified,)
 
+    def get_query_params(self):
+        return [QueryParam("origin"), QueryParam("destination")]
+
     def get(self, request, *args, **kwargs):
-        origin = request.GET.get("origin")
-        destination = request.GET.get("destination")
+        origin = self.query_params.get("origin").value
+        destination = self.query_params.get("destination").value
         response = requests.get(
             f"{GAPI_BASE_URL}/directions/json?key={os.getenv('GOOGLE_API_KEY')}&origin=place_id:{origin}&destination=place_id:{destination}"
+        )
+        return Response(response.json())
+
+
+class SearchView(generics.RetrieveAPIView, BaseAPIView):
+    permission_classes = (IsVerified,)
+
+    def get_query_params(self):
+        return [QueryParam("query")]
+
+    def get(self, request, *args, **kwargs):
+        query = self.query_params.get("query").value
+        response = requests.get(
+            f"{GAPI_BASE_URL}/place/textsearch/json?key={os.getenv('GOOGLE_API_KEY')}&inputtype=textquery&query={query}keyword=music"
         )
         return Response(response.json())
