@@ -33,6 +33,8 @@
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/lodgings/<lodging_id>
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots/<timeslot_id>
+/venues
+/venues/<venue_id>
 
 
 How will I handle venues and places?

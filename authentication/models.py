@@ -6,8 +6,8 @@ from .utils import generate_verification_code
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    active_band = models.UUIDField(null=True, default=None)
-    active_tour = models.UUIDField(null=True, default=None)
+    active_band_id = models.UUIDField(null=True, default=None)
+    active_tour_id = models.UUIDField(null=True, default=None)
     email = models.CharField(unique=True, max_length=255, null=False, editable=False)
     username = models.CharField(unique=False, max_length=255, null=False)
     email_verified = models.BooleanField(default=False)
