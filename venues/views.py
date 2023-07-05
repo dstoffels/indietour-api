@@ -1,7 +1,7 @@
 from rest_framework import generics
 from rest_framework.request import Request
 from rest_framework.response import Response
-from .serializers import Venue, VenueSerializer, VenueNote
+from .serializers import Venue, VenueSerializer, VenueNote, VenueNoteSerializer
 from core.permissions import IsVerified
 from .permissions import IsVenueOwner, IsPublicVenue, IsNoteOwner
 from core.views import BaseAPIView
@@ -46,3 +46,21 @@ class VenueView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
         if self.request.method != "GET":
             return (IsVenueOwner(),)
         return super().get_permissions()
+
+
+class VenueNotesView(generics.ListCreateAPIView, BaseAPIView):
+    serializer_class = VenueNoteSerializer
+    permission_classes = (IsVerified,)
+
+    def get_queryset(self):
+        return VenueNote.objects.filter(venue_id=self.path_vars.venue_id)
+
+
+class VenueNoteView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
+    serializer_class = VenueNoteSerializer
+    permission_classes = (IsVerified,)
+    lookup_field = "id"
+    lookup_url_kwarg = "venuenote_id"
+
+    def get_queryset(self):
+        return VenueNote.objects.filter(venue_id=self.path_vars.venue_id)

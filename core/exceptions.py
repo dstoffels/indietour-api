@@ -1,6 +1,7 @@
 from rest_framework.views import exception_handler
 from rest_framework.response import Response
 from django.http import Http404
+from django.db import IntegrityError
 
 
 def globals(exc, context):

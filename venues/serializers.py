@@ -11,20 +11,37 @@ from rest_framework.exceptions import ValidationError
 
 class VenueNoteSerializer(BaseSerializer):
     class Meta:
-        models = VenueNote
+        model = VenueNote
         fields = "id", "user", "note"
+
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, note: VenueNote):
+        return note.user.username
+
+    def create(self, validated_data):
+        exisiting_note = VenueNote.objects.filter(user=self.user).first()
+        if exisiting_note:
+            raise ValidationError({"detail": "Only one venue note allowed per user.", "code": "DUPLICATE"})
+        validated_data["venue_id"] = self.path_vars.venue_id
+        validated_data["user"] = self.user
+        return super().create(validated_data)
 
 
 class VenueSerializer(BaseSerializer):
     class Meta:
         model = Venue
-        fields = "id", "place", "creator", "is_public", "capacity", "type", "place_id", "notes"
+        fields = "id", "place", "creator", "is_public", "capacity", "type", "place_id", "note"
 
     place = PlaceSerializer(read_only=True)
     place_id = serializers.CharField(write_only=True)
     capacity = serializers.IntegerField(required=False, default=0)
     creator = serializers.SerializerMethodField()
-    notes = VenueNoteSerializer(many=True, read_only=True)
+    note = serializers.SerializerMethodField()
+
+    def get_note(self, venue: Venue):
+        note = venue.notes.filter(user=self.user).first()
+        return VenueNoteSerializer(note, context=self.context).data
 
     def get_creator(self, venue: Venue):
         return venue.creator.username

@@ -14,6 +14,8 @@ class BaseSerializer(serializers.ModelSerializer):
         return super().is_valid(raise_exception=raise_exception)
 
     def get_fields(self):
+        request = self.context.get("request")
+        self.user = request.user
         self.init_query_params()
         self.path_vars: PathVars = self.context.get("path_vars")
         self.path_vars.to_obj_attrs(self)
