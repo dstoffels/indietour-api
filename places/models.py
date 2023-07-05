@@ -12,6 +12,7 @@ class Place(models.Model):
     overview = models.TextField(default="", null=True)
     types = models.JSONField(default=list)
     business_status = models.CharField(max_length=50, default="", null=True)
+    website = models.TextField(null=True)
 
     dates: models.QuerySet = None
     venues: models.QuerySet = None

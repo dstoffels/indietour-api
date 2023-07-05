@@ -16,6 +16,7 @@ class PlaceSerializer(serializers.ModelSerializer):
     overview = serializers.CharField(read_only=True)
     types = serializers.JSONField(read_only=True)
     business_status = serializers.CharField(read_only=True)
+    website = serializers.CharField(read_only=True)
 
     class Meta:
         model = Place
@@ -61,8 +62,11 @@ class PlaceSerializer(serializers.ModelSerializer):
 
             political_address = ", ".join(political_address)
 
+            website = result.get("website")
+            formatted_address = result.get("formatted_address")
+
             place = Place.objects.create(id=place_id)
-            place.formatted_address = result.get("formatted_address")
+            place.formatted_address = formatted_address
             place.name = name
             place.lat = lat
             place.lng = lng
@@ -70,6 +74,7 @@ class PlaceSerializer(serializers.ModelSerializer):
             place.overview = overview
             place.types = types
             place.business_status = business_status
+            place.website = website
 
             place.save()
 

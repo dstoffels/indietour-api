@@ -67,6 +67,6 @@ class SearchView(generics.RetrieveAPIView, BaseAPIView):
     def get(self, request, *args, **kwargs):
         query = self.query_params.get("query").value
         response = requests.get(
-            f"{GAPI_BASE_URL}/place/textsearch/json?key={os.getenv('GOOGLE_API_KEY')}&inputtype=textquery&query={query}keyword=music"
+            f"{GAPI_BASE_URL}/place/textsearch/json?key={os.getenv('GOOGLE_API_KEY')}&inputtype=textquery&query={query}"
         )
         return Response(response.json())
