@@ -10,6 +10,10 @@ class Date(UUIDModel):
     is_confirmed = models.BooleanField(default=False)
     tour = models.ForeignKey("tours.Tour", on_delete=models.CASCADE, related_name="dates")
     place = models.ForeignKey("places.Place", on_delete=models.DO_NOTHING, null=True, related_name="dates")
+
+    contacts: models.ManyToManyField(
+        to="contacts.Contact", through="contacts.PlaceDateContact", related_name="contact_dates"
+    )
     timeslots: models.QuerySet = None
     prospects: models.QuerySet = None
     lodgings = models.QuerySet = None

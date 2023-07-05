@@ -13,11 +13,13 @@ class Place(models.Model):
     types = models.JSONField(default=list)
     business_status = models.CharField(max_length=50, default="", null=True)
     website = models.TextField(null=True)
+    contacts: models.ManyToManyField(
+        to="contacts.Contact", through="contacts.PlaceDateContacts", related_name="contact_places"
+    )
 
     dates: models.QuerySet = None
     venues: models.QuerySet = None
     reviews: models.QuerySet = None
-    contacts: models.QuerySet = None
 
     def __str__(self) -> str:
         return self.name
@@ -28,9 +30,3 @@ class PlaceReview(UUIDModel):
     user = models.ForeignKey("authentication.User", on_delete=models.CASCADE, related_name="reviews")
     rating = models.IntegerField()
     review = models.TextField()
-
-
-class PlaceContact(UUIDModel):
-    place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name="contacts")
-    contact = models.ForeignKey("contacts.Contact", on_delete=models.CASCADE, related_name="places")
-    title = models.CharField(max_length=255)
