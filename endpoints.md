@@ -32,13 +32,15 @@
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/lodgings
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/lodgings/<lodging_id>
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots
+/bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots/types
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots/<timeslot_id>
 /venues
-/venues/<venue_id>
+/venues/types
+/venues/<venue_id>/notes
+/venues/<venue_id>/notes/<venuenote_id>
 
 
 How will I handle venues and places?
-venues have a 1-1 relationship with places
 Does the confirmation process create a new venue for the place? (if none exists)
 - venue can be marked public, but ONLY ONE can be public.
 
@@ -46,15 +48,18 @@ How will I contend w changing google data?
 - cache expiration: attach a timestamp to every place and implement 
 
 venue types
-- Arena
-- Theater
 - Amphitheater
+- Arena
 - Bar
+- Brewpub
 - Club
-- Nightclub
+- Coffeehouse
+- Fair
 - Festival
-- Listening Room
-- PAC
-- Open-Air
 - House
-- Venue
+- Listening Room
+- Nightclub
+- PAC
+- Theater
+- Winery
+- Other

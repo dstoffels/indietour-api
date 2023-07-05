@@ -16,8 +16,8 @@ class TokenSerializer(TokenObtainPairSerializer):
         token["username"] = user.username
         token["is_active"] = user.is_active
         token["email_verified"] = user.email_verified
-        token["active_band_id"] = str(user.active_band.id) if user.active_band else None
-        token["active_tour_id"] = str(user.active_tour.id) if user.active_tour else None
+        token["active_band_id"] = user.active_band_id
+        token["active_tour_id"] = user.active_tour_id
 
         return token
 

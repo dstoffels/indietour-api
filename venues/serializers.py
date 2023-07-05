@@ -23,7 +23,6 @@ class VenueSerializer(BaseSerializer):
     place = PlaceSerializer(read_only=True)
     place_id = serializers.CharField(write_only=True)
     capacity = serializers.IntegerField(required=False, default=0)
-    type = serializers.CharField(required=False, default="")
     creator = serializers.SerializerMethodField()
     notes = VenueNoteSerializer(many=True, read_only=True)
 

@@ -19,6 +19,8 @@ class PathVars:
         self.prospectnote_id = kwargs.get("prospectnote_id")
         self.lodging_id = kwargs.get("lodging_id")
         self.contact_id = kwargs.get("contact_id")
+        self.venue_id = kwargs.get("venue_id")
+        self.venuenote_id = kwargs.get("venuenote_id")
         self.validate()
 
     def update_context(self, context: dict):
