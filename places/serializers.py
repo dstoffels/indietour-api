@@ -1,11 +1,18 @@
 from rest_framework import serializers
-from .models import Place
+from core.serializers import BaseSerializer
+from .models import Place, PlaceContact
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from .utils import fetch_place
 
 
-class PlaceSerializer(serializers.ModelSerializer):
+class PlaceContactSerializer(BaseSerializer):
+    class Meta:
+        model = PlaceContact
+        fields = "__all__"
+
+
+class PlaceSerializer(BaseSerializer):
     place_id = serializers.CharField(write_only=True)
     id = serializers.CharField(read_only=True)
     name = serializers.CharField(read_only=True)
@@ -79,6 +86,3 @@ class PlaceSerializer(serializers.ModelSerializer):
             place.save()
 
         return place
-
-    def is_valid(self, *, raise_exception=True):
-        return super().is_valid(raise_exception=raise_exception)

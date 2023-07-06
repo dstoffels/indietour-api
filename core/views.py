@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from .query_params import QueryParam, QueryParamsManager
 from core.path_vars import PathVars
+from authentication.models import User
 
 
 class BaseAPIView(generics.GenericAPIView):
@@ -16,6 +17,7 @@ class BaseAPIView(generics.GenericAPIView):
     Path variables and query params automatically assigned to view and serializer."""
 
     def initial(self, request, *args, **kwargs):
+        self.user: User = request.user
         self.path_vars = PathVars(kwargs)
         self.init_query_params(request)
         return super().initial(request, *args, **kwargs)

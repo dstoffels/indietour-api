@@ -29,6 +29,8 @@
 /bands/<band_id>/tours/<tour_id>/prospects/<prospect_id>/logentries/<logentry_id>
 /bands/<band_id>/tours/<tour_id>/dates
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>
+/bands/<band_id>/tours/<tour_id>/dates/<date_id>/contacts
+/bands/<band_id>/tours/<tour_id>/dates/<date_id>/contacts/<contact_id>
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/lodgings
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/lodgings/<lodging_id>
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots

@@ -2,7 +2,6 @@ from core.permissions import IsVerified
 from rest_framework.request import Request
 from authentication.models import User
 from .models import Band
-from core.models import get_or_404
 from core.views import BaseAPIView
 
 

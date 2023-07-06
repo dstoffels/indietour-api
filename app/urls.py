@@ -7,4 +7,5 @@ urlpatterns = [
     path("bands", include("bands.urls")),
     path("places", include("places.urls")),
     path("venues", include("venues.urls")),
+    path("contacts", include("contacts.urls")),
 ]
