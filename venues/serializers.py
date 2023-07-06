@@ -5,7 +5,6 @@ from places.models import Place
 from core.serializers import BaseSerializer
 from core.query_params import QueryParam, ListQueryParam
 from datetime import date
-from prospects.serializers import ProspectSerializer
 from rest_framework.exceptions import ValidationError
 
 
@@ -78,7 +77,7 @@ class VenueSerializer(BaseSerializer):
             raise ValidationError({"detail": "This venue has already been published", "code": "INVALID"})
 
     def _get_place(self, place_id):
-        ser = PlaceSerializer(data={"place_id": place_id})
+        ser = PlaceSerializer(data={"place_id": place_id}, context=self.context)
         ser.is_valid()
         ser.save()
         return ser.instance

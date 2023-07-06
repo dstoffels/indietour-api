@@ -36,6 +36,10 @@
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots/types
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots/<timeslot_id>
+/contacts
+/contacts/<contact_id>
+/contacts/<contact_id>/methods
+/contacts/<contact_id>/methods/<contactmethod_id>
 /venues
 /venues/types
 /venues/<venue_id>/notes

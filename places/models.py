@@ -28,7 +28,7 @@ class Place(models.Model):
 class PlaceContact(UUIDModel):
     place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name="contacts")
     contact = models.ForeignKey("contacts.Contact", on_delete=models.CASCADE, related_name="contact_places")
-    title = models.ForeignKey("contacts.ContactTitle", on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
 
 
 class PlaceReview(UUIDModel):

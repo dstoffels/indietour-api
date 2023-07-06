@@ -2,7 +2,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.request import Request
 from authentication.models import User
-from .serializers import Place, PlaceSerializer
+from .serializers import Place, PlaceSerializer, PlaceContact, PlaceContactSerializer
 from core.permissions import IsVerified
 from core.views import BaseAPIView
 from django.shortcuts import get_object_or_404
@@ -10,6 +10,11 @@ import requests
 import os
 from .utils import GAPI_BASE_URL, fetch_place
 from core.query_params import QueryParam
+
+
+# class BasePlaceView(BaseAPIView):
+#     def get_query_params(self):
+#         return [QueryParam("include", ["contacts"])]
 
 
 class PlaceView(generics.RetrieveAPIView, BaseAPIView):
@@ -30,6 +35,16 @@ class PlaceView(generics.RetrieveAPIView, BaseAPIView):
             response = Response(ser.data)
 
         return response
+
+
+class PlaceContactsView(generics.ListCreateAPIView, BaseAPIView):
+    serializer_class = PlaceContactSerializer
+    lookup_field = "place_id"
+    lookup_url_kwarg = "place_id"
+    permission_classes = (IsVerified,)
+
+    def get_queryset(self):
+        return PlaceContact.objects.filter(contact__owner=self.user)
 
 
 class AutocompleteView(generics.RetrieveAPIView, BaseAPIView):

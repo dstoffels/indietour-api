@@ -4,7 +4,6 @@ from bands.serializers import BandUserSerializer, serializers
 from core.serializers import BaseSerializer
 from core.query_params import QueryParam, ListQueryParam
 from datetime import date
-from prospects.serializers import ProspectSerializer
 
 
 class ContactMethodSerializer(BaseSerializer):

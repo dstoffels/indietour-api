@@ -82,10 +82,10 @@ class DateSerializer(BaseSerializer):
 
     def get_fields(self):
         fields = super().get_fields()
-        if not self.include.contains("all"):
-            if not self.include.contains("timeslots"):
-                fields.pop("timeslots")
-            if not self.include.contains("lodgings"):
-                fields.pop("lodgings")
+        # if not self.include.contains("all"):
+        #     if not self.include.contains("timeslots"):
+        #         fields.pop("timeslots")
+        #     if not self.include.contains("lodgings"):
+        #         fields.pop("lodgings")
 
         return fields

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from core.serializers import BaseSerializer
 from .models import Place, PlaceContact
+from contacts.serializers import ContactSerializer
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from .utils import fetch_place
@@ -9,7 +10,15 @@ from .utils import fetch_place
 class PlaceContactSerializer(BaseSerializer):
     class Meta:
         model = PlaceContact
-        fields = "__all__"
+        fields = "id", "contact", "contact_id", "title"
+
+    contact_id = serializers.UUIDField(write_only=True)
+    contact = ContactSerializer(read_only=True)
+    title = serializers.CharField()
+
+    def create(self, validated_data):
+        validated_data["place_id"] = self.path_vars.place_id
+        return super().create(validated_data)
 
 
 class PlaceSerializer(BaseSerializer):
@@ -24,6 +33,12 @@ class PlaceSerializer(BaseSerializer):
     types = serializers.JSONField(read_only=True)
     business_status = serializers.CharField(read_only=True)
     website = serializers.CharField(read_only=True)
+    contacts = serializers.SerializerMethodField()
+
+    def get_contacts(self, place: Place):
+        contacts = PlaceContact.objects.filter(contact__owner=self.user)
+        ser = PlaceContactSerializer(contacts, many=True, context=self.context)
+        return ser.data
 
     class Meta:
         model = Place

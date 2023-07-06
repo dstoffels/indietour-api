@@ -4,6 +4,7 @@ from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from places.utils import fetch_place
 from places.serializers import PlaceSerializer
+from venues.serializers import VenueSerializer
 from core.serializers import BaseSerializer
 
 
@@ -23,10 +24,10 @@ class LogEntrySerializer(BaseSerializer):
 class ProspectSerializer(BaseSerializer):
     class Meta:
         model = Prospect
-        fields = "id", "date", "notes", "status", "hold", "log"
+        fields = "id", "date", "venue", "notes", "status", "hold", "log", "venue_id"
 
-    # place = PlaceSerializer(read_only=True)
-    # place_id = serializers.CharField(write_only=True)
+    venue = VenueSerializer(read_only=True)
+    venue_id = serializers.CharField(write_only=True)
     notes = serializers.CharField(required=False)
     status = serializers.ChoiceField(choices=Prospect.STATUS_CHOICES, default=Prospect.STATUS_CHOICES[0])
     hold = serializers.IntegerField(required=False)
