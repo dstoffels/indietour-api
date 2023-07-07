@@ -47,6 +47,16 @@ class PlaceContactsView(generics.ListCreateAPIView, BaseAPIView):
         return PlaceContact.objects.filter(contact__owner=self.user)
 
 
+class PlaceContactView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
+    serializer_class = PlaceContactSerializer
+    permission_classes = (IsVerified,)  # TODO: needs to validate with place_id and (user) owner
+    lookup_field = "id"
+    lookup_url_kwarg = "placecontact_id"
+
+    def get_queryset(self):
+        return PlaceContact.objects.filter(contact__owner=self.user)
+
+
 class AutocompleteView(generics.RetrieveAPIView, BaseAPIView):
     permission_classes = (IsVerified,)
 

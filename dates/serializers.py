@@ -13,19 +13,10 @@ from core.query_params import BooleanQueryParam, ListQueryParam
 class DateContactSerializer(BaseSerializer):
     class Meta:
         model = DateContact
-        fields = "id", "contact", "title", "notes", "contact_id"
+        fields = "id", "contact", "title", "contact_id"
 
     contact = ContactSerializer(read_only=True)
     contact_id = serializers.UUIDField(write_only=True)
-
-    title = serializers.SerializerMethodField()
-    notes = serializers.SerializerMethodField()
-
-    def get_title(self, datecontact: DateContact):
-        return datecontact.title.title
-
-    def get_notes(self, datecontact: DateContact):
-        return datecontact.title.notes
 
     def create(self, validated_data):
         validated_data["date_id"] = self.path_vars.date_id

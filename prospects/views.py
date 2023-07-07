@@ -7,6 +7,7 @@ from core.views import BaseAPIView
 from core.query_params import ListQueryParam, BooleanQueryParam, QueryParam
 from datetime import date
 from dates.serializers import Date, DateSerializer
+from django.forms.models import model_to_dict
 
 
 class ProspectsView(generics.ListCreateAPIView, BaseAPIView):
@@ -61,8 +62,8 @@ class ConfirmProspectView(generics.CreateAPIView, BaseAPIView):
         ser.save()
 
         date: Date = ser.instance
-        for contact in prospect.venue.place.contacts.all():
-            date.contacts.add(contact)
+        for placecontact in prospect.venue.place.contacts.filter(contact__owner=self.user):
+            date.contacts.create(contact=placecontact.contact, title=placecontact.title)
 
         prospect.status = "CONFIRMED"
         prospect.confirmed_date_id = date.id

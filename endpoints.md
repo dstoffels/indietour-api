@@ -1,19 +1,13 @@
 /auth/register
 /auth/login
-<!-- /auth/logout -->
 /auth/refresh
 /auth/user
 /auth/verify
 /auth/password
 
-<!-- /contacts -->
-<!-- /contacts/<pk> -->
-/places/<pk>
 <!-- /places/<pk>/contacts -->
 <!-- /places/<pk>/commments -->
 <!-- /places/<pk>/commments/<pk> -->
-/places/autocomplete (proxy)
-/places/directions (proxy)
 
 /bands
 /bands/<band_id>
@@ -30,16 +24,25 @@
 /bands/<band_id>/tours/<tour_id>/dates
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/contacts
-/bands/<band_id>/tours/<tour_id>/dates/<date_id>/contacts/<contact_id>
+/bands/<band_id>/tours/<tour_id>/dates/<date_id>/contacts/<datecontact_id>
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/lodgings
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/lodgings/<lodging_id>
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots/types
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/timeslots/<timeslot_id>
+
+/places/<place_id>
+/places/<place_id>/contacts
+/places/<place_id>/contacts/<placecontact_id>
+/places/autocomplete (proxy)
+/places/directions (proxy)
+/places/search (proxy)
+
 /contacts
 /contacts/<contact_id>
 /contacts/<contact_id>/methods
 /contacts/<contact_id>/methods/<contactmethod_id>
+
 /venues
 /venues/types
 /venues/<venue_id>/notes
