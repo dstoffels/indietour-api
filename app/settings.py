@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     "dates",
     "places",
     "timeslots",
-    "prospects",
     "lodgings",
     "contacts",
     "venues",

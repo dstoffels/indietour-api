@@ -4,7 +4,6 @@ from bands.serializers import BandUserSerializer, serializers
 from core.serializers import BaseSerializer
 from core.query_params import QueryParam, ListQueryParam
 from datetime import date
-from prospects.serializers import ProspectSerializer
 
 
 class TourUserSerializer(BaseSerializer):
@@ -54,7 +53,6 @@ class TourSerializer(BaseSerializer):
 
     tourusers = TourUserSerializer(read_only=True, many=True)
     dates = serializers.SerializerMethodField()
-    prospects = ProspectSerializer(read_only=True, many=True)
 
     def get_dates(self, tour: Tour):
         dates = tour.dates.all().order_by("date")

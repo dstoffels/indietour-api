@@ -1,6 +1,6 @@
 from rest_framework import generics
 from rest_framework.request import Request
-from .serializers import Date, DateSerializer, DateContact, DateContactSerializer
+from .serializers import Date, DateSerializer
 from tours.permissions import IsTourUser, IsTourAdmin
 from core.views import BaseAPIView
 from core.query_params import ListQueryParam, BooleanQueryParam, QueryParam
@@ -45,8 +45,3 @@ class DateView(generics.RetrieveUpdateDestroyAPIView, BaseDatesView):
         if self.request.method == "GET":
             return (IsTourUser(),)
         return (IsTourAdmin(),)
-
-
-class DateContactView(generics.CreateAPIView, BaseAPIView):
-    serializer_class = DateContactSerializer
-    queryset = DateContact.objects.all()

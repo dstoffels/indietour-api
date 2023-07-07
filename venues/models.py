@@ -3,12 +3,34 @@ from core.models import UUIDModel
 
 
 class Venue(UUIDModel):
+    VENUE_TYPES = (
+        "Amphitheater",
+        "Arena",
+        "Bar",
+        "Brewpub",
+        "Club",
+        "Coffeehouse",
+        "Fair",
+        "Festival",
+        "House",
+        "Listening Room",
+        "Nightclub",
+        "PAC",
+        "Stadium",
+        "Theater",
+        "Winery",
+        "Other",
+    )
+
     place = models.ForeignKey("places.Place", on_delete=models.DO_NOTHING, related_name="venues")
     creator = models.ForeignKey("authentication.User", on_delete=models.SET_NULL, null=True)
-    is_public = models.BooleanField(default=False)
+    name = models.CharField(max_length=255)
     capacity = models.IntegerField()
-    type = models.CharField(max_length=255)
+    type = models.CharField(max_length=255, choices=[(choice, choice) for choice in VENUE_TYPES])
+    last_update = models.DateTimeField(auto_now=True)
+    private = models.BooleanField(default=False)
 
+    contacts = models.ManyToManyField(to="contacts.Contact", related_name="venues")
     notes: models.QuerySet = None
 
 

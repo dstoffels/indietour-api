@@ -5,6 +5,7 @@ from core.models import UUIDModel
 class Contact(UUIDModel):
     owner = models.ForeignKey("authentication.User", on_delete=models.CASCADE, related_name="user_contacts")
     name = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
     notes = models.TextField(default="", blank=True)
 
     contact_methods: models.QuerySet = None
@@ -23,8 +24,3 @@ class ContactMethod(UUIDModel):
 
     def get_method_choices():
         return [(method, method) for method in ContactMethod.METHODS]
-
-
-class ContactTitle(UUIDModel):
-    title = models.CharField(max_length=255, default="")
-    notes = models.TextField(default="")

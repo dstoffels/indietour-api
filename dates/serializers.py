@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from .models import Date, DateContact
 from contacts.serializers import ContactSerializer
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
@@ -8,21 +7,7 @@ from lodgings.serializers import LodgingSerializer
 from places.serializers import PlaceSerializer, Place
 from core.serializers import BaseSerializer
 from core.query_params import BooleanQueryParam, ListQueryParam
-
-
-class DateContactSerializer(BaseSerializer):
-    class Meta:
-        model = DateContact
-        fields = "id", "contact", "title", "contact_id"
-
-    contact = ContactSerializer(read_only=True)
-    contact_id = serializers.UUIDField(write_only=True)
-
-    def create(self, validated_data):
-        validated_data["date_id"] = self.path_vars.date_id
-        print(self.initial_data)
-
-        return super().create(validated_data)
+from .models import Date
 
 
 class DateSerializer(BaseSerializer):
@@ -46,7 +31,6 @@ class DateSerializer(BaseSerializer):
     place_id = serializers.CharField(write_only=True)
     timeslots = TimeslotSerializer(read_only=True, many=True)
     lodgings = LodgingSerializer(read_only=True, many=True)
-    contacts = DateContactSerializer(read_only=True, many=True)
 
     def create(self, validated_data: dict):
         tour_id = self.path_vars.tour_id
