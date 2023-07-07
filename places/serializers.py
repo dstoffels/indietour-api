@@ -33,7 +33,6 @@ class PlaceSerializer(BaseSerializer):
     types = serializers.JSONField(read_only=True)
     business_status = serializers.CharField(read_only=True)
     website = serializers.CharField(read_only=True)
-    contacts = serializers.SerializerMethodField()
 
     def get_contacts(self, place: Place):
         contacts = PlaceContact.objects.filter(contact__owner=self.user)

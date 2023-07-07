@@ -15,7 +15,6 @@ class PathVars:
         self.place_id = kwargs.get("place_id")
         self.placecontact_id = kwargs.get("placecontact_id")
         self.timeslot_id = kwargs.get("timeslot_id")
-        self.prospect_id = kwargs.get("prospect_id")
         self.prospectnote_id = kwargs.get("prospectnote_id")
         self.lodging_id = kwargs.get("lodging_id")
         self.contact_id = kwargs.get("contact_id")
@@ -44,8 +43,6 @@ class PathVars:
                 date: Date = self._validate_id(tour.dates, self.date_id, "tour")
                 if date:
                     self._validate_id(date.timeslots, self.timeslot_id, "date")
-                    prospect = self._validate_id(date.prospects, self.prospect_id, "date")
-                    # TODO: validate prospect notes
                     self._validate_id(date.lodgings, self.lodging_id, "date")
 
     def _validate_id(self, queryset: models.QuerySet, id, model_name: str):

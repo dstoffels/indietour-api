@@ -25,7 +25,7 @@ class ContactSerializer(BaseSerializer):
         fields = "id", "name", "notes", "contact_methods"
 
     name = serializers.CharField()
-    contact_methods = ContactMethodSerializer(many=True)
+    contact_methods = ContactMethodSerializer(required=False, many=True)
 
     def create(self, validated_data: dict):
         validated_data["owner"] = self.user

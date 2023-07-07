@@ -13,31 +13,20 @@ from .models import Date
 class DateSerializer(BaseSerializer):
     class Meta:
         model = Date
-        fields = (
-            "id",
-            "date",
-            "title",
-            "place",
-            "place_id",
-            "notes",
-            "is_show_day",
-            "is_confirmed",
-            "timeslots",
-            "lodgings",
-            "contacts",
-        )
+        fields = ("id", "date", "place", "place_id", "title", "notes", "timeslots", "lodgings", "contacts", "tour_id")
 
     place = PlaceSerializer(read_only=True)
     place_id = serializers.CharField(write_only=True)
     timeslots = TimeslotSerializer(read_only=True, many=True)
     lodgings = LodgingSerializer(read_only=True, many=True)
+    contacts = ContactSerializer(read_only=True, many=True)
 
     def create(self, validated_data: dict):
         tour_id = self.path_vars.tour_id
         validated_data["tour_id"] = tour_id
-        duplicate = Date.objects.filter(tour_id=tour_id, date=validated_data.get("date")).first()
-        if duplicate:
-            raise ValidationError({"details": "Cannot have duplicate dates in a tour.", "code": "DUPLICATE"})
+        # duplicate = Date.objects.filter(tour_id=tour_id, date=validated_data.get("date")).first()
+        # if duplicate:
+        #     raise ValidationError({"details": "Cannot have duplicate dates in a tour.", "code": "DUPLICATE"})
 
         ser = PlaceSerializer(data=validated_data, context=self.context)
         ser.is_valid()
@@ -46,7 +35,7 @@ class DateSerializer(BaseSerializer):
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        ser = PlaceSerializer(data=validated_data)
+        ser = PlaceSerializer(data=validated_data, context=self.context)
         ser.is_valid()
         ser.save()
         return super().update(instance, validated_data)
@@ -57,10 +46,12 @@ class DateSerializer(BaseSerializer):
 
     def get_fields(self):
         fields = super().get_fields()
-        # if not self.include.contains("all"):
-        #     if not self.include.contains("timeslots"):
-        #         fields.pop("timeslots")
-        #     if not self.include.contains("lodgings"):
-        #         fields.pop("lodgings")
+        if not self.include.contains("all"):
+            if not self.include.contains("timeslots"):
+                fields.pop("timeslots")
+            if not self.include.contains("lodgings"):
+                fields.pop("lodgings")
+            if not self.include.contains("contacts"):
+                fields.pop("contacts")
 
         return fields

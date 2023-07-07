@@ -49,7 +49,7 @@ from dates.serializers import DateSerializer
 class TourSerializer(BaseSerializer):
     class Meta:
         model = Tour
-        fields = ("id", "name", "is_archived", "band_id", "tourusers", "dates", "prospects")
+        fields = ("id", "name", "is_archived", "band_id", "tourusers", "dates")
 
     tourusers = TourUserSerializer(read_only=True, many=True)
     dates = serializers.SerializerMethodField()
@@ -77,7 +77,5 @@ class TourSerializer(BaseSerializer):
         if not self.include.contains("all"):
             if not self.include.contains("dates"):
                 fields.pop("dates")
-            if not self.include.contains("prospects"):
-                fields.pop("prospects")
 
         return fields

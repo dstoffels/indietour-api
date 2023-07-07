@@ -5,6 +5,7 @@ from tours.permissions import IsTourUser, IsTourAdmin
 from core.views import BaseAPIView
 from core.query_params import ListQueryParam, BooleanQueryParam, QueryParam
 from datetime import date
+from contacts.serializers import Contact, ContactSerializer
 
 
 class BaseDatesView(BaseAPIView):
@@ -45,3 +46,16 @@ class DateView(generics.RetrieveUpdateDestroyAPIView, BaseDatesView):
         if self.request.method == "GET":
             return (IsTourUser(),)
         return (IsTourAdmin(),)
+
+
+class DateContactsView(generics.CreateAPIView, BaseDatesView):
+    serializer_class = ContactSerializer
+
+    def post(self, request: Request, *args, **kwargs):
+        ser = ContactSerializer(data=request.data, context=self.get_serializer_context())
+        ser.is_valid()
+        ser.save()
+        date = Date.objects.filter(id=self.path_vars.date_id).first()
+        date.contacts.add(ser.instance)
+        date.save()
+        return self.date_response()
