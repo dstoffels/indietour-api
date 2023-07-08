@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "bands",
     "tours",
     "dates",
+    "shows",
     "places",
     "timeslots",
     "lodgings",

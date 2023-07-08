@@ -23,6 +23,10 @@
 /bands/<band_id>/tours/<tour_id>/prospects/<prospect_id>/logentries/<logentry_id>
 /bands/<band_id>/tours/<tour_id>/dates
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>
+/bands/<band_id>/tours/<tour_id>/dates/<date_id>/logentries
+/bands/<band_id>/tours/<tour_id>/dates/<date_id>/logentries/<logentry_id>
+/bands/<band_id>/tours/<tour_id>/dates/<date_id>/shows
+/bands/<band_id>/tours/<tour_id>/dates/<date_id>/shows/<show_id>
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/contacts
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/contacts/<datecontact_id>
 /bands/<band_id>/tours/<tour_id>/dates/<date_id>/lodgings

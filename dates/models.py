@@ -16,7 +16,7 @@ class Date(UUIDModel):
     hold = models.IntegerField(default=None, null=True)
 
     contacts = models.ManyToManyField(to="contacts.Contact", related_name="dates")
-    venues = models.ManyToManyField(to="venues.Venue", through="dates.Show", related_name="dates")
+    # venues = models.ManyToManyField(to="venues.Venue", through="dates.Show", related_name="dates")
 
     shows: models.QuerySet = None
     timeslots: models.QuerySet = None
@@ -30,11 +30,3 @@ class LogEntry(UUIDModel):
     date = models.ForeignKey(Date, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
     note = models.TextField(default="")
-
-
-class Show(UUIDModel):
-    date = models.ForeignKey(Date, on_delete=models.CASCADE, related_name="shows")
-    venue = models.ForeignKey("venues.Venue", on_delete=models.CASCADE)
-    deal = models.TextField(default="", blank=True)
-    hospitality = models.TextField(default="", blank=True)
-    notes = models.TextField(default="", blank=True)

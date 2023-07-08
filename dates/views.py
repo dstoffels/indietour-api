@@ -1,6 +1,6 @@
 from rest_framework import generics
 from rest_framework.request import Request
-from .serializers import Date, DateSerializer, Show, ShowSerializer
+from .serializers import Date, DateSerializer
 from tours.permissions import IsTourUser, IsTourAdmin
 from core.views import BaseAPIView
 from core.query_params import ListQueryParam, BooleanQueryParam, QueryParam
@@ -11,7 +11,7 @@ from contacts.serializers import Contact, ContactSerializer
 class BaseDatesView(BaseAPIView):
     def get_query_params(self) -> list[QueryParam]:
         return [
-            ListQueryParam("include", ["all", "timeslots", "contacts", "prospects", "lodgings"]),
+            ListQueryParam("include", ["all", "timeslots", "contacts", "shows", "lodgings"]),
             BooleanQueryParam("past_dates"),
         ]
 
@@ -59,19 +59,3 @@ class DateContactsView(generics.CreateAPIView, BaseDatesView):
         date.contacts.add(ser.instance)
         date.save()
         return self.date_response()
-
-
-class ShowsView(generics.ListCreateAPIView, BaseDatesView):
-    serializer_class = ShowSerializer
-
-    def get_queryset(self):
-        return Show.objects.filter(date_id=self.path_vars.date_id)
-
-
-class ShowView(generics.RetrieveUpdateDestroyAPIView, BaseDatesView):
-    serializer_class = ShowSerializer
-    lookup_field = "id"
-    lookup_url_kwarg = "show_id"
-
-    def get_queryset(self):
-        return Show.objects.filter(date_id=self.path_vars.date_id)

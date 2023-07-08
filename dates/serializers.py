@@ -7,21 +7,8 @@ from lodgings.serializers import LodgingSerializer
 from places.serializers import PlaceSerializer, Place
 from core.serializers import BaseSerializer
 from core.query_params import BooleanQueryParam, ListQueryParam
-from .models import Date, Show
-from venues.serializers import Venue, VenueSerializer
-
-
-class ShowSerializer(BaseSerializer):
-    class Meta:
-        model = Show
-        fields = ("id", "venue", "venue_id", "deal", "hospitality", "notes", "date_id")
-
-    venue = VenueSerializer(read_only=True)
-    venue_id = serializers.UUIDField(write_only=True)
-
-    def create(self, validated_data):
-        validated_data["date_id"] = self.path_vars.date_id
-        return super().create(validated_data)
+from .models import Date
+from shows.serializers import ShowSerializer
 
 
 class DateSerializer(BaseSerializer):
@@ -77,6 +64,8 @@ class DateSerializer(BaseSerializer):
     def get_fields(self):
         fields = super().get_fields()
         if not self.include.contains("all"):
+            if not self.include.contains("shows"):
+                fields.pop("shows")
             if not self.include.contains("timeslots"):
                 fields.pop("timeslots")
             if not self.include.contains("lodgings"):
