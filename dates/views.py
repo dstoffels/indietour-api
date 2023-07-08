@@ -1,6 +1,7 @@
 from rest_framework import generics
 from rest_framework.request import Request
-from .serializers import Date, DateSerializer
+from rest_framework.response import Response
+from .serializers import Date, DateSerializer, LogEntry, LogEntrySerializer
 from tours.permissions import IsTourUser, IsTourAdmin
 from core.views import BaseAPIView
 from core.query_params import ListQueryParam, BooleanQueryParam, QueryParam
@@ -15,14 +16,14 @@ class BaseDatesView(BaseAPIView):
             BooleanQueryParam("past_dates"),
         ]
 
-
-class DatesView(generics.ListCreateAPIView, BaseDatesView):
-    serializer_class = DateSerializer
-
     def get_permissions(self):
         if self.request.method == "GET":
             return (IsTourUser(),)
         return (IsTourAdmin(),)
+
+
+class DatesView(generics.ListCreateAPIView, BaseDatesView):
+    serializer_class = DateSerializer
 
     def get_queryset(self):
         tourdates = Date.objects.filter(tour_id=self.path_vars.tour_id).order_by("date")
@@ -42,20 +43,35 @@ class DateView(generics.RetrieveUpdateDestroyAPIView, BaseDatesView):
     lookup_field = "id"
     lookup_url_kwarg = "date_id"
 
-    def get_permissions(self):
-        if self.request.method == "GET":
-            return (IsTourUser(),)
-        return (IsTourAdmin(),)
 
-
-class DateContactsView(generics.CreateAPIView, BaseDatesView):
-    serializer_class = ContactSerializer
+class DateContactView(generics.DestroyAPIView, generics.CreateAPIView, BaseDatesView):
+    permission_classes = (IsTourAdmin,)
 
     def post(self, request: Request, *args, **kwargs):
-        ser = ContactSerializer(data=request.data, context=self.get_serializer_context())
-        ser.is_valid()
-        ser.save()
         date = Date.objects.filter(id=self.path_vars.date_id).first()
-        date.contacts.add(ser.instance)
-        date.save()
+        contact = Contact.objects.filter(id=self.path_vars.contact_id).first()
+        if not date.contacts.contains(contact):
+            date.contacts.add(contact)
         return self.date_response()
+
+    def delete(self, request, *args, **kwargs):
+        date = Date.objects.filter(id=self.path_vars.date_id).first()
+        contact = Contact.objects.filter(id=self.path_vars.contact_id).first()
+        date.contacts.remove(contact)
+        return self.date_response()
+
+
+class DateLogView(generics.ListCreateAPIView, BaseAPIView):
+    serializer_class = LogEntrySerializer
+
+    def get_queryset(self):
+        return LogEntry.objects.filter(date_id=self.path_vars.date_id).order_by("timestamp")
+
+
+class LogEntryView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
+    serializer_class = LogEntrySerializer
+    lookup_field = "id"
+    lookup_url_kwarg = "logentry_id"
+
+    def get_queryset(self):
+        return LogEntry.objects.filter(date_id=self.path_vars.date_id).order_by("timestamp")

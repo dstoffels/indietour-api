@@ -7,6 +7,7 @@ from django.db import models
 
 class PathVars:
     def __init__(self, kwargs: dict) -> None:
+        self.kwargs = kwargs
         self.band_id = kwargs.get("band_id")
         self.banduser_id = kwargs.get("banduser_id")
         self.tour_id = kwargs.get("tour_id")
@@ -24,6 +25,9 @@ class PathVars:
         self.venue_id = kwargs.get("venue_id")
         self.venuenote_id = kwargs.get("venuenote_id")
         self.validate()
+
+    def get(self, attr_name: str):
+        return self.kwargs.get(attr_name)
 
     def update_context(self, context: dict):
         context.update({"path_vars": self})

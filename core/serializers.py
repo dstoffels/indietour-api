@@ -4,7 +4,7 @@ from core.path_vars import PathVars
 
 
 class BaseSerializer(serializers.ModelSerializer):
-    # default_error_messages = {"invalid": "could not validate"}
+    parent_url_kwarg = ""
     query_params: QueryParamsManager
 
     def is_valid(self, *, raise_exception=True):
@@ -24,6 +24,12 @@ class BaseSerializer(serializers.ModelSerializer):
         if isinstance(self.query_params, QueryParamsManager):
             self.query_params.to_obj_attrs(self)
         return super().get_fields()
+
+    def create(self, validated_data):
+        parent_id = self.path_vars.get(self.parent_url_kwarg)
+        if parent_id:
+            validated_data[self.parent_url_kwarg] = parent_id
+        return super().create(validated_data)
 
     def init_query_params(self):
         """(OPTIONAL) Override to create instance vars for QueryParams. This is for intellisense only, vars must not be assigned a value. Called first in self.get_fields()
