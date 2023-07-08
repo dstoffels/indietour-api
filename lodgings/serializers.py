@@ -29,7 +29,7 @@ class LodgingSerializer(BaseSerializer):
     def _set_place(self):
         place_id = self.validated_data.get("place_id")
         if place_id:
-            ser = PlaceSerializer(data={"place_id": place_id})
+            ser = PlaceSerializer(data={"place_id": place_id}, context=self.context)
             ser.is_valid()
             ser.save()
             self.validated_data["place"] = ser.instance

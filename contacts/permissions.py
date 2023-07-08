@@ -11,6 +11,7 @@ class IsContactOwner(IsVerified):
 
     def initial(self, request: Request, view: BaseAPIView) -> None:
         super().initial(request, view)
+        # validate contact existence? get_or_404?
         self.contact = Contact.objects.filter(id=self.path_vars.contact_id).first()
 
     def set_error_msg(self):

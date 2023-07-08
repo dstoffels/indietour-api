@@ -30,7 +30,7 @@ class VenueNoteSerializer(BaseSerializer):
 class VenueSerializer(BaseSerializer):
     class Meta:
         model = Venue
-        fields = "id", "place", "creator", "is_public", "capacity", "type", "place_id", "note"
+        fields = "id", "place", "creator", "capacity", "type", "place_id", "note", "private"
 
     place = PlaceSerializer(read_only=True)
     place_id = serializers.CharField(write_only=True)
@@ -72,7 +72,7 @@ class VenueSerializer(BaseSerializer):
         return super().update(instance, validated_data)
 
     def validate_venue(self, place_id):
-        existing_public_venue = Venue.objects.filter(place_id=place_id, is_public=True).first()
+        existing_public_venue = Venue.objects.filter(place_id=place_id, private=False).first()
         if existing_public_venue:
             raise ValidationError({"detail": "This venue has already been published", "code": "INVALID"})
 
@@ -84,6 +84,6 @@ class VenueSerializer(BaseSerializer):
 
     def validate_place(self, place: Place, validated_data: dict):
         if "premise" in place.types:
-            validated_data["is_public"] = False
+            validated_data["private"] = True
         elif "establishment" in place.types:
-            validated_data["is_public"] = True
+            validated_data["private"] = False
