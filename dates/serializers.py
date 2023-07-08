@@ -34,6 +34,8 @@ class DateSerializer(BaseSerializer):
             "place_id",
             "title",
             "notes",
+            "status",
+            "hold",
             "shows",
             "timeslots",
             "lodgings",
@@ -61,10 +63,11 @@ class DateSerializer(BaseSerializer):
 
         return super().create(validated_data)
 
-    def update(self, instance, validated_data):
-        ser = PlaceSerializer(data=validated_data, context=self.context)
-        ser.is_valid()
-        ser.save()
+    def update(self, instance, validated_data: dict):
+        if validated_data.get("place_id"):
+            ser = PlaceSerializer(data=validated_data, context=self.context)
+            ser.is_valid()
+            ser.save()
         return super().update(instance, validated_data)
 
     def init_query_params(self):

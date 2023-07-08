@@ -42,6 +42,7 @@ class PathVars:
                 self._validate_id(tour.tourusers, self.touruser_id, "tour")
                 date: Date = self._validate_id(tour.dates, self.date_id, "tour")
                 if date:
+                    self._validate_id(date.shows, self.show_id, "date")
                     self._validate_id(date.timeslots, self.timeslot_id, "date")
                     self._validate_id(date.lodgings, self.lodging_id, "date")
 

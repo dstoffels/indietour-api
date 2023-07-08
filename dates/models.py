@@ -17,6 +17,8 @@ class Date(UUIDModel):
 
     contacts = models.ManyToManyField(to="contacts.Contact", related_name="dates")
     venues = models.ManyToManyField(to="venues.Venue", through="dates.Show", related_name="dates")
+
+    shows: models.QuerySet = None
     timeslots: models.QuerySet = None
     lodgings = models.QuerySet = None
 
