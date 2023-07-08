@@ -25,7 +25,7 @@ class DatesView(generics.ListCreateAPIView, BaseDatesView):
         return (IsTourAdmin(),)
 
     def get_queryset(self):
-        tourdates = Date.objects.filter(tour_id=self.kwargs.get("tour_id")).order_by("date")
+        tourdates = Date.objects.filter(tour_id=self.path_vars.tour_id).order_by("date")
         if self.past_dates.is_invalid():
             tourdates = tourdates.filter(date__gte=date.today())
         return tourdates
