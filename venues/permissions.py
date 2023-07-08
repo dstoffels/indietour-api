@@ -7,7 +7,8 @@ from .models import Venue, VenueNote
 
 class IsVenueOwner(IsVerified):
     def get_permission(self):
-        return super().get_permission() and self.venue.creator == self.user
+        if self.venue:
+            return super().get_permission() and self.venue.creator == self.user
 
     def set_error_msg(self):
         self.message = {"detail": "Must be venue owner to access this resource", "code": "UNAUTHORIZED"}
@@ -19,7 +20,8 @@ class IsVenueOwner(IsVerified):
 
 class IsPublicVenue(IsVenueOwner):
     def get_permission(self):
-        return super().get_permission() or self.venue.is_public
+        if self.venue:
+            return super().get_permission() or self.venue.is_public
 
     def set_error_msg(self):
         self.message = {"detail": "This venue is not public.", "code": "UNAUTHORIZED"}

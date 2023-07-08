@@ -28,10 +28,11 @@ class Venue(UUIDModel):
     capacity = models.IntegerField()
     type = models.CharField(max_length=255, choices=[(choice, choice) for choice in VENUE_TYPES])
     last_update = models.DateTimeField(auto_now=True)
-    private = models.BooleanField(default=False)
+    public = models.BooleanField(default=True)
 
     contacts = models.ManyToManyField(to="contacts.Contact", related_name="venues")
     notes: models.QuerySet = None
+    shows: models.QuerySet = None
 
 
 class VenueNote(UUIDModel):

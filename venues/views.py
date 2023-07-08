@@ -14,7 +14,7 @@ class VenueCollectionView(generics.ListCreateAPIView, BaseAPIView):
     permission_classes = (IsVerified,)
 
     def get_queryset(self):
-        venues = Venue.objects.filter(Q(private=False) | Q(creator=self.request.user)).order_by("place__name")
+        venues = Venue.objects.filter(Q(public=True) | Q(creator=self.request.user)).order_by("place__name")
         # if self.query.is_valid():
         # if self.search_by.is_valid():
         #     return venues.filter(**{self.search_by.value: self.query.value})
@@ -39,7 +39,7 @@ class VenueView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
     lookup_url_kwarg = "venue_id"
 
     def get_queryset(self):
-        venues = Venue.objects.filter(Q(private=False) | Q(creator=self.request.user)).order_by("place__name")
+        venues = Venue.objects.filter(Q(public=True) | Q(creator=self.request.user)).order_by("place__name")
         return venues
 
     def get_permissions(self):
@@ -64,3 +64,8 @@ class VenueNoteView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
 
     def get_queryset(self):
         return VenueNote.objects.filter(venue_id=self.path_vars.venue_id)
+
+
+class VenueTypesView(generics.RetrieveAPIView, BaseAPIView):
+    def get(self, request, *args, **kwargs):
+        return Response(Venue.VENUE_TYPES)
