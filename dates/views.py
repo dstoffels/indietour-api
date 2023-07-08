@@ -66,3 +66,12 @@ class ShowsView(generics.ListCreateAPIView, BaseDatesView):
 
     def get_queryset(self):
         return Show.objects.filter(date_id=self.path_vars.date_id)
+
+
+class ShowView(generics.RetrieveUpdateDestroyAPIView, BaseDatesView):
+    serializer_class = ShowSerializer
+    lookup_field = "id"
+    lookup_url_kwarg = "show_id"
+
+    def get_queryset(self):
+        return Show.objects.filter(date_id=self.path_vars.date_id)

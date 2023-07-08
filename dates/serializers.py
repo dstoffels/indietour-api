@@ -14,7 +14,7 @@ from venues.serializers import Venue, VenueSerializer
 class ShowSerializer(BaseSerializer):
     class Meta:
         model = Show
-        fields = ("id", "venue", "venue_id", "deal", "hospitality", "notes")
+        fields = ("id", "venue", "venue_id", "deal", "hospitality", "notes", "date_id")
 
     venue = VenueSerializer(read_only=True)
     venue_id = serializers.UUIDField(write_only=True)
