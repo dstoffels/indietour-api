@@ -21,7 +21,7 @@ class IsVenueOwner(IsVerified):
 class IsPublicVenue(IsVenueOwner):
     def get_permission(self):
         if self.venue:
-            return super().get_permission() or self.venue.is_public
+            return super().get_permission() or self.venue.public
 
     def set_error_msg(self):
         self.message = {"detail": "This venue is not public.", "code": "UNAUTHORIZED"}
