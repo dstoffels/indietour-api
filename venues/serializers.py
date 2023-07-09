@@ -6,6 +6,7 @@ from core.serializers import BaseSerializer
 from core.query_params import QueryParam, ListQueryParam
 from datetime import date
 from rest_framework.exceptions import ValidationError
+from contacts.serializers import ContactSerializer
 
 
 class VenueNoteSerializer(BaseSerializer):
@@ -30,12 +31,17 @@ class VenueNoteSerializer(BaseSerializer):
 class VenueSerializer(BaseSerializer):
     class Meta:
         model = Venue
-        fields = "id", "place", "creator", "capacity", "type", "place_id", "note", "public", "show_count"
+        fields = "id", "place", "creator", "capacity", "type", "place_id", "note", "public", "contacts", "show_count"
 
     place = PlaceSerializer(read_only=True)
     place_id = serializers.CharField(write_only=True)
     capacity = serializers.IntegerField(required=False, default=0)
     creator = serializers.SerializerMethodField()
+    contacts = serializers.SerializerMethodField()
+
+    def get_contacts(self, venue: Venue):
+        return ContactSerializer(venue.contacts.filter(owner=self.user), many=True, context=self.context).data
+
     show_count = serializers.SerializerMethodField()
 
     def get_show_count(self, venue: Venue):

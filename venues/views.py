@@ -7,6 +7,7 @@ from .permissions import IsVenueOwner, IsPublicVenue, IsNoteOwner
 from core.views import BaseAPIView
 from core.query_params import BooleanQueryParam, ListQueryParam, QueryParam
 from django.db.models import Q
+from contacts.models import Contact
 
 
 class VenueCollectionView(generics.ListCreateAPIView, BaseAPIView):
@@ -69,3 +70,19 @@ class VenueNoteView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
 class VenueTypesView(generics.RetrieveAPIView, BaseAPIView):
     def get(self, request, *args, **kwargs):
         return Response(Venue.VENUE_TYPES)
+
+
+class VenueContactView(generics.CreateAPIView, generics.DestroyAPIView, BaseAPIView):
+    def post(self, request, *args, **kwargs):
+        venue = Venue.objects.get(id=self.path_vars.venue_id)
+        contact = Contact.objects.get(id=self.path_vars.contact_id)
+        if not venue.contacts.contains(contact):
+            venue.contacts.add(contact)
+        return Response(VenueSerializer(venue, context=self.get_serializer_context()).data, 201)
+
+    def delete(self, request, *args, **kwargs):
+        venue = Venue.objects.get(id=self.path_vars.venue_id)
+        contact = Contact.objects.get(id=self.path_vars.contact_id)
+        if venue.contacts.contains(contact):
+            venue.contacts.remove(contact)
+        return Response(VenueSerializer(venue, context=self.get_serializer_context()).data, 200)
