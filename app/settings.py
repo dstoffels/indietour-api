@@ -163,7 +163,7 @@ SIMPLE_JWT = {
 try:
     from app.local_settings import *
 except:
-    from production_settings import *
+    from app.production_settings import *
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = os.environ.get("EMAIL_HOST")
