@@ -1,6 +1,7 @@
 from rest_framework import generics
 from rest_framework.request import Request
 from .serializers import RegistrationSerializer, TokenSerializer, UserSerializer
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.response import Response
@@ -15,16 +16,20 @@ from django.utils import timezone
 
 
 class LoginView(TokenObtainPairView):
-    serializer_class = TokenSerializer
+    serializer_class = TokenObtainPairSerializer
 
     def post(self, request: Request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
+        token_pair = super().post(request, *args, **kwargs).data
 
         user = authenticate(request, email=request.data.get("email"), password=request.data.get("password"))
 
         if user:
             user.last_login = timezone.now()
             user.save()
+
+        response = Response(data=UserSerializer(user).data, status=200)
+        response.set_cookie("jwt-access", token_pair.get("access"), httponly=True, secure=False, samesite="Strict")
+        response.set_cookie("jwt-refresh", token_pair.get("refresh"), httponly=True, secure=False, samesite="Strict")
 
         return response
 

@@ -31,7 +31,7 @@ allowed_hosts = os.environ.get("ALLOWED_HOSTS")
 if allowed_hosts:
     ALLOWED_HOSTS = allowed_hosts.split(",")
 else:
-    ALLOWED_HOSTS = ["*"]
+    ALLOWED_HOSTS = ["*", "http://127.0.0.1:42069"]
 
 AUTH_USER_MODEL = "authentication.User"
 APPEND_SLASH = False

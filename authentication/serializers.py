@@ -8,18 +8,19 @@ from django.core.mail import send_mail
 
 
 class TokenSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user: User):
-        token = super().get_token(user)
+    pass
+    # @classmethod
+    # def get_token(cls, user: User):
+    #     token = super().get_token(user)
 
-        token["email"] = user.email
-        token["username"] = user.username
-        token["is_active"] = user.is_active
-        token["email_verified"] = user.email_verified
-        token["active_band_id"] = user.active_band_id
-        token["active_tour_id"] = user.active_tour_id
+    #     token["email"] = user.email
+    #     token["username"] = user.username
+    #     token["is_active"] = user.is_active
+    #     token["email_verified"] = user.email_verified
+    #     token["active_band_id"] = user.active_band_id
+    #     token["active_tour_id"] = user.active_tour_id
 
-        return token
+    #     return token
 
 
 class RegistrationSerializer(serializers.ModelSerializer):

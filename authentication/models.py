@@ -12,6 +12,7 @@ class User(AbstractUser):
     username = models.CharField(unique=True, max_length=255, null=False)
     email_verified = models.BooleanField(default=False)
     verification_code = models.CharField(max_length=6, default=generate_verification_code)
+    last_login = models.DateTimeField(auto_now=True)
 
     member_bands = models.ManyToManyField("bands.Band", through="bands.BandUser", related_name="users")
     owned_bands = models.QuerySet
