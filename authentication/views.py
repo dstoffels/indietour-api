@@ -1,37 +1,57 @@
 from rest_framework import generics
 from rest_framework.request import Request
-from .serializers import RegistrationSerializer, TokenSerializer, UserSerializer
+from .serializers import RegistrationSerializer, UserSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from .models import User
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from django.conf import settings
-from .utils import generate_verification_code
+from .utils import generate_verification_code, generate_user_response
 from django.contrib.auth import authenticate
 from django.utils import timezone
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 class LoginView(TokenObtainPairView):
     serializer_class = TokenObtainPairSerializer
 
     def post(self, request: Request, *args, **kwargs):
-        token_pair = super().post(request, *args, **kwargs).data
-
+        token_pair = super().post(request, args, kwargs).data
         user = authenticate(request, email=request.data.get("email"), password=request.data.get("password"))
 
         if user:
             user.last_login = timezone.now()
             user.save()
 
-        response = Response(data=UserSerializer(user).data, status=200)
-        response.set_cookie("jwt-access", token_pair.get("access"), httponly=True, secure=False, samesite="Strict")
-        response.set_cookie("jwt-refresh", token_pair.get("refresh"), httponly=True, secure=False, samesite="Strict")
+        return generate_user_response(token_pair, user)
 
+
+class LogoutView(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        response = Response()
+        response.delete_cookie("access")
+        response.delete_cookie("refresh")
         return response
+
+
+class RefreshView(TokenRefreshView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        token_pair = super().post(request, *args, **kwargs).data
+
+        jwt_auth = JWTAuthentication()
+        access = token_pair.get("access")
+        valid_token = jwt_auth.get_validated_token(access)
+        user = jwt_auth.get_user(valid_token)
+
+        return generate_user_response(token_pair, user)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -49,7 +69,7 @@ class RegisterView(generics.CreateAPIView):
             user.last_login = timezone.now()
             user.save()
 
-        token = TokenSerializer().get_token(user_ser.instance)
+        token = TokenObtainPairSerializer().get_token(user_ser.instance)
         return Response(
             {"refresh": str(token), "access": str(token.access_token)},
             201,
@@ -66,7 +86,7 @@ class UserView(generics.UpdateAPIView):
         ser = UserSerializer(user, data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
         ser.save()
-        token = TokenSerializer().get_token(user)
+        token = TokenObtainPairSerializer().get_token(user)
         return Response(
             {"refresh": str(token), "access": str(token.access_token)},
             200,
@@ -102,7 +122,7 @@ To verify, log in to your account at indietour.app/login and you will be directe
         if user.verification_code == verification_code:
             user.email_verified = True
             user.save()
-            token = TokenSerializer().get_token(user)
+            token = TokenObtainPairSerializer().get_token(user)
             return Response({"refresh": str(token), "access": str(token.access_token)}, 200)
         raise ValidationError({"detail": "Invalid verification code", "code": "BAD_CREDENTIALS"})
 
@@ -119,7 +139,7 @@ class UserPasswordView(generics.CreateAPIView):
         if user.check_password(old_password):
             user.set_password(new_password)
             user.save()
-            token = TokenSerializer().get_token(user)
+            token = TokenObtainPairSerializer().get_token(user)
             return Response({"refresh": str(token), "access": str(token.access_token)}, 200)
 
         raise ValidationError({"detail": "Incorrect credentials", "code": "BAD_CREDENTIALS"})
