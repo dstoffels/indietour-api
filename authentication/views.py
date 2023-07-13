@@ -18,7 +18,7 @@ from datetime import datetime
 from django.conf import settings
 
 
-class AuthCookieBaseView(generics.GenericAPIView):
+class AuthCookieBaseView(APIView):
     def get_token_pair(self, user: User):
         refresh: RefreshToken = RefreshToken.for_user(user)
         return {"access": str(refresh.access_token), "refresh": str(refresh)}
