@@ -7,22 +7,6 @@ from django.conf import settings
 from django.core.mail import send_mail
 
 
-class TokenSerializer(TokenObtainPairSerializer):
-    pass
-    # @classmethod
-    # def get_token(cls, user: User):
-    #     token = super().get_token(user)
-
-    #     token["email"] = user.email
-    #     token["username"] = user.username
-    #     token["is_active"] = user.is_active
-    #     token["email_verified"] = user.email_verified
-    #     token["active_band_id"] = user.active_band_id
-    #     token["active_tour_id"] = user.active_tour_id
-
-    #     return token
-
-
 class RegistrationSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True, validators=[UniqueValidator(queryset=User.objects.all())])
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])

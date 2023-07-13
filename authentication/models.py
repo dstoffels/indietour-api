@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 import uuid
 from .utils import generate_verification_code
+from rest_framework.request import Request
+from django.contrib.auth import authenticate
+from datetime import datetime
 
 
 class User(AbstractUser):
@@ -23,3 +26,13 @@ class User(AbstractUser):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username", "password"]
+
+    def login(request: Request):
+        email = request.data.get("email")
+        password = request.data.get("password")
+
+        user: User = authenticate(request, email=email, password=password)
+        user.last_login = datetime.now()
+        user.save()
+
+        return user
