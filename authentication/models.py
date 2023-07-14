@@ -32,7 +32,8 @@ class User(AbstractUser):
         password = request.data.get("password")
 
         user: User = authenticate(request, email=email, password=password)
-        user.last_login = datetime.now()
-        user.save()
+        if user:
+            user.last_login = datetime.now()
+            user.save()
 
         return user

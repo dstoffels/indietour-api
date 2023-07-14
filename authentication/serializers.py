@@ -7,8 +7,17 @@ from django.conf import settings
 from django.core.mail import send_mail
 
 
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+
+    def is_valid(self, *, raise_exception=True):
+        return super().is_valid(raise_exception=raise_exception)
+
+
 class RegistrationSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True, validators=[UniqueValidator(queryset=User.objects.all())])
+    username = serializers.CharField(required=True, validators=[UniqueValidator(queryset=User.objects.all())])
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
 
     class Meta:

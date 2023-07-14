@@ -1,7 +1,7 @@
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.request import Request
-from .serializers import RegistrationSerializer, UserSerializer
+from .serializers import RegistrationSerializer, UserSerializer, LoginSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -18,7 +18,7 @@ from datetime import datetime
 from django.conf import settings
 
 
-class AuthCookieBaseView(APIView):
+class AuthCookieBaseView(generics.GenericAPIView):
     def get_token_pair(self, user: User):
         refresh: RefreshToken = RefreshToken.for_user(user)
         return {"access": str(refresh.access_token), "refresh": str(refresh)}
@@ -38,12 +38,13 @@ class AuthCookieBaseView(APIView):
         response.set_cookie("refresh", refresh, expires=refresh_expiry, httponly=True, secure=True, samesite="Strict")
 
 
-class LoginView(AuthCookieBaseView):
+class LoginView(TokenObtainPairView, AuthCookieBaseView):
     permission_classes = (AllowAny,)
 
     def post(self, request: Request, *args, **kwargs):
-        user = User.login(request)
-        token_pair = self.get_token_pair(user)
+        response = super().post(request, *args, **kwargs)
+        user = User.objects.get(email=request.data.get("email"))
+        token_pair = response.data
         return self.get_response(user, token_pair)
 
 
