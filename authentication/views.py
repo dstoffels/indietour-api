@@ -2,7 +2,7 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from .serializers import RegistrationSerializer, UserSerializer, LoginSerializer
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.response import Response
@@ -61,7 +61,10 @@ class LogoutView(AuthCookieBaseView):
 class RefreshView(TokenRefreshView, AuthCookieBaseView):
     permission_classes = (AllowAny,)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: Request, *args, **kwargs):
+        refresh = request.COOKIES.get("refresh")
+        request.data["refresh"] = refresh
+
         token_pair = super().post(request, *args, **kwargs).data
 
         jwt_auth = JWTAuthentication()
