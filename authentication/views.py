@@ -63,6 +63,9 @@ class RefreshView(TokenRefreshView, AuthCookieBaseView):
 
     def post(self, request: Request, *args, **kwargs):
         refresh = request.COOKIES.get("refresh")
+        if not refresh:
+            return Response(None)
+
         request.data["refresh"] = refresh
 
         token_pair = super().post(request, *args, **kwargs).data
@@ -95,12 +98,13 @@ class UserView(generics.UpdateAPIView, AuthCookieBaseView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
-    lookup_field = "id"
-    lookup_url_kwarg = "user_id"
 
     def patch(self, request: Request, *args, **kwargs):
-        response = super().patch(request, *args, **kwargs)
         user: User = request.user
+        ser = UserSerializer(user, data=request.data, partial=True)
+        ser.is_valid()
+        ser.save()
+
         token_pair = self.get_token_pair(user)
         return self.get_response(user, token_pair)
 

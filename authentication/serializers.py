@@ -44,10 +44,10 @@ To verify, log in to your account at indietour.app/login and you will be directe
 
 
 class UserSerializer(serializers.ModelSerializer):
-    email = serializers.CharField(read_only=True)
-    is_active = serializers.BooleanField(read_only=True)
-    email_verified = serializers.BooleanField(read_only=True)
+    # email = serializers.CharField(read_only=True)
+    # is_active = serializers.BooleanField(read_only=True)
+    # email_verified = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = User
-        fields = ("email", "username", "is_active", "email_verified")
+        fields = ("email", "username", "is_active", "email_verified", "active_band_id", "active_tour_id")
