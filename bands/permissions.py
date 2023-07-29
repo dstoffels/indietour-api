@@ -1,5 +1,5 @@
 from core.permissions import IsVerified
-from rest_framework.request import Request
+from core.request import Request
 from authentication.models import User
 from .models import Band
 from core.views import BaseAPIView
@@ -11,7 +11,7 @@ class IsBandOwner(IsVerified):
 
     def initial(self, request: Request, view: BaseAPIView):
         super().initial(request, view)
-        self.band = Band.objects.filter(id=self.path_vars.band_id).first()
+        self.band = request.band
 
     def set_error_msg(self):
         self.message = {"details": "Must be the band owner to access this resource.", "code": "UNAUTHORIZED"}
