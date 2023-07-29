@@ -3,6 +3,7 @@ from tours.models import Tour
 from dates.models import Date
 from rest_framework.exceptions import ValidationError
 from django.db import models
+from django.shortcuts import get_object_or_404
 
 
 class PathVars:
@@ -39,7 +40,7 @@ class PathVars:
     def validate(self):
         """Validates all input path variable ids to ensure integrity between related models"""
         if self.band_id:
-            band: Band = Band.objects.filter(id=self.band_id).first()
+            band: Band = get_object_or_404(Band, id=self.band_id)
             self._validate_id(band.bandusers, self.banduser_id, "band")
             tour: Tour = self._validate_id(band.tours, self.tour_id, "band")
             if tour:

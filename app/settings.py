@@ -31,7 +31,10 @@ allowed_hosts = os.environ.get("ALLOWED_HOSTS")
 if allowed_hosts:
     ALLOWED_HOSTS = allowed_hosts.split(",")
 else:
-    ALLOWED_HOSTS = ["*", "http://127.0.0.1:42069"]
+    ALLOWED_HOSTS = ["*", "http://localhost:42069"]
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = ["*", "http://localhost:42069"]
 
 AUTH_USER_MODEL = "authentication.User"
 APPEND_SLASH = False
@@ -139,7 +142,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5000),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=10),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,

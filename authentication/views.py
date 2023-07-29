@@ -65,6 +65,7 @@ class RefreshView(TokenRefreshView, AuthCookieBaseView):
         refresh = request.COOKIES.get("refresh")
         if not refresh:
             return Response(None)
+            # raise ValidationError({"detail": "No refresh token provided"}, 401)
 
         request.data["refresh"] = refresh
 
@@ -94,10 +95,13 @@ class RegisterView(generics.CreateAPIView, AuthCookieBaseView):
         return self.get_response(user, token_pair, status=201)
 
 
-class UserView(generics.UpdateAPIView, AuthCookieBaseView):
+class UserView(generics.RetrieveUpdateAPIView, AuthCookieBaseView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
+
+    def get(self, request: Request, *args, **kwargs):
+        return Response(UserSerializer(request.user).data, 200)
 
     def patch(self, request: Request, *args, **kwargs):
         user: User = request.user

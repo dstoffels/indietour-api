@@ -25,6 +25,6 @@ def globals(exc, context):
     from rest_framework.exceptions import ValidationError
 
     if isinstance(exc, ValidationError):
-        return Response(data={"detail": exc.detail}, status=400)
+        return Response({"detail": exc.detail}, status=400)
 
     raise exc
