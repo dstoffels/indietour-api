@@ -12,7 +12,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    docker build -t dstoffels/indietour-api:$BUILD_NUMBER .
+                    docker build -t dstoffels/indietour-api-dev:latest .
                     """
                 }
             }
