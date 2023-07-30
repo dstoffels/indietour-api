@@ -7,7 +7,7 @@ services:
     ports:
       - 3307:3306
     env_file:
-      - ./api/.env
+      - .env
     volumes:
       - indietour-db:/var/lib/mysql
 
@@ -15,7 +15,7 @@ services:
     # build: ./api
     image: indietour-api-dev:latest
     env_file:
-      - ./api/.env
+      - .env
     ports:
       - 8000:8000
     depends_on:
