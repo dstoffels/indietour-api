@@ -1,11 +1,18 @@
 pipeline {
     agent any
 
+    environment{
+        def dockerTool = tool name: 'docker-latest-tool', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool' 
+        PATH = "${dockerTool}/bin:${env.PATH}"    
+    }
+
     stages {
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("dstoffels/indietour-api:${env.BUILD_ID}")
+                    sh """
+                    docker build -t dstoffels/indietour-api:$BUILD_NUMBER .
+                    """
                 }
             }
         }
