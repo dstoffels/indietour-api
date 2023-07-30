@@ -11,7 +11,8 @@ pipeline {
         stage('Load ENV'){
             steps{
                 withCredentials([file(credentialsId: 'indietour-api-env', variable: 'ENV')]){
-                    sh """cp $ENV .env"""
+                    sh "rm -f .env"
+                    sh "cp $ENV .env"
                 }
             }
         }
