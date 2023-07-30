@@ -8,6 +8,14 @@ pipeline {
     }
 
     stages {
+        stage('Load ENV'){
+            steps{
+                withCredentials([file(credentialsId: 'indietour-api-env', variable: 'ENV')]){
+                    sh """cp $ENV .env"""
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
