@@ -1,6 +1,7 @@
 from rest_framework import generics
 from rest_framework.response import Response
-from rest_framework.request import Request
+
+# from rest_framework.request import Request
 from authentication.models import User
 from .serializers import Place, PlaceSerializer, PlaceContact, PlaceContactSerializer
 from core.permissions import IsVerified
@@ -10,6 +11,7 @@ import requests
 import os
 from .utils import GAPI_BASE_URL, fetch_place
 from core.query_params import QueryParam
+from core.request import Request
 
 
 # class BasePlaceView(BaseAPIView):
@@ -24,17 +26,25 @@ class PlaceView(generics.RetrieveAPIView, BaseAPIView):
     lookup_url_kwarg = "place_id"
     lookup_field = "id"
 
-    def get(self, request, *args, **kwargs):
-        try:
-            response = super().get(request, *args, **kwargs)
-        except:
-            place = fetch_place(self.path_vars.place_id)
-            ser = PlaceSerializer(data=place, context=self.get_serializer_context())
-            ser.is_valid()
-            ser.save()
-            response = Response(ser.data)
+    def get(self, request: Request, *args, **kwargs):
+        place_id = request.GET.get("place_id")
 
-        return response
+        response = requests.get(
+            f'{GAPI_BASE_URL}/place/details/json?key={os.getenv("GOOGLE_API_KEY")}&place_id={place_id}&fields=place_id,formatted_address,geometry,name,address_components,type,editorial_summary,business_status,website'
+        )
+        return Response(response.json())
+
+    # def get(self, request, *args, **kwargs):
+    #     try:
+    #         response = super().get(request, *args, **kwargs)
+    #     except:
+    # place = fetch_place(self.path_vars.place_id)
+    #         ser = PlaceSerializer(data=place, context=self.get_serializer_context())
+    #         ser.is_valid()
+    #         ser.save()
+    #         response = Response(ser.data)
+
+    #     return response
 
 
 class AutocompleteView(generics.RetrieveAPIView, BaseAPIView):
