@@ -13,7 +13,7 @@ services:
 
   api:
     # build: ./api
-    image: indietour-api-dev:latest
+    image: dstoffels/indietour-api-dev:latest
     env_file:
       - .env
     ports:
