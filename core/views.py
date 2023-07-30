@@ -4,21 +4,25 @@ from bands.serializers import Band, BandSerializer
 from tours.serializers import Tour, TourSerializer
 from dates.serializers import Date, DateSerializer
 from django.shortcuts import get_object_or_404
+from core.utils import retrieve_or_404
 from rest_framework.response import Response
-from rest_framework.request import Request
+from core.request import Request
 from .query_params import QueryParam, QueryParamsManager
 from core.path_vars import PathVars
 from authentication.models import User
+from core.models import UUIDModel
 
 
 class BaseAPIView(generics.GenericAPIView):
+    request: Request
+    model: UUIDModel = None
     """Base for all indietour views.
 
     Path variables and query params automatically assigned to view and serializer."""
 
-    def initial(self, request, *args, **kwargs):
+    def initial(self, request: Request, *args, **kwargs):
         self.user: User = request.user
-        self.path_vars = PathVars(kwargs)
+        self.path_vars = PathVars(kwargs, request)
         self.init_query_params(request)
         return super().initial(request, *args, **kwargs)
 
@@ -42,7 +46,7 @@ class BaseAPIView(generics.GenericAPIView):
         return context
 
     def custom_response(self, model, serializer, id, status_code=200):
-        obj = get_object_or_404(model, id=id)
+        obj = retrieve_or_404(model, id=id)
         ser = serializer(obj, context=self.get_serializer_context())
         return Response(ser.data, status_code)
 
@@ -54,3 +58,13 @@ class BaseAPIView(generics.GenericAPIView):
 
     def date_response(self, status_code=200):
         return self.custom_response(Date, DateSerializer, self.path_vars.date_id, status_code)
+
+    def get_object(self):
+        model_name = self.model.__name__.lower()
+        id = self.request.kwargs.get(f"{model_name}_id")
+
+        if hasattr(self.request, model_name):
+            obj = getattr(self.request, model_name)
+            return obj
+
+        return retrieve_or_404(self.model, id)

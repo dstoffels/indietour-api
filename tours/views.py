@@ -6,6 +6,7 @@ from .permissions import IsTourUser, IsTourAdmin
 from bands.permissions import IsBandAdmin, IsBandUser, IsBandOwner
 from core.views import BaseAPIView
 from core.query_params import BooleanQueryParam, ListQueryParam, QueryParam
+from django.db.models import Q
 
 
 class BaseTourView(BaseAPIView):
@@ -27,7 +28,13 @@ class ToursView(generics.ListCreateAPIView, BaseTourView):
     serializer_class = TourSerializer
 
     def get_queryset(self):
-        tours = Tour.objects.filter(band_id=self.kwargs.get("band_id")).order_by("name")
+        tours = (
+            Tour.objects.filter(
+                Q(band_id=self.path_vars.band_id) & Q(band__owner=self.user) | Q(tourusers__banduser__user=self.user)
+            )
+            .order_by("name")
+            .order_by("name")
+        )
         if self.archived_tours.is_invalid():
             tours = tours.filter(is_archived=False)
         return tours
@@ -39,7 +46,7 @@ class ToursView(generics.ListCreateAPIView, BaseTourView):
 
 
 class TourView(generics.RetrieveUpdateDestroyAPIView, BaseTourView):
-    queryset = Tour.objects.all()
+    model = Tour
     serializer_class = TourSerializer
     lookup_field = "id"
     lookup_url_kwarg = "tour_id"
@@ -51,7 +58,6 @@ class TourView(generics.RetrieveUpdateDestroyAPIView, BaseTourView):
 
 
 class TourUsersView(generics.CreateAPIView, BaseTourView):
-    queryset = TourUser.objects.all()
     permission_classes = (IsTourAdmin,)
     serializer_class = TourUserSerializer
 
@@ -59,9 +65,12 @@ class TourUsersView(generics.CreateAPIView, BaseTourView):
         super().post(request, *args, **kwargs)
         return self.tour_response(201)
 
+    def get_queryset(self):
+        return TourUser.objects.filter(tour_id=self.path_vars.tour_id)
+
 
 class TourUserView(generics.RetrieveUpdateDestroyAPIView, BaseTourView):
-    queryset = TourUser.objects.all()
+    model = TourUser
     permission_classes = (IsTourAdmin,)
     serializer_class = TourUserSerializer
     lookup_url_kwarg = "touruser_id"

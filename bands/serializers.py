@@ -9,6 +9,7 @@ from django.conf import settings
 from core.serializers import BaseSerializer
 from core.query_params import QueryParam
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 
 class BandUserSerializer(BaseSerializer):
@@ -29,7 +30,7 @@ class BandUserSerializer(BaseSerializer):
     def create(self, validated_data: dict):
         email = self.initial_data.get("email")
         is_admin = bool(validated_data.get("is_admin"))
-        band_id = self.context.get("band_id")
+        band_id = self.path_vars.band_id
 
         user, created = User.objects.get_or_create(email=email)
 
@@ -78,7 +79,7 @@ class BandSerializer(BaseSerializer):
     tours = serializers.SerializerMethodField()
 
     def get_tours(self, band: Band):
-        tours = band.tours.all().order_by("name")
+        tours = band.tours.filter(Q(band__owner=self.user) | Q(tourusers__banduser__user=self.user)).order_by("name")
         if self.archived_tours.is_invalid():
             tours = tours.filter(is_archived=False)
         return TourSerializer(tours, many=True, context=self.context).data

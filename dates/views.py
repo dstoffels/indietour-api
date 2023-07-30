@@ -37,8 +37,8 @@ class DatesView(generics.ListCreateAPIView, BaseDatesView):
         self.past_dates: BooleanQueryParam
 
 
-class DateView(generics.RetrieveUpdateDestroyAPIView, BaseDatesView):
-    queryset = Date.objects.all()
+class DateView(BaseDatesView, generics.RetrieveUpdateDestroyAPIView):
+    model = Date
     serializer_class = DateSerializer
     lookup_field = "id"
     lookup_url_kwarg = "date_id"
@@ -50,7 +50,7 @@ class DateContactView(generics.DestroyAPIView, generics.CreateAPIView, BaseDates
     def post(self, request: Request, *args, **kwargs):
         date = Date.objects.filter(id=self.path_vars.date_id).first()
         contact = Contact.objects.filter(id=self.path_vars.contact_id).first()
-        if not date.contacts.contains(contact):
+        if contact and not date.contacts.contains(contact):
             date.contacts.add(contact)
         return self.date_response()
 
@@ -69,9 +69,12 @@ class DateLogView(generics.ListCreateAPIView, BaseAPIView):
 
 
 class LogEntryView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
+    model = LogEntry
     serializer_class = LogEntrySerializer
     lookup_field = "id"
     lookup_url_kwarg = "logentry_id"
 
-    def get_queryset(self):
-        return LogEntry.objects.filter(date_id=self.path_vars.date_id).order_by("timestamp")
+
+class DateStatusView(generics.RetrieveAPIView, BaseAPIView):
+    def get(self, request, *args, **kwargs):
+        return Response(data=Date.STATUS_CHOICES)

@@ -20,12 +20,10 @@ class LodgingsView(generics.ListCreateAPIView, BaseAPIView):
 
 
 class LodgingView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
+    model = Lodging
     serializer_class = LodgingSerializer
     lookup_field = "id"
     lookup_url_kwarg = "lodging_id"
-
-    def get_queryset(self):
-        return Lodging.objects.filter(date_id=self.path_vars.date_id)
 
     def get_permissions(self):
         if self.request.method == "GET":

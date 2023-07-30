@@ -34,14 +34,15 @@ class VenueCollectionView(generics.ListCreateAPIView, BaseAPIView):
 
 
 class VenueView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
+    model = Venue
     serializer_class = VenueSerializer
     permission_classes = (IsPublicVenue,)
     lookup_field = "id"
     lookup_url_kwarg = "venue_id"
 
-    def get_queryset(self):
-        venues = Venue.objects.filter(Q(public=True) | Q(creator=self.request.user)).order_by("place__name")
-        return venues
+    # def get_queryset(self):
+    #     venues = Venue.objects.filter(Q(public=True) | Q(creator=self.request.user)).order_by("place__name")
+    #     return venues
 
     def get_permissions(self):
         if self.request.method != "GET":
@@ -58,13 +59,11 @@ class VenueNotesView(generics.ListCreateAPIView, BaseAPIView):
 
 
 class VenueNoteView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
+    model = VenueNote
     serializer_class = VenueNoteSerializer
     permission_classes = (IsVerified,)
     lookup_field = "id"
     lookup_url_kwarg = "venuenote_id"
-
-    def get_queryset(self):
-        return VenueNote.objects.filter(venue_id=self.path_vars.venue_id)
 
 
 class VenueTypesView(generics.RetrieveAPIView, BaseAPIView):

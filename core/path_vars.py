@@ -4,14 +4,15 @@ from dates.models import Date
 from rest_framework.exceptions import ValidationError
 from django.db import models
 from django.shortcuts import get_object_or_404
+from core.request import Request
 
 
 class PathVars:
-    def __init__(self, kwargs: dict) -> None:
+    def __init__(self, kwargs: dict, request: Request) -> None:
         self.kwargs = kwargs
-        self.band_id = kwargs.get("band_id")
+        self.band_id = kwargs.get("band_id") or request.tour and request.band.id
         self.banduser_id = kwargs.get("banduser_id")
-        self.tour_id = kwargs.get("tour_id")
+        self.tour_id = kwargs.get("tour_id") or request.tour and request.tour.id
         self.touruser_id = kwargs.get("touruser_id")
         self.date_id = kwargs.get("date_id")
         self.place_id = kwargs.get("place_id")

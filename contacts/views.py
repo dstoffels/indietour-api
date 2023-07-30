@@ -16,13 +16,11 @@ class ContactsView(generics.ListCreateAPIView, BaseAPIView):
 
 
 class ContactView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
+    model = Contact
     serializer_class = ContactSerializer
     permission_classes = (IsVerified,)
     lookup_field = "id"
     lookup_url_kwarg = "contact_id"
-
-    def get_queryset(self):
-        return Contact.objects.filter(owner=self.user)
 
     def get_permissions(self):
         if self.request.method != "GET":
@@ -39,10 +37,8 @@ class ContactMethodsView(generics.ListCreateAPIView, BaseAPIView):
 
 
 class ContactMethodView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
+    model = ContactMethod
     serializer_class = ContactMethodSerializer
     permission_classes = (IsContactOwner,)
     lookup_field = "id"
     lookup_url_kwarg = "contactmethod_id"
-
-    def get_queryset(self):
-        return ContactMethod.objects.filter(contact_id=self.path_vars.contact_id)

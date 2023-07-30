@@ -20,7 +20,7 @@ class TimeslotsView(generics.ListCreateAPIView, BaseAPIView):
 
 
 class TimeslotView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
-    queryset = Timeslot.objects.all()
+    model = Timeslot
     serializer_class = TimeslotSerializer
     permission_classes = (IsTourAdmin,)
     lookup_url_kwarg = "timeslot_id"

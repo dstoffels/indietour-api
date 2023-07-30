@@ -29,32 +29,12 @@ class PlaceView(generics.RetrieveAPIView, BaseAPIView):
             response = super().get(request, *args, **kwargs)
         except:
             place = fetch_place(self.path_vars.place_id)
-            ser = PlaceSerializer(data=place)
+            ser = PlaceSerializer(data=place, context=self.get_serializer_context())
             ser.is_valid()
             ser.save()
             response = Response(ser.data)
 
         return response
-
-
-class PlaceContactsView(generics.ListCreateAPIView, BaseAPIView):
-    serializer_class = PlaceContactSerializer
-    lookup_field = "place_id"
-    lookup_url_kwarg = "place_id"
-    permission_classes = (IsVerified,)
-
-    def get_queryset(self):
-        return PlaceContact.objects.filter(contact__owner=self.user)
-
-
-class PlaceContactView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
-    serializer_class = PlaceContactSerializer
-    permission_classes = (IsVerified,)  # TODO: needs to validate with place_id and (user) owner
-    lookup_field = "id"
-    lookup_url_kwarg = "placecontact_id"
-
-    def get_queryset(self):
-        return PlaceContact.objects.filter(contact__owner=self.user)
 
 
 class AutocompleteView(generics.RetrieveAPIView, BaseAPIView):

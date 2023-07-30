@@ -3,7 +3,7 @@ from core.models import UUIDModel
 
 
 class Date(UUIDModel):
-    STATUS_CHOICES = ("UNCONFIRMED", "INQUIRY SENT", "HOLD", "OFFER RECEIVED", "CONFIRMED")
+    STATUS_CHOICES = ("PROSPECT", "INQUIRED", "HOLD", "CHALLENGED", "RELEASED", "OPTION", "CONFIRMED", "CANCELLED")
 
     tour = models.ForeignKey("tours.Tour", on_delete=models.CASCADE, related_name="dates")
     date = models.DateField()

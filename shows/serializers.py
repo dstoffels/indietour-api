@@ -4,6 +4,7 @@ from core.serializers import BaseSerializer
 from core.query_params import BooleanQueryParam, ListQueryParam
 from .models import Show
 from venues.serializers import Venue, VenueSerializer
+from core.utils import retrieve_or_404
 
 
 class ShowSerializer(BaseSerializer):
@@ -14,6 +15,7 @@ class ShowSerializer(BaseSerializer):
     venue = VenueSerializer(read_only=True)
     venue_id = serializers.UUIDField(write_only=True)
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict):
         validated_data["date_id"] = self.path_vars.date_id
+        retrieve_or_404(Venue, validated_data.get("venue_id"))
         return super().create(validated_data)

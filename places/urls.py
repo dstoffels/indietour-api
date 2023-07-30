@@ -6,6 +6,4 @@ urlpatterns = [
     path("/directions", views.DirectionsView.as_view(), name="directions"),
     path("/search", views.SearchView.as_view(), name="search"),
     path("/<place_id>", views.PlaceView.as_view(), name="place"),
-    path("/<place_id>/contacts", views.PlaceContactsView.as_view(), name="place"),
-    path("/<place_id>/contacts/<placecontact_id>", views.PlaceContactView.as_view(), name="place"),
 ]

@@ -44,7 +44,7 @@ class BandsView(generics.ListCreateAPIView, BaseBandView):
 
 
 class BandView(generics.RetrieveUpdateDestroyAPIView, BaseBandView):
-    queryset = Band.objects.all()
+    model = Band
     serializer_class = BandSerializer
     lookup_url_kwarg = "band_id"
     lookup_field = "id"
@@ -68,7 +68,7 @@ class BandUsersView(generics.CreateAPIView, BaseBandView):
 
 
 class BandUserView(generics.UpdateAPIView, generics.DestroyAPIView, BaseBandView):
-    queryset = BandUser.objects.all()
+    model = BandUser
     serializer_class = BandUserSerializer
     permission_classes = (IsBandAdmin,)
     lookup_url_kwarg = "banduser_id"
