@@ -2,7 +2,7 @@ version: '3.1'
 services:
   db:
     # build: ./db
-    image: dstoffels/indietour-db:latest
+    image: dstoffels/indietour-db:1
     restart: always
     ports:
       - 3307:3306
@@ -13,7 +13,7 @@ services:
 
   api:
     # build: ./api
-    image: indietour-api:latest
+    image: indietour-api-dev:latest
     env_file:
       - ./api/.env
     ports:
