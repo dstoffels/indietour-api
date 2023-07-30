@@ -57,6 +57,9 @@ class ListQueryParam(QueryParam):
     def validate_value(self):
         return self._is_null() or bool(set(self.value) & set(self.accepted_values))
 
+    def has_values(self):
+        return not self._is_null() and bool(len(self.value))
+
 
 class QueryParamsManager:
     def __init__(self, query_params: list[QueryParam], request: Request) -> None:

@@ -14,6 +14,7 @@ class BaseDatesView(BaseAPIView):
         return [
             ListQueryParam("include", ["all", "timeslots", "contacts", "shows", "lodgings"]),
             BooleanQueryParam("past_dates"),
+            ListQueryParam("status", [choice.lower() for choice in Date.STATUS_CHOICES]),
         ]
 
     def get_permissions(self):
@@ -29,12 +30,15 @@ class DatesView(generics.ListCreateAPIView, BaseDatesView):
         tourdates = Date.objects.filter(tour_id=self.path_vars.tour_id).order_by("date")
         if self.past_dates.is_invalid():
             tourdates = tourdates.filter(date__gte=date.today())
+        if self.status.has_values():
+            tourdates = tourdates.filter(status__in=self.status.value)
         return tourdates
 
     def init_query_params(self, request: Request):
         super().init_query_params(request)
         self.include: ListQueryParam
         self.past_dates: BooleanQueryParam
+        self.status: ListQueryParam
 
 
 class DateView(BaseDatesView, generics.RetrieveUpdateDestroyAPIView):
