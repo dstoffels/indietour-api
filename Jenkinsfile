@@ -22,6 +22,7 @@ pipeline {
                 script {
                     sh """
                     docker build -t dstoffels/indietour-api-dev:latest .
+                    docker image prune -f
                     """
                 }
             }
