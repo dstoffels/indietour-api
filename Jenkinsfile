@@ -22,7 +22,6 @@ pipeline {
                 script {
                     sh """
                     docker build -t dstoffels/indietour-api-dev:latest .
-                    docker image prune -f
                     """
                 }
             }
@@ -32,6 +31,12 @@ pipeline {
             steps {
                 sh "docker-compose -f docker-compose-dev.yaml down"
                 sh "docker-compose -f docker-compose-dev.yaml -p indietour-api up -d"
+            }
+        }
+
+        stage("Clean Up"){
+            steps{
+                sh "docker image prune -f"
             }
         }
     }
