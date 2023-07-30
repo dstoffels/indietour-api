@@ -29,7 +29,7 @@ pipeline {
 
         stage('Local Compose') {
             steps {
-                sh "docker-compose -f docker-compose-dev.yaml -d down"
+                sh "docker-compose -f docker-compose-dev.yaml down"
                 sh "docker-compose -f docker-compose-dev.yaml -p indietour-api -d up"
             }
         }
