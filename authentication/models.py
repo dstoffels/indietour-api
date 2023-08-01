@@ -18,6 +18,7 @@ class User(AbstractUser):
     last_login = models.DateTimeField(auto_now=True)
     show_archived_bands = models.BooleanField(default=False)
     show_archived_tours = models.BooleanField(default=False)
+    show_past_dates = models.BooleanField(default=False)
 
     member_bands = models.ManyToManyField("bands.Band", through="bands.BandUser", related_name="users")
     owned_bands = models.QuerySet
