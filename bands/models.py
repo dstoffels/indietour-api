@@ -4,7 +4,7 @@ from django.contrib import admin
 
 
 class Band(UUIDModel):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
     owner = models.ForeignKey("authentication.User", on_delete=models.CASCADE, related_name="owned_bands")
     is_archived = models.BooleanField(default=False)
     tours: models.QuerySet = None

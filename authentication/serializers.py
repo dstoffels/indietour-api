@@ -44,10 +44,35 @@ To verify, log in to your account at indietour.app/login and you will be directe
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # email = serializers.CharField(read_only=True)
-    # is_active = serializers.BooleanField(read_only=True)
-    # email_verified = serializers.BooleanField(read_only=True)
+    is_band_admin = serializers.SerializerMethodField()
+
+    def get_is_band_admin(self, user: User):
+        from bands.models import Band
+
+        band: Band = Band.objects.filter(id=user.active_band_id).first()
+        return bool(band) and band.owner == user or bool(band.bandusers.filter(user=user, is_admin=True).first())
+
+    is_tour_admin = serializers.SerializerMethodField()
+
+    def get_is_tour_admin(self, user: User):
+        from tours.models import Tour
+
+        tour: Tour = Tour.objects.filter(id=user.active_tour_id).first()
+        return (
+            bool(tour)
+            and tour.band.owner == user
+            or bool(tour.tourusers.filter(banduser__user=user, is_admin=True).first())
+        )
 
     class Meta:
         model = User
-        fields = ("email", "username", "is_active", "email_verified", "active_band_id", "active_tour_id")
+        fields = (
+            "email",
+            "username",
+            "is_active",
+            "email_verified",
+            "active_band_id",
+            "active_tour_id",
+            "is_band_admin",
+            "is_tour_admin",
+        )
