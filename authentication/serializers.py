@@ -76,4 +76,5 @@ class UserSerializer(serializers.ModelSerializer):
             "is_tour_admin",
             "show_archived_bands",
             "show_archived_tours",
+            "show_past_dates",
         )
