@@ -50,7 +50,8 @@ class UserSerializer(serializers.ModelSerializer):
         from bands.models import Band
 
         band: Band = Band.objects.filter(id=user.active_band_id).first()
-        return bool(band) and band.owner == user or bool(band.bandusers.filter(user=user, is_admin=True).first())
+        print(bool(band))
+        return bool(band) and (band.owner == user or bool(band.bandusers.filter(user=user, is_admin=True).first()))
 
     is_tour_admin = serializers.SerializerMethodField()
 
@@ -58,10 +59,8 @@ class UserSerializer(serializers.ModelSerializer):
         from tours.models import Tour
 
         tour: Tour = Tour.objects.filter(id=user.active_tour_id).first()
-        return (
-            bool(tour)
-            and tour.band.owner == user
-            or bool(tour.tourusers.filter(banduser__user=user, is_admin=True).first())
+        return bool(tour) and (
+            tour.band.owner == user or bool(tour.tourusers.filter(banduser__user=user, is_admin=True).first())
         )
 
     class Meta:
