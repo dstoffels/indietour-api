@@ -16,6 +16,8 @@ class User(AbstractUser):
     email_verified = models.BooleanField(default=False)
     verification_code = models.CharField(max_length=6, default=generate_verification_code)
     last_login = models.DateTimeField(auto_now=True)
+    show_archived_bands = models.BooleanField(default=False)
+    show_archived_tours = models.BooleanField(default=False)
 
     member_bands = models.ManyToManyField("bands.Band", through="bands.BandUser", related_name="users")
     owned_bands = models.QuerySet

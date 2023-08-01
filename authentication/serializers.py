@@ -74,4 +74,6 @@ class UserSerializer(serializers.ModelSerializer):
             "active_tour_id",
             "is_band_admin",
             "is_tour_admin",
+            "show_archived_bands",
+            "show_archived_tours",
         )
