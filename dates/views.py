@@ -4,9 +4,10 @@ from rest_framework.response import Response
 from .serializers import Date, DateSerializer, LogEntry, LogEntrySerializer
 from tours.permissions import IsTourUser, IsTourAdmin
 from core.views import BaseAPIView
-from core.query_params import ListQueryParam, BooleanQueryParam, QueryParam
+from core.query_params import ListQueryParam, BooleanQueryParam, QueryParam, DateTimeQueryParam
 from datetime import date
 from contacts.serializers import Contact, ContactSerializer
+from rest_framework.exceptions import ValidationError
 
 
 class BaseDatesView(BaseAPIView):
@@ -15,6 +16,7 @@ class BaseDatesView(BaseAPIView):
             ListQueryParam("include", ["all", "timeslots", "contacts", "shows", "lodgings"]),
             BooleanQueryParam("past_dates"),
             ListQueryParam("status", [choice.lower() for choice in Date.STATUS_CHOICES]),
+            DateTimeQueryParam("timestamp"),
         ]
 
     def get_permissions(self):
@@ -27,9 +29,11 @@ class DatesView(generics.ListCreateAPIView, BaseDatesView):
     serializer_class = DateSerializer
 
     def get_queryset(self):
+        if self.timestamp.is_null():
+            raise ValidationError({"detail": f"{self.timestamp.name} is a required query param."})
         tourdates = Date.objects.filter(tour_id=self.path_vars.tour_id).order_by("date")
         if self.past_dates.is_invalid():
-            tourdates = tourdates.filter(date__gte=date.today())
+            tourdates = tourdates.filter(date__gte=self.timestamp.value)
         if self.status.has_values():
             tourdates = tourdates.filter(status__in=self.status.value)
         return tourdates
@@ -39,6 +43,7 @@ class DatesView(generics.ListCreateAPIView, BaseDatesView):
         self.include: ListQueryParam
         self.past_dates: BooleanQueryParam
         self.status: ListQueryParam
+        self.timestamp: DateTimeQueryParam
 
 
 class DateView(BaseDatesView, generics.RetrieveUpdateDestroyAPIView):

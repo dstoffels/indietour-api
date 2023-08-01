@@ -1,20 +1,25 @@
 from rest_framework.request import Request
 from rest_framework.exceptions import ValidationError
+from django.utils.dateparse import parse_datetime
 
 
 class QueryParam:
-    def __init__(self, name: str, accepted_values: list[str] = []):
+    def __init__(self, name: str, accepted_values: list[str] = [], required=False):
         self.name = name
         self.value: str = None
         self.accepted_values = accepted_values
+        self.required = required
 
     def set_value(self, value: str):
         self.value = value
 
     def validate_value(self):
-        return self._is_null() or not bool(self.accepted_values) or self.value in self.accepted_values
+        return self.is_null() or not bool(self.accepted_values) or self.value in self.accepted_values
 
     def is_valid(self):
+        if self.required and self.value is None:
+            raise ValidationError({"detail": f"{self.name} is a required query param."})
+
         return not bool(self.accepted_values) or self.value in self.accepted_values
 
     def is_invalid(self):
@@ -23,7 +28,7 @@ class QueryParam:
     def contains(self, value):
         return self.value == value
 
-    def _is_null(self):
+    def is_null(self):
         return self.value is None
 
     def __repr__(self) -> str:
@@ -39,26 +44,33 @@ class BooleanQueryParam(QueryParam):
         self.value = self.value == "true"
 
     def is_valid(self):
+        super().is_valid()
         return self.value
 
 
 class ListQueryParam(QueryParam):
-    def __init__(self, name: str, accepted_values=[]):
-        super().__init__(name, accepted_values)
-
     def set_value(self, value: str):
         super().set_value(value)
-        if not self._is_null():
+        if not self.is_null():
             self.value = self.value.replace(" ", "").split(",")
 
     def contains(self, value):
-        return not self._is_null() and value in self.value
+        return not self.is_null() and value in self.value
 
     def validate_value(self):
-        return self._is_null() or bool(set(self.value) & set(self.accepted_values))
+        return self.is_null() or bool(set(self.value) & set(self.accepted_values))
 
     def has_values(self):
-        return not self._is_null() and bool(len(self.value))
+        return not self.is_null() and bool(len(self.value))
+
+
+class DateTimeQueryParam(QueryParam):
+    def set_value(self, value: str):
+        if value is not None:
+            try:
+                self.value = parse_datetime(value).replace(hour=23, minute=59, second=59)
+            except:
+                raise ValidationError({"detail": f"{self.name} must be an ISO datetime format. Value: {value}"})
 
 
 class QueryParamsManager:
@@ -79,7 +91,7 @@ class QueryParamsManager:
         if len(invalid_params):
             raise ValidationError(
                 {
-                    "details": "Invalid query parameter value(s)",
+                    "detail": "Invalid query parameter value(s)",
                     "invalid_params": [
                         {param.name: param.value, "accepted values": param.accepted_values} for param in invalid_params
                     ],

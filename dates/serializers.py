@@ -47,8 +47,12 @@ class DateSerializer(BaseSerializer):
 
     def create(self, validated_data: dict):
         tour_id = self.path_vars.tour_id
+        status = validated_data.get("status")
         validated_data["tour_id"] = tour_id
-        duplicate = Date.objects.filter(tour_id=tour_id, date=validated_data.get("date"), status="CONFIRMED").first()
+        duplicate = (
+            status == "CONFIRMED"
+            and Date.objects.filter(tour_id=tour_id, date=validated_data.get("date"), status="CONFIRMED").first()
+        )
         if duplicate:
             raise ValidationError({"details": "Cannot have duplicate dates in a tour.", "code": "DUPLICATE"})
 
