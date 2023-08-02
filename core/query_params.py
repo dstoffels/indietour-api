@@ -1,6 +1,6 @@
 from rest_framework.request import Request
 from rest_framework.exceptions import ValidationError
-from django.utils.dateparse import parse_datetime
+from datetime import datetime
 
 
 class QueryParam:
@@ -64,13 +64,15 @@ class ListQueryParam(QueryParam):
         return not self.is_null() and bool(len(self.value))
 
 
-class DateTimeQueryParam(QueryParam):
+class DateQueryParam(QueryParam):
     def set_value(self, value: str):
         if value is not None:
             try:
-                self.value = parse_datetime(value).replace(hour=23, minute=59, second=59)
+                self.value = datetime.strptime(value, "%Y-%m-%d").date()
             except:
-                raise ValidationError({"detail": f"{self.name} must be an ISO datetime format. Value: {value}"})
+                raise ValidationError(
+                    {"detail": f"{self.name} must be a date string formatted as YYYY-MM-DD. Value received: {value}"}
+                )
 
 
 class QueryParamsManager:
