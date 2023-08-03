@@ -13,7 +13,7 @@ class Date(UUIDModel):
     status = models.CharField(
         max_length=30, default=STATUS_CHOICES[0], choices=[(choice, choice) for choice in STATUS_CHOICES]
     )
-    hold = models.IntegerField(default=None, null=True)
+    hold = models.IntegerField(default=0)
 
     contacts = models.ManyToManyField(to="contacts.Contact", related_name="dates")
     # venues = models.ManyToManyField(to="venues.Venue", through="dates.Show", related_name="dates")
