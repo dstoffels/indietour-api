@@ -16,7 +16,7 @@ class TimeslotsView(generics.ListCreateAPIView, BaseAPIView):
     permission_classes = (IsTourAdmin,)
 
     def get_queryset(self):
-        return Timeslot.objects.filter(date_id=self.path_vars.date_id)
+        return Timeslot.objects.filter(date_id=self.path_vars.date_id).order_by("start_time")
 
 
 class TimeslotView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
