@@ -2,7 +2,7 @@ from rest_framework import serializers
 from contacts.serializers import ContactSerializer
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
-from timeslots.serializers import TimeslotSerializer
+from timeslots.serializers import TimeslotSerializer, Timeslot
 from lodgings.serializers import LodgingSerializer
 from places.serializers import PlaceSerializer, Place
 from core.serializers import BaseSerializer
@@ -41,9 +41,13 @@ class DateSerializer(BaseSerializer):
     place = PlaceSerializer(read_only=True)
     place_id = serializers.CharField(write_only=True)
     shows = ShowSerializer(read_only=True, many=True)
-    timeslots = TimeslotSerializer(read_only=True, many=True)
+    timeslots = serializers.SerializerMethodField()
     lodgings = LodgingSerializer(read_only=True, many=True)
     contacts = ContactSerializer(read_only=True, many=True)
+
+    def get_timeslots(self, date):
+        timeslots = Timeslot.objects.filter(date=date).order_by("start_time")
+        return TimeslotSerializer(timeslots, read_only=True, many=True, context=self.context).data
 
     def create(self, validated_data: dict):
         tour_id = self.path_vars.tour_id
