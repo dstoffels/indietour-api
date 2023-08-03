@@ -58,7 +58,7 @@ class TimeslotSerializer(BaseSerializer):
         return super().update(instance, validated_data)
 
     def _new_place(self, place_id):
-        ser = PlaceSerializer(data={"place_id": place_id})
+        ser = PlaceSerializer(data={"place_id": place_id}, context=self.context)
         ser.is_valid()
         ser.save()
         return ser.instance
