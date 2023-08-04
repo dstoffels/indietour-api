@@ -1,12 +1,12 @@
 from core.views import BaseAPIView
 from core.views import BaseAPIView
-from bands.permissions import IsBandOwner
+from bands.permissions import IsBandAdmin
 from core.request import Request
 from .models import Tour, TourUser
 from django.shortcuts import get_object_or_404
 
 
-class IsTourUser(IsBandOwner):
+class IsTourUser(IsBandAdmin):
     def get_permission(self):
         return super().get_permission() or bool(self.touruser)
 
