@@ -31,7 +31,9 @@ class IsBandUser(IsBandOwner):
 
 class IsBandAdmin(IsBandUser):
     def get_permission(self):
-        return super().get_permission() or bool(self.banduser) and self.banduser.is_admin
+        bu = bool(self.banduser)
+        ad = self.banduser.is_admin
+        return super().get_permission() and self.banduser.is_admin
 
     def set_error_msg(self):
         self.message = {"details": "Must be a band admin to access this resource.", "code": "REQUIRES_ADMIN"}

@@ -80,9 +80,9 @@ class BandSerializer(BaseSerializer):
 
     def get_tours(self, band: Band):
         tours = band.tours.filter(
-            Q(band__owner=self.user)
-            | Q(band__bandusers__user=self.user, band__bandusers__is_admin=True)
-            | Q(tourusers__banduser__user=self.user)
+            Q(band__owner=self.user)  # is user band owner?
+            | Q(band__bandusers__user=self.user, band__bandusers__is_admin=True)  # is user a band admin?
+            | Q(tourusers__banduser__user=self.user)  # is user a tour user?
         ).order_by("name")
         if self.archived_tours.is_invalid():
             tours = tours.filter(is_archived=False)
