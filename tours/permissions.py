@@ -20,7 +20,9 @@ class IsTourUser(IsBandAdmin):
 
 class IsTourAdmin(IsTourUser):
     def get_permission(self):
-        return super().get_permission() or bool(self.touruser) and self.touruser.is_admin
+        if self.touruser:
+            return super().get_permission() and self.touruser.is_admin
+        return super().get_permission()
 
     def set_error_msg(self):
         self.message = {"detail": "Must be a tour admin to access this resource.", "code": "REQUIRES_ADMIN"}

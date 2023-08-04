@@ -1,7 +1,7 @@
 from core.permissions import IsVerified
 from core.request import Request
 from authentication.models import User
-from .models import Band
+from .models import Band, BandUser
 from core.views import BaseAPIView
 
 
@@ -26,14 +26,15 @@ class IsBandUser(IsBandOwner):
 
     def initial(self, request: Request, view: BaseAPIView):
         super().initial(request, view)
-        self.banduser = self.band.bandusers.filter(user=self.user).first()
+        self.banduser: BandUser = self.band.bandusers.filter(user=self.user).first()
+        print(self.banduser)
 
 
 class IsBandAdmin(IsBandUser):
     def get_permission(self):
-        bu = bool(self.banduser)
-        ad = self.banduser.is_admin
-        return super().get_permission() and self.banduser.is_admin
+        if self.banduser:
+            return super().get_permission() and self.banduser.is_admin
+        return super().get_permission()
 
     def set_error_msg(self):
         self.message = {"details": "Must be a band admin to access this resource.", "code": "REQUIRES_ADMIN"}
