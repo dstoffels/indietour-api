@@ -16,21 +16,27 @@ class VenueCollectionView(generics.ListCreateAPIView, BaseAPIView):
 
     def get_queryset(self):
         venues = Venue.objects.filter(Q(public=True) | Q(creator=self.request.user)).order_by("place__name")
-        # if self.query.is_valid():
-        # if self.search_by.is_valid():
-        #     return venues.filter(**{self.search_by.value: self.query.value})
-        # venues = venues.filter(
-        #     Q(place__name__icontains=self.query.value) | Q(place__formatted_address__icontains=self.query.value)
-        # )
+        if self.name.value:
+            venues = venues.filter(place__name__icontains=self.name.value)
+        if self.location.value:
+            venues = venues.filter(place__formatted_address__icontains=self.location.value)
+        if self.capacity.value:
+            venues = venues.filter(capacity__lte=self.capacity.value)
+        if self.type.value:
+            venues = venues.filter(type=self.type.value)
+
         return venues
 
     def get_query_params(self):
-        return [QueryParam("query"), QueryParam("search_by", ["capacity", "type"])]
+        return [QueryParam("name"), QueryParam("location"), QueryParam("capacity"), QueryParam("type")]
 
     def init_query_params(self, request: Request):
         super().init_query_params(request)
-        self.query: QueryParam
-        self.search_by: QueryParam
+
+        self.name: QueryParam
+        self.location: QueryParam
+        self.capacity: QueryParam
+        self.type: QueryParam
 
 
 class VenueView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):

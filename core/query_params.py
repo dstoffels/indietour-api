@@ -57,6 +57,9 @@ class ListQueryParam(QueryParam):
     def contains(self, value):
         return not self.is_null() and value in self.value
 
+    def is_valid(self):
+        return all(item in self.accepted_values for item in self.value)
+
     def validate_value(self):
         return self.is_null() or bool(set(self.value) & set(self.accepted_values))
 
