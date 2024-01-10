@@ -46,8 +46,7 @@ pipeline {
                     sh '''
                         ssh -o StrictHostKeyChecking=no -i $SSH_KEY dan.stoffels@104.197.236.93 <<'EOF'
                         sudo rm .env
-                        y
-                        EOF
+                        'EOF'
                     '''
                     
                     sh '''scp -i $SSH_KEY $ENV dan.stoffels@104.197.236.93:./.env'''
@@ -65,7 +64,7 @@ pipeline {
 
                         sudo docker-compose up -d indietour
 
-                        EOF                    
+                        'EOF'                    
                         ''' 
                 }
             }
