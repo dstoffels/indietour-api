@@ -40,13 +40,6 @@ pipeline {
             }
         }
 
-        stage('Local Compose') {
-            steps {
-                sh "docker-compose -f docker-compose.yaml down"
-                sh "docker-compose -f docker-compose.yaml -p indietour-api up -d"
-            }
-        }
-
         stage('Deploy to GCP') {
             steps{
                 withCredentials([sshUserPrivateKey(credentialsId: 'gcp-ssh-key', keyFileVariable: 'SSH_KEY')]) {
