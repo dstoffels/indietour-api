@@ -43,8 +43,8 @@ pipeline {
         stage('Deploy to GCP') {
             steps{
                 withCredentials([sshUserPrivateKey(credentialsId: 'gcp-ssh-key', keyFileVariable: 'SSH_KEY')]) {
-                    sh '''
-                        ssh -o StrictHostKeyChecking=no -i $SSH_KEY dan_stoffels@104.197.236.93 << EOF
+                    sh """
+                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} dan_stoffels@104.197.236.93 << EOF
 
                         if [-f docker-compose.yaml ]; then
                             docker-compose down
@@ -58,7 +58,7 @@ pipeline {
                         docker-compose up -d
 
                         EOF                    
-                        ''' 
+                        """ 
                 }
             }
         }
