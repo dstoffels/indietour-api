@@ -21,7 +21,20 @@ pipeline {
             steps {
                 script {
                     sh """
-                    docker build -t dstoffels/indietour-api-dev:latest .
+                    docker build -t dstoffels/indietour-api:$BUILD_NUMBER .
+                    """
+                }
+            }
+        }
+
+        stage("Push Latest Docker Image"){
+            steps{
+                withCredentials([usernamePassword(credentialsId: 'personal-docker-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh """
+                    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+                    docker push dstoffels/indietour-api:$BUILD_NUMBER
+                    docker tag dstoffels/indietour-api:$BUILD_NUMBER dstoffels/indietour-api:latest
+                    docker push dstoffels/indietour-api:latest
                     """
                 }
             }
@@ -29,8 +42,31 @@ pipeline {
 
         stage('Local Compose') {
             steps {
-                sh "docker-compose -f docker-compose-dev.yaml down"
-                sh "docker-compose -f docker-compose-dev.yaml -p indietour-api up -d"
+                sh "docker-compose -f docker-compose.yaml down"
+                sh "docker-compose -f docker-compose.yaml -p indietour-api up -d"
+            }
+        }
+
+        stage('Deploy to GCP') {
+            steps{
+                withCredentials([sshUserPrivateKey(credentialsId: 'gcp-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                    sh '''
+                        ssh -i $SSH_KEY dan.stoffels@104.197.236.93 << EOF
+
+                        if [-f docker-compose.yaml ]; then
+                            docker-compose down
+                        fi
+
+
+                        docker image prune -af
+
+                        curl -o docker-compose.yaml https://raw.githubusercontent.com/dstoffels/indietour-api/main/docker-compose.yaml
+
+                        docker-compose up -d
+
+                        EOF                    
+                        ''' 
+                }
             }
         }
 
