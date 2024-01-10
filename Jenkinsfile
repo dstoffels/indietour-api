@@ -49,14 +49,14 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no -i $SSH_KEY dan.stoffels@104.197.236.93 <<'EOF'
 
                         if [ -f docker-compose.yaml ]; then
-                            docker-compose down
+                            sudo docker-compose down
                         fi
 
-                        docker image prune -af
+                        sudo docker image prune -af
 
-                        curl -o docker-compose.yaml https://raw.githubusercontent.com/dstoffels/indietour-api/main/docker-compose.yaml
+                        sudo curl -o docker-compose.yaml https://raw.githubusercontent.com/dstoffels/indietour-api/main/docker-compose.yaml
 
-                        docker-compose up -d
+                        sudo docker-compose up -d
 
                         EOF                    
                         ''' 
