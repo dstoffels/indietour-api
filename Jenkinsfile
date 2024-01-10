@@ -56,7 +56,9 @@ pipeline {
 
                         curl -o docker-compose.yaml https://raw.githubusercontent.com/dstoffels/indietour-api/main/docker-compose.yaml
 
-                        docker-compose up -d                    
+                        docker-compose up -d
+                        
+                        EOF                    
                         ''' 
                 }
             }
