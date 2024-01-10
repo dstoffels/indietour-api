@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "*"
+djangorestframework = "*"
+djangorestframework-simplejwt = "*"
+django-cors-headers = "*"
+mysql-connector-python = "8.0.29"
+tzdata = "*"
+requests = "*"
+python-dotenv = "*"
+
+[dev-packages]
+autopep8 = "*"

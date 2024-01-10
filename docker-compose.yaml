@@ -1,0 +1,26 @@
+version: '3.1'
+services:
+  db:
+    # build: ./db
+    image: dstoffels/indietour-db:1
+    restart: always
+    ports:
+      - 3306:3306
+    env_file:
+      - .env
+    volumes:
+      - indietour-db:/var/lib/mysql
+
+  api:
+    # build: ./api
+    image: dstoffels/indietour-api:latest
+    env_file:
+      - .env
+    ports:
+      - 80:8000
+    depends_on:
+      - db
+    restart: always
+
+volumes:
+  indietour-db:

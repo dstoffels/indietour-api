@@ -1,0 +1,79 @@
+pipeline {
+    agent any
+
+    environment{
+        DOCKER_HOST = 'tcp://host.docker.internal:2375'
+        def dockerTool = tool name: 'docker-latest-tool', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool' 
+        PATH = "${dockerTool}/bin:${env.PATH}"    
+    }
+
+    stages {
+        stage('Load ENV'){
+            steps{
+                withCredentials([file(credentialsId: 'indietour-api-env', variable: 'ENV')]){
+                    sh "rm -f .env"
+                    sh "cp $ENV .env"
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh """
+                    docker build -t dstoffels/indietour-api:$BUILD_NUMBER .
+                    """
+                }
+            }
+        }
+
+        stage("Push Latest Docker Image"){
+            steps{
+                withCredentials([usernamePassword(credentialsId: 'personal-docker-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh """
+                    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+                    docker push dstoffels/indietour-api:$BUILD_NUMBER
+                    docker tag dstoffels/indietour-api:$BUILD_NUMBER dstoffels/indietour-api:latest
+                    docker push dstoffels/indietour-api:latest
+                    """
+                }
+            }
+        }
+
+        stage('Local Compose') {
+            steps {
+                sh "docker-compose -f docker-compose.yaml down"
+                sh "docker-compose -f docker-compose.yaml -p indietour-api up -d"
+            }
+        }
+
+        stage('Deploy to GCP') {
+            steps{
+                withCredentials([sshUserPrivateKey(credentialsId: 'gcp-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                    sh '''
+                        ssh -i $SSH_KEY dan.stoffels@104.197.236.93 << EOF
+
+                        if [-f docker-compose.yaml ]; then
+                            docker-compose down
+                        fi
+
+
+                        docker image prune -af
+
+                        curl -o docker-compose.yaml https://raw.githubusercontent.com/dstoffels/indietour-api/main/docker-compose.yaml
+
+                        docker-compose up -d
+
+                        EOF                    
+                        ''' 
+                }
+            }
+        }
+
+        stage("Clean Up"){
+            steps{
+                sh "docker image prune -f"
+            }
+        }
+    }
+}

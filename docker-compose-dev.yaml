@@ -1,0 +1,28 @@
+version: '3.1'
+services:
+  db:
+    # build: ./db
+    image: dstoffels/indietour-db:1
+    restart: always
+    ports:
+      - 3307:3306
+    env_file:
+      - .env
+    volumes:
+      - indietour-db:/var/lib/mysql
+
+  api:
+    # build: ./api
+    image: dstoffels/indietour-api-dev:latest
+    env_file:
+      - .env
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    restart: always
+    # command: >
+    #   sh -c "python manage.py migrate && gunicorn -b 0.0.0.0 app.wsgi:application"
+
+volumes:
+  indietour-db:
