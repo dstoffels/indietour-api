@@ -45,7 +45,9 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: 'gcp-ssh-key', keyFileVariable: 'SSH_KEY'), file(credentialsId: 'indietour-api-env', variable: 'ENV')]) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no -i $SSH_KEY dan.stoffels@104.197.236.93 <<'EOF'
-                        sudo rm .env
+                        if [ -f .env ]; then
+                            sudo rm .env
+                        fi
                         'EOF'
                     '''
                     
