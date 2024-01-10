@@ -48,7 +48,6 @@ pipeline {
                         if [ -f .env ]; then
                             sudo rm .env
                         fi
-                        'EOF'
                     '''
                     
                     sh '''scp -i $SSH_KEY $ENV dan.stoffels@104.197.236.93:./.env'''
@@ -64,9 +63,7 @@ pipeline {
 
                         sudo curl -o docker-compose.yaml https://raw.githubusercontent.com/dstoffels/indietour-api/main/docker-compose.yaml
 
-                        sudo docker-compose up -d indietour
-
-                        'EOF'                    
+                        sudo docker-compose up -d indietour                   
                         ''' 
                 }
             }
