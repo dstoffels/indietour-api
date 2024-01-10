@@ -46,7 +46,7 @@ pipeline {
                     sh '''
                         ssh -o StrictHostKeyChecking=no -i $SSH_KEY danst@104.197.236.93 << EOF
 
-                        if [-f docker-compose.yaml ]; then
+                        if [ -f docker-compose.yaml ]; then
                             docker-compose down
                         fi
 
