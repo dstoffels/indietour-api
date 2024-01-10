@@ -63,7 +63,7 @@ pipeline {
 
                         sudo curl -o docker-compose.yaml https://raw.githubusercontent.com/dstoffels/indietour-api/main/docker-compose.yaml
 
-                        sudo docker-compose up -d indietour                   
+                        sudo docker-compose up -d                   
                         ''' 
                 }
             }
