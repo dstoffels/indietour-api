@@ -17,34 +17,34 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    sh """
-                    docker build -t dstoffels/indietour-api:$BUILD_NUMBER .
-                    """
-                }
-            }
-        }
+        // stage('Build Docker Image') {
+        //     steps {
+        //         script {
+        //             sh """
+        //             docker build -t dstoffels/indietour-api:$BUILD_NUMBER .
+        //             """
+        //         }
+        //     }
+        // }
 
-        stage("Push Docker Image"){
-            steps{
-                withCredentials([usernamePassword(credentialsId: 'personal-docker-hub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh """
-                    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
-                    docker push dstoffels/indietour-api:$BUILD_NUMBER
-                    docker tag dstoffels/indietour-api:$BUILD_NUMBER dstoffels/indietour-api:latest
-                    docker push dstoffels/indietour-api:latest
-                    """
-                }
-            }
-        }
+        // stage("Push Docker Image"){
+        //     steps{
+        //         withCredentials([usernamePassword(credentialsId: 'personal-docker-hub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+        //             sh """
+        //             docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+        //             docker push dstoffels/indietour-api:$BUILD_NUMBER
+        //             docker tag dstoffels/indietour-api:$BUILD_NUMBER dstoffels/indietour-api:latest
+        //             docker push dstoffels/indietour-api:latest
+        //             """
+        //         }
+        //     }
+        // }
 
         stage('Deploy to GCP') {
             steps{
                 withCredentials([sshUserPrivateKey(credentialsId: 'gcp-ssh-key', keyFileVariable: 'SSH_KEY')]) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} dan.stoffels@104.197.236.93 << EOF
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no -i $SSH_KEY danst@104.197.236.93 << EOF
 
                         if [-f docker-compose.yaml ]; then
                             docker-compose down
@@ -58,7 +58,7 @@ pipeline {
                         docker-compose up -d
 
                         EOF                    
-                        """ 
+                        ''' 
                 }
             }
         }
