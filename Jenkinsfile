@@ -43,7 +43,7 @@ pipeline {
         stage('Deploy to GCP') {
             steps{
                 withCredentials([sshUserPrivateKey(credentialsId: 'gcp-ssh-key', keyFileVariable: 'SSH_KEY'), file(credentialsId: 'indietour-api-env', variable: 'ENV')]) {
-                    // sh '''scp -i $SSH_KEY $ENV dan.stoffels@104.197.236.93:./.env'''
+                    sh '''sudo scp -i $SSH_KEY $ENV dan.stoffels@104.197.236.93:./.env'''
 
                     sh '''
                         ssh -o StrictHostKeyChecking=no -i $SSH_KEY dan.stoffels@104.197.236.93 <<'EOF'
