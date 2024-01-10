@@ -50,14 +50,11 @@ pipeline {
                             docker-compose down
                         fi
 
-
                         docker image prune -af
 
                         curl -o docker-compose.yaml https://raw.githubusercontent.com/dstoffels/indietour-api/main/docker-compose.yaml
 
-                        docker-compose up -d
-
-                        EOF                    
+                        docker-compose up -d                    
                         ''' 
                 }
             }
