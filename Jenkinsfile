@@ -44,7 +44,7 @@ pipeline {
             steps{
                 withCredentials([sshUserPrivateKey(credentialsId: 'gcp-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                        ssh -i $SSH_KEY dan.stoffels@104.197.236.93 << EOF
+                        ssh -i -t $SSH_KEY dan.stoffels@104.197.236.93 << EOF
 
                         if [-f docker-compose.yaml ]; then
                             docker-compose down
