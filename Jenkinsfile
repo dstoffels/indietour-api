@@ -27,9 +27,9 @@ pipeline {
             }
         }
 
-        stage("Push Latest Docker Image"){
+        stage("Push Docker Image"){
             steps{
-                withCredentials([usernamePassword(credentialsId: 'personal-docker-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'personal-docker-hub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh """
                     docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
                     docker push dstoffels/indietour-api:$BUILD_NUMBER
@@ -40,31 +40,30 @@ pipeline {
             }
         }
 
-        stage('Local Compose') {
-            steps {
-                sh "docker-compose -f docker-compose.yaml down"
-                sh "docker-compose -f docker-compose.yaml -p indietour-api up -d"
-            }
-        }
-
         stage('Deploy to GCP') {
             steps{
-                withCredentials([sshUserPrivateKey(credentialsId: 'gcp-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'gcp-ssh-key', keyFileVariable: 'SSH_KEY'), file(credentialsId: 'indietour-api-env', variable: 'ENV')]) {
                     sh '''
-                        ssh -i $SSH_KEY dan.stoffels@104.197.236.93 << EOF
+                        ssh -o StrictHostKeyChecking=no -i $SSH_KEY dan.stoffels@104.197.236.93 <<'EOF'
+                        if [ -f .env ]; then
+                            sudo rm .env
+                        fi
+                    '''
+                    
+                    sh '''scp -i $SSH_KEY $ENV dan.stoffels@104.197.236.93:./.env'''
 
-                        if [-f docker-compose.yaml ]; then
-                            docker-compose down
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no -i $SSH_KEY dan.stoffels@104.197.236.93 <<'EOF'
+
+                        if [ -f docker-compose.yaml ]; then
+                            sudo docker-compose down
                         fi
 
+                        sudo docker image prune -af
 
-                        docker image prune -af
+                        sudo curl -o docker-compose.yaml https://raw.githubusercontent.com/dstoffels/indietour-api/main/docker-compose.yaml
 
-                        curl -o docker-compose.yaml https://raw.githubusercontent.com/dstoffels/indietour-api/main/docker-compose.yaml
-
-                        docker-compose up -d
-
-                        EOF                    
+                        sudo docker-compose up -d                   
                         ''' 
                 }
             }
