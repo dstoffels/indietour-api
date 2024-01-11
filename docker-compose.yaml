@@ -1,42 +1,24 @@
 version: '3.1'
 services:
   db:
-    # build: ./db
     image: dstoffels/indietour-db:1
-    restart: always
     ports:
       - 3306:3306
     env_file:
       - .env
     volumes:
       - indietour-db:/var/lib/mysql
+    restart: always
 
   api:
-    # build: ./api
     image: dstoffels/indietour-api:latest
-    env_file:
-      - .env
     ports:
       - 80:8000
+    env_file:
+      - .env
     depends_on:
       - db
     restart: always
-
-  # certbot:
-  #   image: certbot/certbot
-  #   volumes:
-  #     - certbot:/etc/letsencrypt
-  #     - webroot:/var/www/html
-  #   entrypoint: certbot
-  #   command: certonly --webroot --webroot-path=/var/www/html --email your-email@example.com --agree-tos --no-eff-email --staging -d yourdomain.com -d www.yourdomain.com
-
-  # nginx:
-  #   image: nginx:alpine
-  #   ports:
-  #     - 80:80
-  #     - 443:443
-  #   depends_on:
-  #     - api
 
 volumes:
   indietour-db:
