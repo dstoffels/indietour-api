@@ -1,5 +1,6 @@
 #!/bin/sh
 
-openssl req -x509 -newkey rsa:4096 -keyout /etc/nginx/key.pem -out /etc/nginx/cert.pem -days 365 -nodes -subj '/CN=localhost'
+mkcert -install
+mkcert -key-file /etc/nginx/key.pem -cert-file /etc/nginx/cert.pem localhost
 
 exec nginx -g 'daemon off;'
