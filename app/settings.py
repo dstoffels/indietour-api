@@ -29,7 +29,7 @@ allowed_hosts = os.environ.get("ALLOWED_HOSTS")
 if allowed_hosts:
     ALLOWED_HOSTS = allowed_hosts.split(",")
 else:
-    ALLOWED_HOSTS = ["http://localhost:42069"]
+    ALLOWED_HOSTS = ["*", "http://localhost:42069"]
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = ["*", "http://localhost:42069"]
