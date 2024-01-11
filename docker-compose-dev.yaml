@@ -11,7 +11,6 @@ services:
       - indietour-db:/var/lib/mysql
 
   api:
-    # build: ./
     image: dstoffels/indietour-api-dev
     env_file:
       - .env
@@ -20,7 +19,6 @@ services:
     restart: always
 
   nginx:
-    # build: ./nginx/
     image: dstoffels/indietour-api-proxy
     ports:
       - 80:80
