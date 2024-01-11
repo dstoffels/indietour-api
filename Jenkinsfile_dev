@@ -30,6 +30,7 @@ pipeline {
         stage('Local Composition') {
             steps {
                 sh "docker-compose -f docker-compose-dev.yaml down"
+                sh "chmod +x ./nginx/init-nginx.sh"
                 sh "docker-compose -f docker-compose-dev.yaml -p indietour-api-dev up -d"
             }
         }
