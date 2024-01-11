@@ -2,7 +2,10 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from .serializers import RegistrationSerializer, UserSerializer, LoginSerializer
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
+from rest_framework_simplejwt.serializers import (
+    TokenObtainPairSerializer,
+    TokenRefreshSerializer,
+)
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.response import Response
@@ -31,11 +34,27 @@ class AuthCookieBaseView(generics.GenericAPIView):
     def set_cookies(self, response: Response, token_pair: dict):
         access = token_pair.get("access")
         access_expiry = datetime.utcnow() + settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"]
-        response.set_cookie("access", access, expires=access_expiry, httponly=True, secure=True, samesite="Strict")
+        response.set_cookie(
+            "access",
+            access,
+            expires=access_expiry,
+            httponly=True,
+            secure=True,
+            samesite="None",
+        )
 
         refresh = token_pair.get("refresh")
-        refresh_expiry = datetime.utcnow() + settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"]
-        response.set_cookie("refresh", refresh, expires=refresh_expiry, httponly=True, secure=True, samesite="Strict")
+        refresh_expiry = (
+            datetime.utcnow() + settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"]
+        )
+        response.set_cookie(
+            "refresh",
+            refresh,
+            expires=refresh_expiry,
+            httponly=True,
+            secure=True,
+            samesite="None",
+        )
 
 
 class LoginView(TokenObtainPairView, AuthCookieBaseView):
@@ -133,7 +152,10 @@ To verify, log in to your account at indietour.app/login and you will be directe
             fail_silently=False,
         )
         return Response(
-            {"detail": f"An email with a new verification code has been sent to {user.email}. "}, status=200
+            {
+                "detail": f"An email with a new verification code has been sent to {user.email}. "
+            },
+            status=200,
         )
 
     def post(self, request: Request, *args, **kwargs):
@@ -144,7 +166,9 @@ To verify, log in to your account at indietour.app/login and you will be directe
             user.save()
             token_pair = self.get_token_pair(user)
             return self.get_response(user, token_pair)
-        raise ValidationError({"detail": "Invalid verification code", "code": "BAD_CREDENTIALS"})
+        raise ValidationError(
+            {"detail": "Invalid verification code", "code": "BAD_CREDENTIALS"}
+        )
 
 
 class UserPasswordView(generics.CreateAPIView, AuthCookieBaseView):
@@ -162,4 +186,6 @@ class UserPasswordView(generics.CreateAPIView, AuthCookieBaseView):
             token_pair = self.get_token_pair(user)
             return self.get_response(user, token_pair)
 
-        raise ValidationError({"detail": "Invalid credentials", "code": "BAD_CREDENTIALS"})
+        raise ValidationError(
+            {"detail": "Invalid credentials", "code": "BAD_CREDENTIALS"}
+        )
