@@ -26,9 +26,6 @@ services:
     depends_on:
       - api
     restart: always
-    volumes:
-      - ./nginx/ssl/localhost.pem:/etc/nginx/cert.pem
-      - ./nginx/ssl/localhost-key.pem:/etc/nginx/key.pem
 
 volumes:
   indietour-db:
