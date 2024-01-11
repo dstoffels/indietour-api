@@ -1,7 +1,6 @@
 version: '3.1'
 services:
   db:
-    # build: ./db
     image: dstoffels/indietour-db:1
     restart: always
     ports:
@@ -12,17 +11,26 @@ services:
       - indietour-db:/var/lib/mysql
 
   api:
-    # build: ./api
+    build: ./
     image: dstoffels/indietour-api-dev:latest
     env_file:
       - .env
-    ports:
-      - 8000:8000
     depends_on:
       - db
     restart: always
-    # command: >
-    #   sh -c "python manage.py migrate && gunicorn -b 0.0.0.0 app.wsgi:application"
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - api
+    volumes:
+      - ./nginx/init-nginx.sh:/init-nginx.sh
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    entrypoint: ["/init-nginx.sh"]
+    restart: always
 
 volumes:
   indietour-db:
