@@ -31,7 +31,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    docker build -f /nginx -t dstoffels/indietour-api-proxy .
+                    docker build -f ./nginx/Dockerfile -t dstoffels/indietour-api-proxy .
                     """
                 }
             }
