@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
+from rest_framework_simplejwt.serializers import (
+    TokenObtainPairSerializer,
+    TokenRefreshSerializer,
+)
 from django.contrib.auth.password_validation import validate_password
 from .models import User
 from django.conf import settings
@@ -16,9 +19,15 @@ class LoginSerializer(serializers.Serializer):
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True, validators=[UniqueValidator(queryset=User.objects.all())])
-    username = serializers.CharField(required=True, validators=[UniqueValidator(queryset=User.objects.all())])
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    email = serializers.EmailField(
+        required=True, validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    username = serializers.CharField(
+        required=True, validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    password = serializers.CharField(
+        write_only=True, required=True, validators=[validate_password]
+    )
 
     class Meta:
         model = User
@@ -51,7 +60,10 @@ class UserSerializer(serializers.ModelSerializer):
 
         band: Band = Band.objects.filter(id=user.active_band_id).first()
         print(bool(band))
-        return bool(band) and (band.owner == user or bool(band.bandusers.filter(user=user, is_admin=True).first()))
+        return bool(band) and (
+            band.owner == user
+            or bool(band.bandusers.filter(user=user, is_admin=True).first())
+        )
 
     is_tour_admin = serializers.SerializerMethodField()
 
@@ -60,7 +72,8 @@ class UserSerializer(serializers.ModelSerializer):
 
         tour: Tour = Tour.objects.filter(id=user.active_tour_id).first()
         return bool(tour) and (
-            tour.band.owner == user or bool(tour.tourusers.filter(banduser__user=user, is_admin=True).first())
+            tour.band.owner == user
+            or bool(tour.tourusers.filter(banduser__user=user, is_admin=True).first())
         )
 
     class Meta:
@@ -77,4 +90,7 @@ class UserSerializer(serializers.ModelSerializer):
             "show_archived_bands",
             "show_archived_tours",
             "show_past_dates",
+            "show_dates_list",
+            "show_schedule_list",
+            "booking_mode",
         )

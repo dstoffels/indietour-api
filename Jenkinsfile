@@ -73,7 +73,7 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: 'api-ssh-key', keyFileVariable: 'SSH_KEY'), file(credentialsId: 'indietour-api-env', variable: 'ENV')]) {
                     sh """
                         ssh -o StrictHostKeyChecking=no -i $SSH_KEY dan.stoffels@104.197.236.93 <<'EOF'
-                        docker image prune -f
+                        sudo docker image prune -f
                     """
                 }
 
