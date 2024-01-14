@@ -17,21 +17,11 @@ pipeline {
             }
         }
 
-        stage('Build api Image') {
+        stage('Build API Image') {
             steps {
                 script {
                     sh """
                     docker build -t dstoffels/indietour-api-dev .
-                    """
-                }
-            }
-        }
-
-        stage('Build nginx Image') {
-            steps {
-                script {
-                    sh """
-                    docker build -f ./nginx/Dockerfile -t dstoffels/indietour-api-proxy .
                     """
                 }
             }
