@@ -36,6 +36,7 @@ class DateSerializer(BaseSerializer):
             "lodgings",
             "contacts",
             "tour_id",
+            "is_show_day",
         )
 
     place = PlaceSerializer(read_only=True)
@@ -47,7 +48,9 @@ class DateSerializer(BaseSerializer):
 
     def get_timeslots(self, date):
         timeslots = Timeslot.objects.filter(date=date).order_by("start_time")
-        return TimeslotSerializer(timeslots, read_only=True, many=True, context=self.context).data
+        return TimeslotSerializer(
+            timeslots, read_only=True, many=True, context=self.context
+        ).data
 
     def create(self, validated_data: dict):
         tour_id = self.path_vars.tour_id
@@ -55,10 +58,17 @@ class DateSerializer(BaseSerializer):
         validated_data["tour_id"] = tour_id
         duplicate = (
             status == "CONFIRMED"
-            and Date.objects.filter(tour_id=tour_id, date=validated_data.get("date"), status="CONFIRMED").first()
+            and Date.objects.filter(
+                tour_id=tour_id, date=validated_data.get("date"), status="CONFIRMED"
+            ).first()
         )
         if duplicate:
-            raise ValidationError({"details": "Cannot have duplicate dates in a tour.", "code": "DUPLICATE"})
+            raise ValidationError(
+                {
+                    "details": "Cannot have duplicate dates in a tour.",
+                    "code": "DUPLICATE",
+                }
+            )
 
         ser = PlaceSerializer(data=validated_data, context=self.context)
         ser.is_valid()

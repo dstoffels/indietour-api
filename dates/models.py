@@ -3,17 +3,33 @@ from core.models import UUIDModel
 
 
 class Date(UUIDModel):
-    STATUS_CHOICES = ("PROSPECT", "INQUIRED", "HOLD", "CHALLENGED", "RELEASED", "OPTION", "CONFIRMED", "CANCELLED")
+    STATUS_CHOICES = (
+        "PROSPECT",
+        "INQUIRED",
+        "HOLD",
+        "CHALLENGED",
+        "RELEASED",
+        "OPTION",
+        "CONFIRMED",
+        "CANCELLED",
+    )
 
-    tour = models.ForeignKey("tours.Tour", on_delete=models.CASCADE, related_name="dates")
+    tour = models.ForeignKey(
+        "tours.Tour", on_delete=models.CASCADE, related_name="dates"
+    )
     date = models.DateField()
-    place = models.ForeignKey("places.Place", on_delete=models.DO_NOTHING, null=True, related_name="dates")
+    place = models.ForeignKey(
+        "places.Place", on_delete=models.DO_NOTHING, null=True, related_name="dates"
+    )
     title = models.CharField(max_length=255, blank=True)
     notes = models.TextField(blank=True)
     status = models.CharField(
-        max_length=30, default=STATUS_CHOICES[0], choices=[(choice, choice) for choice in STATUS_CHOICES]
+        max_length=30,
+        default=STATUS_CHOICES[0],
+        choices=[(choice, choice) for choice in STATUS_CHOICES],
     )
     hold = models.IntegerField(default=0)
+    is_show_day = models.BooleanField(default=False)
 
     contacts = models.ManyToManyField(to="contacts.Contact", related_name="dates")
     # venues = models.ManyToManyField(to="venues.Venue", through="dates.Show", related_name="dates")
