@@ -40,7 +40,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to GCP') {
+        stage('Deploy') {
             steps{
                 withCredentials([sshUserPrivateKey(credentialsId: 'api-ssh-key', keyFileVariable: 'SSH_KEY'), file(credentialsId: 'indietour-api-env', variable: 'ENV')]) {
                     sh '''
@@ -50,7 +50,8 @@ pipeline {
                         fi
                     '''
                     
-                    sh '''scp -i $SSH_KEY $ENV dan.stoffels@104.197.236.93:./.env'''
+                    sh "scp -i $SSH_KEY $ENV dan.stoffels@104.197.236.93:./.env"
+                    sh "scp -i $SSH_KEY docker-compose.yaml dan.stoffels@104.197.236.93:./docker-compose.yaml"
 
                     sh '''
                         ssh -o StrictHostKeyChecking=no -i $SSH_KEY dan.stoffels@104.197.236.93 <<'EOF'
@@ -59,9 +60,7 @@ pipeline {
                             sudo docker-compose down
                         fi
 
-                        sudo docker image prune -af
-
-                        sudo curl -o docker-compose.yaml https://raw.githubusercontent.com/dstoffels/indietour-api/main/docker-compose.yaml
+                        sudo docker-compose pull
 
                         sudo docker-compose up -d                   
                         ''' 
@@ -71,6 +70,13 @@ pipeline {
 
         stage("Clean Up"){
             steps{
+                withCredentials([sshUserPrivateKey(credentialsId: 'api-ssh-key', keyFileVariable: 'SSH_KEY'), file(credentialsId: 'indietour-api-env', variable: 'ENV')]) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no -i $SSH_KEY dan.stoffels@104.197.236.93 <<'EOF'
+                        docker image prune -f
+                    """
+                }
+
                 sh "docker image prune -f"
             }
         }
