@@ -10,7 +10,17 @@ from core.utils import retrieve_or_404
 class ShowSerializer(BaseSerializer):
     class Meta:
         model = Show
-        fields = ("id", "venue", "venue_id", "deal", "hospitality", "notes", "date_id")
+        fields = (
+            "id",
+            "venue",
+            "venue_id",
+            "status",
+            "hold",
+            "deal",
+            "hospitality",
+            "notes",
+            "date_id",
+        )
 
     venue = VenueSerializer(read_only=True)
     venue_id = serializers.UUIDField(write_only=True)

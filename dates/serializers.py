@@ -29,8 +29,7 @@ class DateSerializer(BaseSerializer):
             "place_id",
             "title",
             "notes",
-            "status",
-            "hold",
+            "is_published",
             "shows",
             "timeslots",
             "lodgings",
@@ -40,7 +39,7 @@ class DateSerializer(BaseSerializer):
         )
 
     place = PlaceSerializer(read_only=True)
-    place_id = serializers.CharField(write_only=True)
+    place_id = serializers.CharField(write_only=True, required=False)
     shows = ShowSerializer(read_only=True, many=True)
     timeslots = serializers.SerializerMethodField()
     lodgings = LodgingSerializer(read_only=True, many=True)
