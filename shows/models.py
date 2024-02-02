@@ -20,8 +20,10 @@ class Show(UUIDModel):
     hospitality = models.TextField(default="", blank=True)
     notes = models.TextField(default="", blank=True)
 
+    log: models.QuerySet
+
 
 class LogEntry(UUIDModel):
-    date = models.ForeignKey(Show, on_delete=models.CASCADE)
+    show = models.ForeignKey(Show, on_delete=models.CASCADE, related_name="log")
     timestamp = models.DateTimeField(auto_now_add=True)
     note = models.TextField(default="")

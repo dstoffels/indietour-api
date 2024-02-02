@@ -8,6 +8,7 @@ from core.views import BaseAPIView
 from core.query_params import BooleanQueryParam, ListQueryParam, QueryParam
 from django.db.models import Q
 from contacts.models import Contact
+import re
 
 
 class VenueCollectionView(generics.ListCreateAPIView, BaseAPIView):
@@ -15,11 +16,19 @@ class VenueCollectionView(generics.ListCreateAPIView, BaseAPIView):
     permission_classes = (IsVerified,)
 
     def get_queryset(self):
-        venues = Venue.objects.filter(Q(public=True) | Q(creator=self.request.user)).order_by("place__name")
-        if self.name.value:
-            venues = venues.filter(place__name__icontains=self.name.value)
-        if self.location.value:
-            venues = venues.filter(place__formatted_address__icontains=self.location.value)
+        venues = Venue.objects.filter(Q(public=True) | Q(creator=self.request.user))
+
+        query = self.q.value
+        if query:
+            words = re.findall(r"\w+", query)
+            query = Q()
+
+            for word in words:
+                query |= Q(place__name__icontains=word) | Q(
+                    place__formatted_address__icontains=word
+                )
+
+            venues = venues.filter(query)
         if self.capacity.value:
             venues = venues.filter(capacity__lte=self.capacity.value)
         if self.type.value:
@@ -28,11 +37,18 @@ class VenueCollectionView(generics.ListCreateAPIView, BaseAPIView):
         return venues
 
     def get_query_params(self):
-        return [QueryParam("name"), QueryParam("location"), QueryParam("capacity"), QueryParam("type")]
+        return [
+            QueryParam("q"),
+            QueryParam("name"),
+            QueryParam("location"),
+            QueryParam("capacity"),
+            QueryParam("type"),
+        ]
 
     def init_query_params(self, request: Request):
         super().init_query_params(request)
 
+        self.q: QueryParam
         self.name: QueryParam
         self.location: QueryParam
         self.capacity: QueryParam
@@ -83,11 +99,15 @@ class VenueContactView(generics.CreateAPIView, generics.DestroyAPIView, BaseAPIV
         contact = Contact.objects.get(id=self.path_vars.contact_id)
         if not venue.contacts.contains(contact):
             venue.contacts.add(contact)
-        return Response(VenueSerializer(venue, context=self.get_serializer_context()).data, 201)
+        return Response(
+            VenueSerializer(venue, context=self.get_serializer_context()).data, 201
+        )
 
     def delete(self, request, *args, **kwargs):
         venue = Venue.objects.get(id=self.path_vars.venue_id)
         contact = Contact.objects.get(id=self.path_vars.contact_id)
         if venue.contacts.contains(contact):
             venue.contacts.remove(contact)
-        return Response(VenueSerializer(venue, context=self.get_serializer_context()).data, 200)
+        return Response(
+            VenueSerializer(venue, context=self.get_serializer_context()).data, 200
+        )

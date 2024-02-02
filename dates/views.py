@@ -1,6 +1,6 @@
 from rest_framework import generics
 from rest_framework.request import Request
-from .serializers import Date, DateSerializer, LogEntry, LogEntrySerializer
+from .serializers import Date, DateSerializer
 from tours.permissions import IsTourUser, IsTourAdmin
 from core.views import BaseAPIView
 from core.query_params import (
@@ -72,19 +72,3 @@ class DateContactView(generics.DestroyAPIView, generics.CreateAPIView, BaseDates
         contact = Contact.objects.filter(id=self.path_vars.contact_id).first()
         date.contacts.remove(contact)
         return self.date_response()
-
-
-class DateLogView(generics.ListCreateAPIView, BaseAPIView):
-    serializer_class = LogEntrySerializer
-
-    def get_queryset(self):
-        return LogEntry.objects.filter(date_id=self.path_vars.date_id).order_by(
-            "timestamp"
-        )
-
-
-class LogEntryView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
-    model = LogEntry
-    serializer_class = LogEntrySerializer
-    lookup_field = "id"
-    lookup_url_kwarg = "logentry_id"

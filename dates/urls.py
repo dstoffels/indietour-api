@@ -6,8 +6,6 @@ from lodgings.views import LodgingsView
 
 urlpatterns = [
     path("/<date_id>", views.DateView.as_view()),
-    path("/<date_id>/logentries", views.DateLogView.as_view()),
-    path("/<date_id>/logentries/<logentry_id>", views.LogEntryView.as_view()),
     path("/<date_id>/contacts/<contact_id>", views.DateContactView.as_view()),
     path("/<date_id>/shows", ShowsView.as_view()),
     path("/<date_id>/timeslots", TimeslotsView.as_view()),
