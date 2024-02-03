@@ -2,10 +2,6 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from .serializers import RegistrationSerializer, UserSerializer, LoginSerializer
-from rest_framework_simplejwt.serializers import (
-    TokenObtainPairSerializer,
-    TokenRefreshSerializer,
-)
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.response import Response
@@ -145,7 +141,7 @@ class UserVerifyView(generics.CreateAPIView, AuthCookieBaseView):
             f"""Verify your email address so we know it’s really you.
 Your email verification code is: {user.verification_code}
 
-To verify, log in to your account at indietour.app/login and you will be directed to enter your verification code.
+To verify, log in to your account at indietour.org and you will be directed to enter your verification code.
 """,
             settings.EMAIL_HOST,
             [user.email],

@@ -7,16 +7,8 @@ from lodgings.serializers import LodgingSerializer
 from places.serializers import PlaceSerializer, Place
 from core.serializers import BaseSerializer
 from core.query_params import BooleanQueryParam, ListQueryParam
-from .models import Date, LogEntry
+from .models import Date
 from shows.serializers import ShowSerializer
-
-
-class LogEntrySerializer(BaseSerializer):
-    parent_url_kwarg = "date_id"
-
-    class Meta:
-        model = LogEntry
-        fields = "id", "timestamp", "note"
 
 
 class DateSerializer(BaseSerializer):
@@ -29,8 +21,7 @@ class DateSerializer(BaseSerializer):
             "place_id",
             "title",
             "notes",
-            "status",
-            "hold",
+            "is_published",
             "shows",
             "timeslots",
             "lodgings",
@@ -40,7 +31,7 @@ class DateSerializer(BaseSerializer):
         )
 
     place = PlaceSerializer(read_only=True)
-    place_id = serializers.CharField(write_only=True)
+    place_id = serializers.CharField(write_only=True, required=False)
     shows = ShowSerializer(read_only=True, many=True)
     timeslots = serializers.SerializerMethodField()
     lodgings = LodgingSerializer(read_only=True, many=True)

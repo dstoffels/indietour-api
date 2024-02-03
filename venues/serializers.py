@@ -22,7 +22,9 @@ class VenueNoteSerializer(BaseSerializer):
     def create(self, validated_data):
         exisiting_note = VenueNote.objects.filter(user=self.user).first()
         if exisiting_note:
-            raise ValidationError({"detail": "Only one venue note allowed per user.", "code": "DUPLICATE"})
+            raise ValidationError(
+                {"detail": "Only one venue note allowed per user.", "code": "DUPLICATE"}
+            )
         validated_data["venue_id"] = self.path_vars.venue_id
         validated_data["user"] = self.user
         return super().create(validated_data)
@@ -31,16 +33,30 @@ class VenueNoteSerializer(BaseSerializer):
 class VenueSerializer(BaseSerializer):
     class Meta:
         model = Venue
-        fields = "id", "place", "creator", "capacity", "type", "place_id", "note", "public", "contacts", "show_count"
+        fields = (
+            "id",
+            "place",
+            "creator",
+            "capacity",
+            "type",
+            "place_id",
+            "note",
+            "public",
+            "contacts",
+            "show_count",
+        )
 
     place = PlaceSerializer(read_only=True)
     place_id = serializers.CharField(write_only=True)
+    type = serializers.CharField(required=False, default="Other")
     capacity = serializers.IntegerField(required=False, default=0)
     creator = serializers.SerializerMethodField()
     contacts = serializers.SerializerMethodField()
 
     def get_contacts(self, venue: Venue):
-        return ContactSerializer(venue.contacts.filter(owner=self.user), many=True, context=self.context).data
+        return ContactSerializer(
+            venue.contacts.filter(owner=self.user), many=True, context=self.context
+        ).data
 
     show_count = serializers.SerializerMethodField()
 

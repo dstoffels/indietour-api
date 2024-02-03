@@ -7,5 +7,8 @@ class RequestMiddleware:
         self.get_response = get_response
 
     def __call__(self, request: WSGIRequest):
+        if request.path_info.startswith("/admin"):
+            return self.get_response(request)
+
         request = Request(request.environ)
         return self.get_response(request)

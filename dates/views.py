@@ -1,10 +1,14 @@
 from rest_framework import generics
 from rest_framework.request import Request
-from rest_framework.response import Response
-from .serializers import Date, DateSerializer, LogEntry, LogEntrySerializer
+from .serializers import Date, DateSerializer
 from tours.permissions import IsTourUser, IsTourAdmin
 from core.views import BaseAPIView
-from core.query_params import ListQueryParam, BooleanQueryParam, QueryParam, DateQueryParam
+from core.query_params import (
+    ListQueryParam,
+    BooleanQueryParam,
+    QueryParam,
+    DateQueryParam,
+)
 from contacts.serializers import Contact
 from rest_framework.exceptions import ValidationError
 
@@ -12,9 +16,11 @@ from rest_framework.exceptions import ValidationError
 class BaseDatesView(BaseAPIView):
     def get_query_params(self) -> list[QueryParam]:
         return [
-            ListQueryParam("include", ["all", "timeslots", "contacts", "shows", "lodgings"]),
+            ListQueryParam(
+                "include", ["all", "timeslots", "contacts", "shows", "lodgings"]
+            ),
             BooleanQueryParam("past_dates"),
-            ListQueryParam("status", [choice.lower() for choice in Date.STATUS_CHOICES]),
+            BooleanQueryParam("all_dates"),
             DateQueryParam("request_date"),
         ]
 
@@ -31,15 +37,16 @@ class DatesView(generics.ListCreateAPIView, BaseDatesView):
         tourdates = Date.objects.filter(tour_id=self.path_vars.tour_id).order_by("date")
         if self.past_dates.is_invalid():
             tourdates = tourdates.filter(date__gte=self.request_date.value)
-        if self.status.has_values():
-            tourdates = tourdates.filter(status__in=self.status.value)
+        if self.all_dates.is_invalid():
+            tourdates = tourdates.filter(is_published=True)
+
         return tourdates
 
     def init_query_params(self, request: Request):
         super().init_query_params(request)
         self.include: ListQueryParam
         self.past_dates: BooleanQueryParam
-        self.status: ListQueryParam
+        self.all_dates: BooleanQueryParam
         self.request_date: DateQueryParam
 
 
@@ -65,22 +72,3 @@ class DateContactView(generics.DestroyAPIView, generics.CreateAPIView, BaseDates
         contact = Contact.objects.filter(id=self.path_vars.contact_id).first()
         date.contacts.remove(contact)
         return self.date_response()
-
-
-class DateLogView(generics.ListCreateAPIView, BaseAPIView):
-    serializer_class = LogEntrySerializer
-
-    def get_queryset(self):
-        return LogEntry.objects.filter(date_id=self.path_vars.date_id).order_by("timestamp")
-
-
-class LogEntryView(generics.RetrieveUpdateDestroyAPIView, BaseAPIView):
-    model = LogEntry
-    serializer_class = LogEntrySerializer
-    lookup_field = "id"
-    lookup_url_kwarg = "logentry_id"
-
-
-class DateStatusView(generics.RetrieveAPIView, BaseAPIView):
-    def get(self, request, *args, **kwargs):
-        return Response(data=Date.STATUS_CHOICES)

@@ -25,18 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 
-# allowed_hosts = os.environ.get("ALLOWED_HOSTS")
-# if allowed_hosts:
-#     ALLOWED_HOSTS = allowed_hosts.split(",")
-# else:
-#     ALLOWED_HOSTS = ["*", "localhost"]
-
-# allowed_hosts = os.environ.get("CORS_ALLOWED_ORIGINS")
-# if allowed_hosts:
-#     CORS_ALLOWED_ORIGINS = allowed_hosts.split(",")
-# else:
-#     CORS_ALLOWED_ORIGINS = ["*", "http://localhost:42069"]
-ALLOWED_HOSTS = ["indietour.org", "104.197.236.93", "localhost"]
+ALLOWED_HOSTS = ["indietour.org", "localhost"]
 CORS_ALLOWED_ORIGINS = ["https://indietour.org", "http://localhost:42069"]
 
 CORS_ALLOW_CREDENTIALS = True
