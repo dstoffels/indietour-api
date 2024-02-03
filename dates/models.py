@@ -13,6 +13,7 @@ class Date(UUIDModel):
     title = models.CharField(max_length=255, blank=True)
     notes = models.TextField(blank=True)
     is_published = models.BooleanField(default=False)
+
     is_show_day = models.BooleanField(default=False)
 
     contacts = models.ManyToManyField(to="contacts.Contact", related_name="dates")
