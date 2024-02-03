@@ -3,11 +3,18 @@ from core.models import UUIDModel
 
 
 class Tour(UUIDModel):
-    name = models.CharField(max_length=255, error_messages={"unique": "Name must be unique."})
-    band = models.ForeignKey("bands.Band", on_delete=models.CASCADE, related_name="tours")
+    name = models.CharField(
+        max_length=255, error_messages={"unique": "Name must be unique."}
+    )
+    band = models.ForeignKey(
+        "bands.Band", on_delete=models.CASCADE, related_name="tours"
+    )
     is_archived = models.BooleanField(default=False)
     tourusers: models.QuerySet
     dates: models.QuerySet
+
+    class Meta:
+        unique_together = "band", "name"
 
     def __str__(self) -> str:
         return f"Tour: {self.name} (band: {self.band.name})"

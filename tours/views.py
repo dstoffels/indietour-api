@@ -7,6 +7,7 @@ from bands.permissions import IsBandAdmin, IsBandUser, IsBandOwner
 from core.views import BaseAPIView
 from core.query_params import BooleanQueryParam, ListQueryParam, QueryParam
 from django.db.models import Q
+from django.db.utils import IntegrityError
 
 
 class BaseTourView(BaseAPIView):
@@ -30,7 +31,8 @@ class ToursView(generics.ListCreateAPIView, BaseTourView):
     def get_queryset(self):
         tours = (
             Tour.objects.filter(
-                Q(band_id=self.path_vars.band_id) & Q(band__owner=self.user) | Q(tourusers__banduser__user=self.user)
+                Q(band_id=self.path_vars.band_id) & Q(band__owner=self.user)
+                | Q(tourusers__banduser__user=self.user)
             )
             .order_by("name")
             .order_by("name")

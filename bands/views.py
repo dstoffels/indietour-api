@@ -2,13 +2,20 @@ from rest_framework import generics
 from rest_framework.request import Request
 from rest_framework.response import Response
 from authentication.models import User
-from .serializers import BandSerializer, BandsSerializer, Band, BandUserSerializer, BandUser
+from .serializers import (
+    BandSerializer,
+    BandsSerializer,
+    Band,
+    BandUserSerializer,
+    BandUser,
+)
 from core.permissions import IsVerified
 from .permissions import IsBandUser, IsBandAdmin, IsBandOwner
 from django.shortcuts import get_object_or_404
 from core.views import BaseAPIView
 from core.query_params import BooleanQueryParam, QueryParam
 from django.db.models import Q
+from django.db.utils import IntegrityError
 
 
 class BaseBandView(BaseAPIView):
@@ -41,6 +48,12 @@ class BandsView(generics.ListCreateAPIView, BaseBandView):
         self.archived_tours: QueryParam
         self.include: QueryParam
         super().init_query_params(request)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            return super().post(request, *args, **kwargs)
+        except IntegrityError as e:
+            return Response({"detail": "Cannot have duplicate bands."}, 400)
 
 
 class BandView(generics.RetrieveUpdateDestroyAPIView, BaseBandView):
