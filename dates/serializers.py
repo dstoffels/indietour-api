@@ -56,14 +56,10 @@ class DateSerializer(BaseSerializer):
         if duplicate:
             raise ValidationError(
                 {
-                    "details": "Cannot have duplicate dates in a tour.",
+                    "detail": "Cannot have duplicate dates in a tour.",
                     "code": "DUPLICATE",
                 }
             )
-
-        ser = PlaceSerializer(data=validated_data, context=self.context)
-        ser.is_valid()
-        ser.save()
 
         return super().create(validated_data)
 
