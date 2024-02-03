@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from core.query_params import QueryParamsManager
 from core.path_vars import PathVars
+from authentication.models import User
 
 
 class BaseSerializer(serializers.ModelSerializer):
@@ -9,7 +10,7 @@ class BaseSerializer(serializers.ModelSerializer):
 
     def is_valid(self, *, raise_exception=True):
         request = self.context.get("request")
-        self.user = request.user
+        self.user: User = request.user
         self.query_params = self.context.get("query_params")
         return super().is_valid(raise_exception=raise_exception)
 

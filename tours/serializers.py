@@ -37,7 +37,9 @@ class TourUserSerializer(BaseSerializer):
         touruser = TourUser.objects.filter(tour_id=tour_id, banduser=banduser).first()
         if not touruser:
             touruser = TourUser.objects.create(
-                tour_id=tour_id, banduser=banduser, is_admin=validated_data.get("is_admin")
+                tour_id=tour_id,
+                banduser=banduser,
+                is_admin=validated_data.get("is_admin"),
             )
         return touruser
 
@@ -62,9 +64,13 @@ class TourSerializer(BaseSerializer):
 
     def create(self, validated_data: dict):
         validated_data["band_id"] = self.context.get("band_id")
-        duplicate = Tour.objects.filter(band_id=validated_data.get("band_id"), name=validated_data.get("name")).first()
+        duplicate = Tour.objects.filter(
+            band_id=validated_data.get("band_id"), name=validated_data.get("name")
+        ).first()
         if duplicate:
-            raise ValidationError({"details": "Cannot have duplicate tours.", "code": "DUPLICATE"})
+            raise ValidationError(
+                {"detail": "Cannot have duplicate tours.", "code": "DUPLICATE"}
+            )
         return super().create(validated_data)
 
     def init_query_params(self):
