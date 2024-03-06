@@ -61,11 +61,15 @@ class SearchView(generics.RetrieveAPIView, BaseAPIView):
     permission_classes = (IsVerified,)
 
     def get_query_params(self):
-        return [QueryParam("query")]
+        return [QueryParam("query"), QueryParam("pagetoken")]
 
     def get(self, request, *args, **kwargs):
         query = self.query_params.get("query").value
+        pagetoken = self.query_params.get("pagetoken").value
+
+        pagetoken = f"&pagetoken={pagetoken}" if pagetoken else ""
+
         response = requests.get(
-            f"{GAPI_BASE_URL}/place/textsearch/json?key={os.getenv('GOOGLE_API_KEY')}&inputtype=textquery&query={query}"
+            f"{GAPI_BASE_URL}/place/textsearch/json?key={os.getenv('GOOGLE_API_KEY')}&inputtype=textquery&query={query}{pagetoken}"
         )
         return Response(response.json())
